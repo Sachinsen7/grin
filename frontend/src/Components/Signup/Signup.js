@@ -88,7 +88,7 @@ export default function LoginCard({ toadd, hide, position }) {
                 >
                     <h4 style={{
                         fontSize: '2rem',
-                        color: '#fff',
+                        color: '#000',
                         fontWeight: 'bold',
                         marginBottom: '20px',
                     }}>{position}</h4>
@@ -103,9 +103,9 @@ export default function LoginCard({ toadd, hide, position }) {
                                 border: 'none',
                                 borderRadius: '18px',
                                 outline: 'none',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                color: '#fff',
-                                caretColor: '#fff',
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                color: '#000',
+                                caretColor: '#000',
                                 transition: 'background-color 0.3s ease',
                             }}
                             required
@@ -129,9 +129,9 @@ export default function LoginCard({ toadd, hide, position }) {
                                 border: 'none',
                                 borderRadius: '18px',
                                 outline: 'none',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                color: '#fff',
-                                caretColor: '#fff',
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                color: '#000',
+                                caretColor: '#000',
                                 transition: 'background-color 0.3s ease',
                             }}
                             required
@@ -153,9 +153,9 @@ export default function LoginCard({ toadd, hide, position }) {
                                 border: 'none',
                                 borderRadius: '18px',
                                 outline: 'none',
-                                backgroundColor: 'rgba(255, 255, 255, 0.1)',
-                                color: '#fff',
-                                caretColor: '#fff',
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                color: '#000',
+                                caretColor: '#000',
                                 transition: 'background-color 0.3s ease',
                             }}
                             required
@@ -173,7 +173,7 @@ export default function LoginCard({ toadd, hide, position }) {
                         // className={style.Button}
                         style={{
                             width: '100%',
-                            backgroundColor: 'rgba(218, 216, 224, 0.8)',
+                            backgroundColor: 'rgba(57, 26, 147, 0.8)',
                             color: 'white',
                             border: 'none',
                             borderRadius: '28px',

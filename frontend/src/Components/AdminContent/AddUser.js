@@ -257,6 +257,7 @@ export default function Admin() {
       {isModalOpen && (
         <div style={{
             position: 'fixed',
+            color: 'black',
             top: '0%',
             left: '0%',
             width: '100%',
@@ -268,11 +269,12 @@ export default function Admin() {
             zIndex: 1000,
         }}>
           <div style={{
-              backgroundColor: 'rgba(218, 216, 224, 0.6)',
+              backgroundColor: 'rgba(218, 216, 224)',
               borderRadius: '20px',
               width: '90%',
               maxWidth: '400px',
               position: 'relative',
+              color: 'black',
           }}>
             <FaTimes
               style={{
