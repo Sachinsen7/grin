@@ -1,79 +1,99 @@
-import React from 'react'
+import React from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { RxHamburgerMenu } from "react-icons/rx";
+import { RxHamburgerMenu } from 'react-icons/rx';
 
 export default function LogOutComponent() {
-  const [sidebar, setSidebar] = useState(true)
+  const [sidebar, setSidebar] = useState(true);
   const navigate = useNavigate();
 
   const handleClick = () => {
-    setSidebar(!sidebar)
-  }
+    const newState = !sidebar;
+    setSidebar(newState);
+    try {
+      if (!newState) {
+        document.body.classList.add('sidebar-visible');
+      } else {
+        document.body.classList.remove('sidebar-visible');
+      }
+    } catch (e) {
+      // ignore in non-browser environments
+    }
+  };
+
   const handleLogOut = () => {
-    localStorage.removeItem('authToken')
-    localStorage.removeItem('userRole')
-    navigate('/')
-  }
+    // Reset sidebar to closed state (original position)
+    setSidebar(true);
+    // Remove sidebar-visible class to reset body and content positioning
+    try {
+      document.body.classList.remove('sidebar-visible');
+    } catch (e) {
+      // ignore in non-browser environments
+    }
+    // Clear auth tokens and navigate to home
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userRole');
+    navigate('/');
+  };
 
   return (
-    <div
-    
-    >
+    <div>
+      {/* Toggle button - fixed position, does not translate */}
       <div
-        style={{
-          width: "10vw",
-          maxWidth: "200px",
-          textAlign: 'center',
-          minWidth: "130px",
-          position: "fixed",
-          top: "10px", left: "0px",
-          padding: "10px",
-          zIndex: '1000',
-          backgroundColor: sidebar ? '' : 'blue',
-          color: sidebar ? '' : 'white',
-          display: "flex",
-          justifyContent: "center",
-          transform: sidebar ? 'translateX(-10px)' : 'translateX(0)',
-          transition: 'transform 0.3s ease', // Specifies a smooth transition
-        }}
-
         onClick={handleClick}
-      ><RxHamburgerMenu />
+        style={{
+          width: '48px',
+          height: '48px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          position: 'fixed',
+          top: '10px',
+          left: '10px',
+          padding: '6px',
+          zIndex: 1100,
+          backgroundColor: '#0a64d6',
+          color:  '#fff',
+          borderRadius: '6px',
+          cursor: 'pointer',
+        }}
+        aria-label="Toggle sidebar"
+      >
+        <RxHamburgerMenu />
       </div>
+
+      {/* Sidebar content - fixed and compact when visible */}
       <div
         style={{
-          width: "10vw",
-          minWidth: "130px",
-          maxWidth: "200px",
-          backgroundColor: "white",
-          height: "100vh",      // Covers the full viewport height
-          position: "fixed",    // Use fixed to keep it pinned to the viewport
-          left: "0px",
-          top: "0px",           // Start at the top of the viewport
+          width: sidebar ? 0 : '400px',
+          minWidth: sidebar ? 0 : '200px',
+          maxWidth: sidebar ? 0 : '90px',
+          backgroundColor: '#fff',
+          height: '100vh',
+          position: 'fixed',
+          margin: 0,
+          left: 0,
+          top: 0,
           display: sidebar ? 'none' : 'block',
-          overflow: "hidden",   // Prevents scrolling inside the div
-          zIndex: "900",
-          textAlign: "center",
-          border: "1px solid #ccc",
-          borderRadius: '4px'
-
-        }}>
-        <button style={{
-
-
-          position: "relative",
-          margin: " auto",
-          color: "black",
-          top: "50px",
-
-
+          overflow: 'hidden',
+          zIndex: 1000,
+          textAlign: 'center',
+          borderRight: '1px solid #e0e0e0',
         }}
+      >
+        <button
           onClick={handleLogOut}
-        >LogOut</button>
-
+          style={{
+            marginTop: '15px',
+            display: 'block',
+            marginLeft: '60px',
+            marginRight: 'auto',
+            backgroundColor: '#1ed1cbff',
+          }}
+        >
+          LogOut
+        </button>
       </div>
-
     </div>
-  )
+  );
 }

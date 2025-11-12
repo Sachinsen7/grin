@@ -1,11 +1,12 @@
 /* InputForm.module.css */
 .form {
-    margin: 20px;
-    padding: 20px;
+    margin: clamp(12px, 3vw, 20px);
+    padding: clamp(12px, 3vw, 20px);
     border: 1px solid #ccc;
     border-radius: 8px;
     display: flex;
     flex-direction: column;
+    box-sizing: border-box;
   }
   .forms{
     margin: 10px;
@@ -14,23 +15,38 @@
   
   .formRow {
     display: flex;
-    align-items: center;
-    margin-bottom: 16px;
+    align-items: left;
+    margin-bottom: clamp(10px, 2vw, 16px);
+    flex-wrap: wrap;
+    gap: clamp(6px, 2vw, 10px);
   }
   
   .label {
     font-weight: bold;
-    /* flex-grow: 1; */
     margin-right: 10px;
-    width: 150px; /* Set a fixed width to align labels */
+    width: 140px;
+    min-width: 140px;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    text-align: left;
   }
 .custom{
+  .formRow {
+    display: flex;
+    text-align: center;
+    align-items: center;
+    
+    flex-wrap: wrap;
+    gap: clamp(6px, 2vw, 10px);
+    justify-content: flex-start;
+  }
+  text-align: center;
   display: inline-block;
-  padding: 5px 15px;
+  padding: clamp(10px, 1vw, 10px) clamp(10px, 3vw, 5px);
   background-color: #407ab8;
   color: white;
   border-radius: 4px;
   cursor: pointer;
+  font-size: clamp(0.75rem, 1.8vw, 0.95rem);
   }
   
   .input {
@@ -39,16 +55,17 @@
     padding: 8px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    color: #000;
   }
   
   .button {
-    padding: 10px 20px;
-   
+    padding: clamp(8px, 2vw, 20px) clamp(8px, 3vw, 20px);
     background-color: rgba(218, 216, 224, 0.8);
     color: white;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    font-size: clamp(0.9rem, 2vw, 1rem);
   }
   
   .button:hover {
@@ -56,10 +73,13 @@
   }
   
   .dateInput {
-    padding: 8px;
-    margin-left: 10px;
+    padding: clamp(6px, 1.5vw, 8px);
+    margin-left: clamp(4px, 1vw, 10px);
     border: 1px solid #ccc;
     border-radius: 4px;
+    color: #000;
+    font-size: clamp(0.8rem, 2vw, 1rem);
+    box-sizing: border-box;
   }
   
   #btn {
@@ -68,5 +88,26 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
   }
-  
+
+@media screen and (max-width: 768px) {
+  .formRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .label {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+  .input {
+    width: 100%;
+  }
+  .dateInput {
+    width: 100%;
+    margin-left: 0;
+  }
+  .forms {
+    margin: clamp(8px, 2vw, 10px);
+  }
+}

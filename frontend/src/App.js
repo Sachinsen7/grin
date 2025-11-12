@@ -22,46 +22,47 @@ import InventoryView from './Pages/Inventory/InventoryView';
 import SupplierList from './Pages/SupplierList';
 import DropdownView from './Pages/DropdownView/DropdownView';
 
+
 function App() {
   return (
     <UserProvider>
       <Router>
         <SessionManager />
-        <Routes>
-        <Route path="/en" element={<EntriesTable />} />
-          <Route path="/" element={<Home />} />
-          
-          <Route path="/admin/log-in" element={<LoginCard value="Admin" />} />
-          <Route path="/gsn/log-in" element={<LoginCard value="GSN" />} />
-          <Route path="/attendee/log-in" element={<LoginCard value="GRIN" />} />
-          <Route path="/accountmanager/log-in" element={<LoginCard value="Account Manager" />} />
-          <Route path="/storemanager/log-in" element={<LoginCard value="Store Manager" />} />
-          <Route path="/generalmanager/log-in" element={<LoginCard value="General Manager" />} />
-          <Route path="/purchasemanager/log-in" element={<LoginCard value="Purchase Manager" />} />
-          <Route path="/auditor/log-in" element={<LoginCard value="Auditor" />} />
+        <div id="main-content">
+          <Routes>
+            <Route path="/en" element={<EntriesTable />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/admin/log-in" element={<LoginCard value="Admin" />} />
+            <Route path="/gsn/log-in" element={<LoginCard value="GSN" />} />
+            <Route path="/attendee/log-in" element={<LoginCard value="GRIN" />} />
+            <Route path="/accountmanager/log-in" element={<LoginCard value="Account Manager" />} />
+            <Route path="/storemanager/log-in" element={<LoginCard value="Store Manager" />} />
+            <Route path="/generalmanager/log-in" element={<LoginCard value="General Manager" />} />
+            <Route path="/purchasemanager/log-in" element={<LoginCard value="Purchase Manager" />} />
+            <Route path="/auditor/log-in" element={<LoginCard value="Auditor" />} />
 
-          {/* Private Routes */}
-          <Route path="/admin-dashboard" element={<PrivateRoute allowedRole="admin"><Admin /></PrivateRoute>} />
-          <Route path="/purchasemanager-dashboard" element={<PrivateRoute allowedRole="purchasemanager"><Purchasemanager /></PrivateRoute>} />
-          <Route path="/storemanager-dashboard" element={<PrivateRoute allowedRole="storemanager"><Storemanager /></PrivateRoute>} />
-          <Route path="/generalmanager-dashboard" element={<PrivateRoute allowedRole="generalmanager"><Generalmanager /></PrivateRoute>} />
-          <Route path="/accountmanager-dashboard" element={<PrivateRoute allowedRole="accountmanager"><Accountant /></PrivateRoute>} />
-          <Route path="/auditor-dashboard" element={<PrivateRoute allowedRole="auditor"><ApprovalSample managerType="Auditor" /></PrivateRoute>} />
-          <Route path="/attendee-dashboard" element={<PrivateRoute allowedRole="attendee"><GrinEntry /></PrivateRoute>} />
-          <Route path="/gsn-dashboard" element={<PrivateRoute allowedRole="GSN"><Gsn /></PrivateRoute>} />
-          <Route path="/grin-dashboard/entry" element={<PrivateRoute allowedRole="attendee"><Attendee /></PrivateRoute>} />
-          <Route path="/view-user" element={<PrivateRoute allowedRole="admin"><AddUser /></PrivateRoute>} />
-          <Route path="/view-form" element={<PrivateRoute allowedRole="admin"><ViewForm /></PrivateRoute>} />
-          <Route path="/grn" element={<PrivateRoute allowedRole="admin"><Grn /></PrivateRoute>} />
-          <Route path="/inventory-view" element={<PrivateRoute allowedRole="admin"><InventoryView /></PrivateRoute>} />
-          <Route path="/dropdown-view" element={<PrivateRoute allowedRole="admin"><DropdownView /></PrivateRoute>} />
-          {/* Supplier List Route */}
-          <Route path="/supplier-list" element={<SupplierList />} />
-         
+            {/* Private Routes */}
+            <Route path="/admin-dashboard" element={<PrivateRoute allowedRole="admin"><Admin /></PrivateRoute>} />
+            <Route path="/purchasemanager-dashboard" element={<PrivateRoute allowedRole="purchasemanager"><Purchasemanager /></PrivateRoute>} />
+            <Route path="/storemanager-dashboard" element={<PrivateRoute allowedRole="storemanager"><Storemanager /></PrivateRoute>} />
+            <Route path="/generalmanager-dashboard" element={<PrivateRoute allowedRole="generalmanager"><Generalmanager /></PrivateRoute>} />
+            <Route path="/accountmanager-dashboard" element={<PrivateRoute allowedRole="accountmanager"><Accountant /></PrivateRoute>} />
+            <Route path="/auditor-dashboard" element={<PrivateRoute allowedRole="auditor"><ApprovalSample managerType="Auditor" /></PrivateRoute>} />
+            <Route path="/attendee-dashboard" element={<PrivateRoute allowedRole="attendee"><GrinEntry /></PrivateRoute>} />
+            <Route path="/gsn-dashboard" element={<PrivateRoute allowedRole="GSN"><Gsn /></PrivateRoute>} />
+            <Route path="/grin-dashboard/entry" element={<PrivateRoute allowedRole="attendee"><Attendee /></PrivateRoute>} />
+            <Route path="/view-user" element={<PrivateRoute allowedRole="admin"><AddUser /></PrivateRoute>} />
+            <Route path="/view-form" element={<PrivateRoute allowedRole="admin"><ViewForm /></PrivateRoute>} />
+            <Route path="/grn" element={<PrivateRoute allowedRole="admin"><Grn /></PrivateRoute>} />
+            <Route path="/inventory-view" element={<PrivateRoute allowedRole="admin"><InventoryView /></PrivateRoute>} />
+            <Route path="/dropdown-view" element={<PrivateRoute allowedRole="admin"><DropdownView /></PrivateRoute>} />
+            {/* Supplier List Route */}
+            <Route path="/supplier-list" element={<SupplierList />} />
 
-          {/* 404 Fallback Route */}
-          <Route path="*" element={<h1>404 - Page Not Found</h1>} />
-        </Routes>
+            {/* 404 Fallback Route */}
+            <Route path="*" element={<h1>404 - Page Not Found</h1>} />
+          </Routes>
+        </div>
       </Router>
     </UserProvider>
   );

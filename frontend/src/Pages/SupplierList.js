@@ -38,8 +38,17 @@ export default function SupplierList() {
         return res.json();
       })
       .then(data => {
+        // Server wraps response as { success: true, data: [...] }
+        let suppliers = data;
+        if (data && data.data && Array.isArray(data.data)) {
+          suppliers = data.data;
+        } else if (!Array.isArray(suppliers)) {
+          console.error('Suppliers API returned unexpected format:', data);
+          throw new Error('Invalid suppliers data from server');
+        }
+        
         // Unique filter: only by partyName (ignore case and spaces)
-        const uniqueSuppliers = data.filter((supplier, index, self) => {
+        const uniqueSuppliers = suppliers.filter((supplier, index, self) => {
           const currName = (supplier.partyName || '').trim().toLowerCase();
           return index === self.findIndex(s =>
             (s.partyName || '').trim().toLowerCase() === currName

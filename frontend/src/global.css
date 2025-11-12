@@ -1,0 +1,36 @@
+/* Global responsive helper styles */
+
+/* When the sidebar is visible, shift the entire app to the right so the
+    sidebar doesn't overlap content and the layout feels responsive. */
+
+/* Shift main content using margin so fixed elements remain fixed to viewport */
+body.sidebar-visible #main-content {
+   margin-left: 140px;
+   transition: margin-left 300ms ease;
+}
+
+@media (max-width: 600px) {
+   body.sidebar-visible #main-content {
+      margin-left: 90px;
+   }
+}
+
+#main-content {
+   transition: margin-left 300ms ease;
+}
+
+/* Slightly nudge search inputs further right when sidebar is open so they appear
+   more centered relative to the shifted content. We target inputs whose
+   placeholder contains "Search" to avoid touching unrelated inputs. */
+body.sidebar-visible input[placeholder*="Search"] {
+  margin-left: 100px;
+  transition: margin-left 300ms ease;
+}
+
+/* Increase margin on search input containers to push them lower */
+input[placeholder*="Search"] {
+  margin-top: 40px !important;
+  margin-bottom: 20px !important;
+  
+}
+

@@ -388,19 +388,20 @@ export default function Gsn() {
     };
 
     const containerStyle = {
-        width: "130%",
+        width: "100%",
+        maxWidth: '100%',
         overflow: 'hidden',
         textAlign: 'center',
-        minHeight: '100vh',
-        padding: '20px',
+        minHeight: 'auto',
+        padding: 'clamp(10px, 5vw, 20px)',
         background: 'linear-gradient(-45deg, #fcb900, #9900ef, #ff6900, #00ff07)',
         backgroundSize: '400% 400%',
         animation: 'gradientAnimation 12s ease infinite',
         borderRadius: '10px',
         boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-        marginLeft: 'auto',
-        marginRight: 'auto',
-
+        marginLeft: '0',
+        marginRight: '0',
+        boxSizing: 'border-box',
     };
 
     const globalStyles = `
@@ -418,17 +419,21 @@ export default function Gsn() {
             <LogOutComponent />
             <div style={containerStyle}>
                 <style>{globalStyles}</style>
-                <div style={{ width: "90vw", display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={{ width: "100%", maxWidth: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', marginLeft: '0', marginRight: '0', boxSizing: 'border-box', padding: '0 clamp(8px, 3vw, 16px)' }}>
                     <div id="nav"
                         style={{
-                            width: "90%",
-                            height: "30px",
+                            width: "100%",
+                            maxWidth: '100%',
+                            height: "auto",
                             display: "flex",
                             justifyContent: "center",
                             alignItems: 'center',
-                            fontSize: "25px",
-                            padding: '10px',
-                            marginTop: "20px"
+                            fontSize: "clamp(18px, 6vw, 25px)",
+                            padding: 'clamp(8px, 3vw, 10px)',
+                            marginTop: "clamp(10px, 3vw, 20px)",
+                            marginLeft: '0',
+                            marginRight: '0',
+                            boxSizing: 'border-box',
                         }}
                     >
                         <h2>GSN Details</h2>
@@ -437,15 +442,19 @@ export default function Gsn() {
                     {/* Latest GSN Number Display */}
                     {latestGsnNumber && (
                         <div style={{
-                            width: "90%",
+                            width: "calc(100% - 20px)",
+                            maxWidth: '100%',
                             display: "flex",
+                            color: 'black',
                             justifyContent: "center",
                             alignItems: 'center',
-                            padding: '10px',
-                            marginTop: "10px",
+                            padding: 'clamp(8px, 2vw, 10px)',
+                            marginTop: "clamp(8px, 2vw, 10px)",
+                            margin: 'clamp(8px, 2vw, 10px) auto',
                             backgroundColor: 'rgba(224, 211, 211, 0.9)',
                             borderRadius: '8px',
-                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)'
+                            boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
+                            boxSizing: 'border-box'
                         }}>
                             <h3 style={{
                                 margin: '0',
@@ -458,8 +467,8 @@ export default function Gsn() {
                         </div>
                     )}
 
-                    <div style={{ width: "90vw", maxWidth: '700px' }}>
-                        <form action="" onSubmit={submitHandler} style={{ margin: '40px', width: "100%" }}>
+                    <div style={{ width: "100%", maxWidth: '760px', boxSizing: 'border-box', padding: '0 clamp(8px, 3vw, 16px)' }}>
+                        <form action="" onSubmit={submitHandler} style={{ margin: 'clamp(12px, 3vw, 18px) clamp(4px, 2vw, 8px)', width: "100%", boxSizing: 'border-box' }}>
                             <div className={styles.form}>
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>GSN :</label>
@@ -542,7 +551,7 @@ export default function Gsn() {
                                             top: '100%',
                                             width: '100%',
                                             border: '1px solid rgba(0, 0, 0, 0.1)',
-                                            backgroundColor: '#ffffff',
+                                            backgroundColor: '#ffffffff',
                                             boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
                                             borderRadius: '8px',
                                             padding: '16px',
@@ -602,7 +611,7 @@ export default function Gsn() {
                                         required
                                         className={styles.dateInput}
                                         type="date"
-                                        style={{ marginTop: "30px" }}
+                                        style={{ marginTop: "0px" }}
                                         value={lrDate}
                                         onChange={(e) => setLrDate(e.target.value)}
                                     />
@@ -657,8 +666,8 @@ export default function Gsn() {
                             </div>
 
                             <div className={styles.forms}>
-                                <div className={styles.formRow} style={{ dissplay: "flex", flexDirection: 'column' }}>
-                                    <label className={styles.label}>Material Information:</label>
+                                <div className={styles.formRow} style={{ width : '100%',display: "flex", flexDirection: 'column' }}>
+                                    <label  style={{fontWeight: 'bold', display : "flex"}}>Material Information:</label>
                                     <TableComponent data={tableData} handleTableChange={handleTableChange} />
                                 </div>
                             </div>
@@ -759,7 +768,7 @@ export default function Gsn() {
                                         type="text"
                                         value={materialTotal.toFixed(2)}
                                         readOnly
-                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }}
+                                        style={{ fontWeight: 'bold', backgroundColor: 'rgba(218, 216, 224, 0.6)' }}
                                     />
                                 </div>
                                 <div className={styles.formRow} style={{ display: igst ? 'none' : 'flex' }}>
@@ -811,7 +820,7 @@ export default function Gsn() {
                                         type="text"
                                         value={gstTax.toFixed(2)}
                                         readOnly
-                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }}
+                                        style={{ fontWeight: 'bold', backgroundColor: 'rgba(218, 216, 224, 0.6)' }}
                                     />
                                 </div>
 
@@ -822,13 +831,13 @@ export default function Gsn() {
                                         type="text"
                                         value={totalAmount.toFixed(2)}
                                         readOnly
-                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }}
+                                        style={{ fontWeight: 'bold', backgroundColor:'rgba(218, 216, 224, 0.6)' }}
                                     />
                                 </div>
                             </div>
 
                             <div id="btn">
-                                <button style={{ width: "100%" }} className={style.button} id={styles.btn}>Submit</button>
+                                <button style={{ width: "95%", height: "100%" }} className={style.button} id={styles.btn}>Submit</button>
                             </div>
                         </form>
                     </div>
