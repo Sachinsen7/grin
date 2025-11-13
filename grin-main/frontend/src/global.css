@@ -1,0 +1,29 @@
+
+body.sidebar-visible #main-content {
+   margin-left: 140px;
+   transition: margin-left 300ms ease;
+}
+
+@media (max-width: 600px) {
+   body.sidebar-visible #main-content {
+      margin-left: 90px;
+   }
+}
+
+#main-content {
+   transition: margin-left 300ms ease;
+}
+
+
+body.sidebar-visible input[placeholder*="Search"] {
+  margin-left: 100px;
+  transition: margin-left 300ms ease;
+}
+
+
+input[placeholder*="Search"] {
+  margin-top: 40px !important;
+  margin-bottom: 20px !important;
+  
+}
+

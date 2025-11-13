@@ -1,0 +1,37 @@
+6.3 Duplicate API Calls (􀀀 MEDIUM)
+Problem:
+// Same API called in multiple components
+useEffect(() => {
+axios.get(${url}/api/suppliers);
+}, []);
+No caching
+Duplicate requests
+Wasted bandwidth
+Solution:
+Use React Query or SWR
+Implement caching
+Share data across components
+
+5.5 Commented Out Code (􀀀 LOW)
+Problem:
+// const oldFunction = () => {}
+// Lots of commented code
+Dead code everywhere
+Confusing for developers
+Solution:
+Remove commented code
+Use version control
+
+4.2 Unnecessary Re-renders (􀀀 HIGH)
+Problem:
+useEffect(() => {
+getData();
+loadSuppliers();
+}, []); // But state updates cause re-renders
+No memoization
+Inline function definitions
+Large state objects
+Impact: Laggy UI, poor performance
+Solution:
+const memoizedData = useMemo(() => processData(data), [data]);
+const handleClick = useCallback(() => {}, []);

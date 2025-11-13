@@ -1,0 +1,1716 @@
+{
+    "info": {
+        "name": "GRIN Network API - Complete Collection",
+        "description": "Complete API collection for GRIN Network Backend with all routes",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "variable": [
+        {
+            "key": "baseUrl",
+            "value": "http://localhost:5000",
+            "type": "string"
+        },
+        {
+            "key": "token",
+            "value": "",
+            "type": "string"
+        }
+    ],
+    "item": [
+        {
+            "name": "1. Admin Routes",
+            "item": [
+                {
+                    "name": "Sign Up Admin",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Admin User\",\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/admin",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "admin"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Login Admin",
+                    "event": [
+                        {
+                            "listen": "test",
+                            "script": {
+                                "exec": [
+                                    "var jsonData = pm.response.json();",
+                                    "pm.collectionVariables.set(\"token\", jsonData.token);"
+                                ]
+                            }
+                        }
+                    ],
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/admin",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "admin"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Admins",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/admin",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "admin"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Admin",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/admin/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "admin",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "ADMIN_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "2. Attendee Routes",
+            "item": [
+                {
+                    "name": "Login Attendee",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"attendee1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/attendee",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "attendee"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up Attendee (Auth Required)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Attendee Name\",\n  \"username\": \"attendee1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/attendee",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "attendee"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Attendees",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/attendee",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "attendee"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Attendee",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/attendee/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "attendee",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "ATTENDEE_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "3. Store Manager Routes",
+            "item": [
+                {
+                    "name": "Login Store Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"storemanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/storemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "storemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up Store Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Store Manager Name\",\n  \"username\": \"storemanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/storemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "storemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Store Managers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/storemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "storemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Store Manager",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/storemanager/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "storemanager",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "MANAGER_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "4. General Manager Routes",
+            "item": [
+                {
+                    "name": "Login General Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"generalmanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/generalmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "generalmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up General Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"General Manager Name\",\n  \"username\": \"generalmanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/generalmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "generalmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All General Managers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/generalmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "generalmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete General Manager",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/generalmanager/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "generalmanager",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "MANAGER_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "5. Purchase Manager Routes",
+            "item": [
+                {
+                    "name": "Login Purchase Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"purchasemanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/purchasemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "purchasemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up Purchase Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Purchase Manager Name\",\n  \"username\": \"purchasemanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/purchasemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "purchasemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Purchase Managers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/purchasemanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "purchasemanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Purchase Manager",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/purchasemanager/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "purchasemanager",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "MANAGER_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "6. Account Manager Routes",
+            "item": [
+                {
+                    "name": "Login Account Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"accountmanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/accountmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "accountmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up Account Manager",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Account Manager Name\",\n  \"username\": \"accountmanager1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/accountmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "accountmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Account Managers",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/accountmanager",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "accountmanager"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Account Manager",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/accountmanager/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "accountmanager",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "MANAGER_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "7. GSN Routes",
+            "item": [
+                {
+                    "name": "Login GSN",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"gsn1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/gsn",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "gsn"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Sign Up GSN",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"GSN User\",\n  \"username\": \"gsn1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/gsn",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "gsn"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All GSN",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/gsn",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "gsn"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete GSN",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/getall/gsn/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getall",
+                                "gsn",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "GSN_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "8. Auditor Routes",
+            "item": [
+                {
+                    "name": "Sign Up Auditor",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"name\": \"Auditor Name\",\n  \"username\": \"auditor1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/sign-up/auditor",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "sign-up",
+                                "auditor"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Login Auditor",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"username\": \"auditor1\",\n  \"password\": \"pass123\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/log-in/auditor",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "log-in",
+                                "auditor"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All Auditors",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getAll/auditor",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getAll",
+                                "auditor"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Auditor",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getAll/auditor/delete/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getAll",
+                                "auditor",
+                                "delete",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "AUDITOR_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "9. GRIN Entries Routes",
+            "item": [
+                {
+                    "name": "Upload GRIN Entry (with files)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "grinNo",
+                                    "value": "GRIN001",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grinDate",
+                                    "value": "2024-01-15",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gsn",
+                                    "value": "GSN001",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gsnDate",
+                                    "value": "2024-01-15",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "poNo",
+                                    "value": "PO001",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "poDate",
+                                    "value": "2024-01-10",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "partyName",
+                                    "value": "ABC Suppliers",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "innoviceno",
+                                    "value": "INV001",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "innoviceDate",
+                                    "value": "2024-01-12",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lrNo",
+                                    "value": "LR001",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lrDate",
+                                    "value": "2024-01-13",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "transName",
+                                    "value": "XYZ Transport",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "vehicleNo",
+                                    "value": "MH12AB1234",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gstNo",
+                                    "value": "27AABCU9603R1ZM",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "cgst",
+                                    "value": "9",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "sgst",
+                                    "value": "9",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "companyName",
+                                    "value": "ABC Company",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "address",
+                                    "value": "123 Street, City",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "mobileNo",
+                                    "value": "9876543210",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "totalAmount",
+                                    "value": "10000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tableData",
+                                    "value": "[{\"item\":\"Item1\",\"description\":\"Desc1\",\"quantityNo\":10,\"quantityKg\":5,\"price\":100}]",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "path/to/bill.pdf"
+                                },
+                                {
+                                    "key": "photo",
+                                    "type": "file",
+                                    "src": "path/to/photo.jpg"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/upload-data",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "upload-data"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All GRIN Entries",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/getdata",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "getdata"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Verify Document",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"ENTRY_ID_HERE\",\n  \"role\": \"PurchaseManager\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "verify"
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "10. Entries Management Routes",
+            "item": [
+                {
+                    "name": "Get All Entries",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/getdata1",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "getdata1"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Create Entry",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"grinNo\": \"GRIN002\",\n  \"grinDate\": \"2024-01-15\",\n  \"gsn\": \"GSN002\",\n  \"gsnDate\": \"2024-01-15\",\n  \"poNo\": \"PO002\",\n  \"poDate\": \"2024-01-10\",\n  \"partyName\": \"XYZ Suppliers\",\n  \"innoviceno\": \"INV002\",\n  \"innoviceDate\": \"2024-01-12\",\n  \"receivedFrom\": \"Warehouse A\",\n  \"lrNo\": \"LR002\",\n  \"lrDate\": \"2024-01-13\",\n  \"transName\": \"ABC Transport\",\n  \"vehicleNo\": \"MH12CD5678\",\n  \"gstNo\": \"27AABCU9603R1ZM\",\n  \"cgst\": 9,\n  \"sgst\": 9,\n  \"companyName\": \"XYZ Company\",\n  \"address\": \"456 Avenue, City\",\n  \"mobileNo\": \"9876543211\",\n  \"totalAmount\": 15000,\n  \"tableData\": [{\"item\": \"Item2\", \"description\": \"Desc2\", \"quantityValue\": 20, \"priceValue\": 750, \"priceType\": \"per unit\", \"total\": 15000}]\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/create",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "create"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Entry Visibility",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"ENTRY_ID_HERE\",\n  \"isHidden\": false\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/verify",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "verify"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Manager Signature",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"id\": \"ENTRY_ID_HERE\",\n  \"managerType\": \"GeneralManager\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/update-signature",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "update-signature"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Bill File",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "id",
+                                    "value": "ENTRY_ID_HERE",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "path/to/new-bill.pdf"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/update-bill",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "update-bill"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Entry By ID",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/:id",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                ":id"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "id",
+                                    "value": "ENTRY_ID_HERE"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Entry By Party Name",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/delete-by-party/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "delete-by-party",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "ABC Suppliers"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Entry By Party Name",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"totalAmount\": 12000,\n  \"mobileNo\": \"9999999999\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/entries/update-by-party/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "entries",
+                                "update-by-party",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "ABC Suppliers"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "11. GSN Data Routes",
+            "item": [
+                {
+                    "name": "Upload GSN Data (with files)",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "formdata",
+                            "formdata": [
+                                {
+                                    "key": "grinNo",
+                                    "value": "GRIN003",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "grinDate",
+                                    "value": "2024-01-16",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gsn",
+                                    "value": "GSN003",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gsnDate",
+                                    "value": "2024-01-16",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "poNo",
+                                    "value": "PO003",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "poDate",
+                                    "value": "2024-01-11",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "partyName",
+                                    "value": "DEF Suppliers",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "innoviceno",
+                                    "value": "INV003",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "innoviceDate",
+                                    "value": "2024-01-14",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lrNo",
+                                    "value": "LR003",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "lrDate",
+                                    "value": "2024-01-15",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "transName",
+                                    "value": "PQR Transport",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "vehicleNo",
+                                    "value": "MH12EF9012",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gstNo",
+                                    "value": "27AABCU9603R1ZM",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "cgst",
+                                    "value": "9",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "sgst",
+                                    "value": "9",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "igst",
+                                    "value": "0",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "companyName",
+                                    "value": "DEF Company",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "address",
+                                    "value": "789 Road, City",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "mobileNo",
+                                    "value": "9876543212",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "gstTax",
+                                    "value": "1800",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "materialTotal",
+                                    "value": "10000",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "totalAmount",
+                                    "value": "11800",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "tableData",
+                                    "value": "[{\"item\":\"Item3\",\"description\":\"Desc3\",\"quantityValue\":15,\"priceValue\":666.67,\"priceType\":\"per kg\",\"total\":10000}]",
+                                    "type": "text"
+                                },
+                                {
+                                    "key": "file",
+                                    "type": "file",
+                                    "src": "path/to/gsn-bill.pdf"
+                                },
+                                {
+                                    "key": "photo",
+                                    "type": "file",
+                                    "src": "path/to/gsn-photo.jpg"
+                                }
+                            ]
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/gsn/upload-data",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gsn",
+                                "upload-data"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get All GSN Data",
+                    "request": {
+                        "method": "GET",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gsn/getdata",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gsn",
+                                "getdata"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete GSN Entry By Party Name",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "url": {
+                            "raw": "{{baseUrl}}/gsn/upload-data/delete-by-party/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gsn",
+                                "upload-data",
+                                "delete-by-party",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "DEF Suppliers"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update GSN Entry By Party Name",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            },
+                            {
+                                "key": "Authorization",
+                                "value": "Bearer {{token}}"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"totalAmount\": 13000,\n  \"mobileNo\": \"8888888888\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/gsn/upload-data/update-by-party/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "gsn",
+                                "upload-data",
+                                "update-by-party",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "DEF Suppliers"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "name": "12. Supplier Routes",
+            "item": [
+                {
+                    "name": "Get All Suppliers",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/suppliers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "suppliers"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Add Supplier",
+                    "request": {
+                        "method": "POST",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"partyName\": \"New Supplier Ltd\",\n  \"address\": \"123 Business Park, City\",\n  \"gstNo\": \"27AABCU9603R1ZM\",\n  \"mobileNo\": \"9876543213\",\n  \"companyName\": \"New Supplier Company\",\n  \"email\": \"contact@newsupplier.com\",\n  \"isActive\": true\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/suppliers",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "suppliers"
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Get Supplier Details",
+                    "request": {
+                        "method": "GET",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/supplier-details?partyName=New Supplier Ltd",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "supplier-details"
+                            ],
+                            "query": [
+                                {
+                                    "key": "partyName",
+                                    "value": "New Supplier Ltd"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Update Supplier",
+                    "request": {
+                        "method": "PUT",
+                        "header": [
+                            {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                            }
+                        ],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n  \"address\": \"456 Updated Address, City\",\n  \"mobileNo\": \"9999999999\",\n  \"email\": \"updated@newsupplier.com\"\n}"
+                        },
+                        "url": {
+                            "raw": "{{baseUrl}}/api/supplier/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "supplier",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "New Supplier Ltd"
+                                }
+                            ]
+                        }
+                    }
+                },
+                {
+                    "name": "Delete Supplier",
+                    "request": {
+                        "method": "DELETE",
+                        "header": [],
+                        "url": {
+                            "raw": "{{baseUrl}}/api/supplier/:partyName",
+                            "host": [
+                                "{{baseUrl}}"
+                            ],
+                            "path": [
+                                "api",
+                                "supplier",
+                                ":partyName"
+                            ],
+                            "variable": [
+                                {
+                                    "key": "partyName",
+                                    "value": "New Supplier Ltd"
+                                }
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ]
+}
