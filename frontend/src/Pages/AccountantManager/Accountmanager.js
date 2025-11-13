@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import styles from '../../Components/Approval/Approval.module.css';
 import axios from 'axios';
 import TableComponent from '../../Components/Table/Table.rendering';
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import { useCombinedData } from '../../hooks/useApiData';
 
 export default function Accountant({ managerType }) {
     const [visibleItem, setVisibleItem] = useState(null);
@@ -26,120 +27,105 @@ export default function Accountant({ managerType }) {
 
     const url = process.env.REACT_APP_BACKEND_URL;
     const fieldName = managerFieldMap[managerType];
+    const token = localStorage.getItem('authToken');
 
-    // Function to fetch and combine data
-    const fetchAndCombineData = async () => {
-            try {
-            const token = localStorage.getItem('authToken');
-            console.log(`(${managerType}) Fetching data with token:`, token);
-            
-            const [gsnResponse, grnResponse] = await Promise.all([
-                axios.get(`${url}/gsn/getdata`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
-                }),
-                axios.get(`${url}/getdata`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                })
-            ]);
+    // Use the custom hook for combined data (handles caching automatically)
+    const { data: combinedData, isLoading, error } = useCombinedData(token);
 
-            // Sort individual lists first
-            const sortedGsnData = (gsnResponse.data || []).filter(u => !u.isHidden)
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-            const sortedGrnData = (grnResponse.data || []).filter(u => !u.isHidden)
-                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    // Process and combine data using useMemo to avoid re-processing on every render
+    const processedList = useMemo(() => {
+        if (!combinedData || !combinedData.gsnData || !combinedData.grnData) {
+            return [];
+        }
 
-            console.log(`(${managerType}) Sorted GSN Data:`, sortedGsnData);
-            console.log(`(${managerType}) Sorted GRN Data:`, sortedGrnData);
+        const { gsnData, grnData } = combinedData;
 
-            const combined = {};
-            
-            // Process sorted GSN documents
-            sortedGsnData.forEach(doc => {
-                if (!combined[doc.partyName]) {
-                    combined[doc.partyName] = {
-                        partyName: doc.partyName,
-                        gsnDocuments: [],
-                        grnDocuments: [],
-                        GeneralManagerSigned: doc.GeneralManagerSigned,
-                        StoreManagerSigned: doc.StoreManagerSigned,
-                        PurchaseManagerSigned: doc.PurchaseManagerSigned,
-                        AccountManagerSigned: doc.AccountManagerSigned
-                    };
-                }
-                combined[doc.partyName].gsnDocuments.push(doc);
-                if (combined[doc.partyName].GeneralManagerSigned === undefined) combined[doc.partyName].GeneralManagerSigned = doc.GeneralManagerSigned;
-                if (combined[doc.partyName].StoreManagerSigned === undefined) combined[doc.partyName].StoreManagerSigned = doc.StoreManagerSigned;
-                if (combined[doc.partyName].PurchaseManagerSigned === undefined) combined[doc.partyName].PurchaseManagerSigned = doc.PurchaseManagerSigned;
-                if (combined[doc.partyName].AccountManagerSigned === undefined) combined[doc.partyName].AccountManagerSigned = doc.AccountManagerSigned;
-            });
+        // Sort individual lists first
+        const sortedGsnData = (gsnData || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        const sortedGrnData = (grnData || []).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-            // Process sorted GRN documents
-            sortedGrnData.forEach(doc => {
-                if (!combined[doc.partyName]) {
-                    combined[doc.partyName] = {
-                        partyName: doc.partyName,
-                        gsnDocuments: [],
-                        grnDocuments: [],
-                        GeneralManagerSigned: doc.GeneralManagerSigned,
-                        StoreManagerSigned: doc.StoreManagerSigned,
-                        PurchaseManagerSigned: doc.PurchaseManagerSigned,
-                        AccountManagerSigned: doc.AccountManagerSigned
-                    };
-                }
-                combined[doc.partyName].grnDocuments.push(doc);
-                if (combined[doc.partyName].GeneralManagerSigned === undefined) combined[doc.partyName].GeneralManagerSigned = doc.GeneralManagerSigned;
-                if (combined[doc.partyName].StoreManagerSigned === undefined) combined[doc.partyName].StoreManagerSigned = doc.StoreManagerSigned;
-                if (combined[doc.partyName].PurchaseManagerSigned === undefined) combined[doc.partyName].PurchaseManagerSigned = doc.PurchaseManagerSigned;
-                if (combined[doc.partyName].AccountManagerSigned === undefined) combined[doc.partyName].AccountManagerSigned = doc.AccountManagerSigned;
-            });
+        console.log(`(${managerType}) Sorted GSN Data (from cache):`, sortedGsnData);
+        console.log(`(${managerType}) Sorted GRN Data (from cache):`, sortedGrnData);
 
-            const combinedListData = Object.values(combined);
+        const combined = {};
+        
+        // Process sorted GSN documents
+        sortedGsnData.forEach(doc => {
+            if (!combined[doc.partyName]) {
+                combined[doc.partyName] = {
+                    partyName: doc.partyName,
+                    gsnDocuments: [],
+                    grnDocuments: [],
+                    GeneralManagerSigned: doc.GeneralManagerSigned,
+                    StoreManagerSigned: doc.StoreManagerSigned,
+                    PurchaseManagerSigned: doc.PurchaseManagerSigned,
+                    AccountManagerSigned: doc.AccountManagerSigned
+                };
+            }
+            combined[doc.partyName].gsnDocuments.push(doc);
+            if (combined[doc.partyName].GeneralManagerSigned === undefined) combined[doc.partyName].GeneralManagerSigned = doc.GeneralManagerSigned;
+            if (combined[doc.partyName].StoreManagerSigned === undefined) combined[doc.partyName].StoreManagerSigned = doc.StoreManagerSigned;
+            if (combined[doc.partyName].PurchaseManagerSigned === undefined) combined[doc.partyName].PurchaseManagerSigned = doc.PurchaseManagerSigned;
+            if (combined[doc.partyName].AccountManagerSigned === undefined) combined[doc.partyName].AccountManagerSigned = doc.AccountManagerSigned;
+        });
 
-            // Function to get the latest createdAt from a group
-            const getLatestDate = (item) => {
-                const dates = [
-                    ...(item.gsnDocuments || []).map(d => new Date(d.createdAt)),
-                    ...(item.grnDocuments || []).map(d => new Date(d.createdAt))
-                ].filter(d => !isNaN(d));
-                return dates.length > 0 ? Math.max(...dates.map(d => d.getTime())) : 0;
-            };
+        // Process sorted GRN documents
+        sortedGrnData.forEach(doc => {
+            if (!combined[doc.partyName]) {
+                combined[doc.partyName] = {
+                    partyName: doc.partyName,
+                    gsnDocuments: [],
+                    grnDocuments: [],
+                    GeneralManagerSigned: doc.GeneralManagerSigned,
+                    StoreManagerSigned: doc.StoreManagerSigned,
+                    PurchaseManagerSigned: doc.PurchaseManagerSigned,
+                    AccountManagerSigned: doc.AccountManagerSigned
+                };
+            }
+            combined[doc.partyName].grnDocuments.push(doc);
+            if (combined[doc.partyName].GeneralManagerSigned === undefined) combined[doc.partyName].GeneralManagerSigned = doc.GeneralManagerSigned;
+            if (combined[doc.partyName].StoreManagerSigned === undefined) combined[doc.partyName].StoreManagerSigned = doc.StoreManagerSigned;
+            if (combined[doc.partyName].PurchaseManagerSigned === undefined) combined[doc.partyName].PurchaseManagerSigned = doc.PurchaseManagerSigned;
+            if (combined[doc.partyName].AccountManagerSigned === undefined) combined[doc.partyName].AccountManagerSigned = doc.AccountManagerSigned;
+        });
 
-            // Sort the final combined list
-            combinedListData.sort((a, b) => getLatestDate(b) - getLatestDate(a));
+        const combinedListData = Object.values(combined);
 
-            console.log(`(${managerType}) Sorted Combined List Data:`, combinedListData);
-            setCombinedList(combinedListData);
+        // Function to get the latest createdAt from a group
+        const getLatestDate = (item) => {
+            const dates = [
+                ...(item.gsnDocuments || []).map(d => new Date(d.createdAt)),
+                ...(item.grnDocuments || []).map(d => new Date(d.createdAt))
+            ].filter(d => !isNaN(d));
+            return dates.length > 0 ? Math.max(...dates.map(d => d.getTime())) : 0;
+        };
+
+        // Sort the final combined list
+        combinedListData.sort((a, b) => getLatestDate(b) - getLatestDate(a));
+
+        console.log(`(${managerType}) Sorted Combined List Data (cached):`, combinedListData);
+        return combinedListData;
+    }, [combinedData, managerType]);
+
+    // Update combinedList and selectedValue when processedList changes
+    useEffect(() => {
+        if (processedList.length > 0) {
+            setCombinedList(processedList);
             setIsDataLoaded(true);
 
             // Set initial state of the checkboxes based on fetched data
-            const initialSelectedValue = combinedListData.reduce((acc, item) => {
+            const initialSelectedValue = processedList.reduce((acc, item) => {
                 if (fieldName && item.hasOwnProperty(fieldName)) {
                     acc[item.partyName] = item[fieldName] === true ? 'checked' : 'not_checked';
                 } else {
                     acc[item.partyName] = 'not_checked';
                 }
-                    return acc;
-                }, {});
+                return acc;
+            }, {});
 
-                setSelectedValue(initialSelectedValue);
-
-            } catch (err) {
-            console.error(`(${managerType}) Error fetching data`, err);
-            if (err.response) {
-                console.error(`(${managerType}) Fetch Error Response:`, err.response.data);
-            }
-            }
-        };
-
-    useEffect(() => {
-        fetchAndCombineData();
-    }, []);
+            setSelectedValue(initialSelectedValue);
+        }
+    }, [processedList, fieldName]);
 
     // useEffect for filtering based on searchTerm
     useEffect(() => {

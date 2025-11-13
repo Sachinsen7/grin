@@ -1,10 +1,12 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
 import style from './Inputgrin.module.css';
 import styles from './Fileupload.module.css'; // Import the CSS module
 import TableComponent from '../../Components/Table/TableEntry'; // Import the TableComponent
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import { useLocation } from 'react-router-dom';
+import { validateFile } from '../../utils/fileValidation';
+import { useGsnData, useSuppliers } from '../../hooks/useApiData';
 
 export default function Attendee() {
     const location = useLocation();
@@ -65,58 +67,7 @@ export default function Attendee() {
         }))
     );
 
-    // Function to get latest GSN number
-    const getLatestGsnNumber = async () => {
-        try {
-            const url = process.env.REACT_APP_BACKEND_URL;
-            const token = localStorage.getItem('authToken');
-            const res = await axios.get(`${url}/gsn/getdata`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (res.data && res.data.length > 0) {
-                // Sort by creation date to get the latest
-                const sortedData = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                const latestEntry = sortedData[0];
-                if (latestEntry && latestEntry.gsn) {
-                    setLatestGsnNumber(latestEntry.gsn);
-                }
-            }
-        } catch (err) {
-            console.log("Error fetching latest GSN number:", err);
-        }
-    };
-
-    useEffect(() => {
-        if (initialselectedValue) {
-            setpartyName(initialselectedValue);
-            console.log("Auto-filled Party Name:", initialselectedValue);
-        }
-        if (initialgsnDate) {
-            setInnoviceDate(initialgsnDate);
-            console.log("Auto-filled Invoice Date:", initialgsnDate);
-        }
-        if (initialGrinNo) {
-            setGrinNo(initialGrinNo);
-            console.log("Auto-filled GRIN No:", initialGrinNo);
-        }
-        if (initialGsn) {
-            setGsn(initialGsn);
-            console.log("Auto-filled GSN:", initialGsn);
-        }
-        if (initialGrinDate) {
-            setGrinDate(initialGrinDate);
-            console.log("Auto-filled GRIN Date:", initialGrinDate);
-        }
-        if (initialGsnDate) {
-            setGsnDate(initialGsnDate);
-            console.log("Auto-filled GSN Date:", initialGsnDate);
-        }
-    }, [initialselectedValue, initialgsnDate, initialGrinNo, initialGsn, initialGrinDate, initialGsnDate]);
-
+    // State variables
     const [backendData, setbackendData] = useState([]);
     const [suppliers, setSuppliers] = useState([]);
     const [filteredSuppliers, setFilteredSuppliers] = useState([]);
@@ -124,12 +75,32 @@ export default function Attendee() {
     const [isVisible, setIsVisible] = useState(false);
 
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const file = e.target.files[0];
+        const validation = validateFile(file, 'documents');
+        
+        if (!validation.isValid) {
+            alert(`❌ File validation failed:\n${validation.error}`);
+            e.target.value = ''; // Clear the input
+            return;
+        }
+        
+        setFile(file);
+        console.log('✓ File validated and selected:', file.name);
     };
 
     // Add handler for photo change
     const handlePhotoChange = (e) => {
-        setPhoto(e.target.files[0]);
+        const file = e.target.files[0];
+        const validation = validateFile(file, 'images');
+        
+        if (!validation.isValid) {
+            alert(`❌ Photo validation failed:\n${validation.error}`);
+            e.target.value = ''; // Clear the input
+            return;
+        }
+        
+        setPhoto(file);
+        console.log('✓ Photo validated and selected:', file.name);
     };
 
     const handleTableChange = (index, field, value) => {
@@ -294,6 +265,66 @@ export default function Attendee() {
             }
         }
     };
+
+    // Use React Query hooks for caching
+    const token = localStorage.getItem('authToken');
+    const { data: gsnDataFromAPI } = useGsnData(token);
+    const { data: suppliersFromAPI } = useSuppliers();
+
+    // Process GSN data with caching
+    useEffect(() => {
+        if (gsnDataFromAPI && Array.isArray(gsnDataFromAPI)) {
+            setbackendData(gsnDataFromAPI);
+            
+            // Get latest GSN number from cached data
+            if (gsnDataFromAPI.length > 0) {
+                const sortedData = gsnDataFromAPI.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const latestEntry = sortedData[0];
+                if (latestEntry && latestEntry.gsn) {
+                    setLatestGsnNumber(latestEntry.gsn);
+                }
+            }
+        }
+    }, [gsnDataFromAPI]);
+
+    // Process suppliers data with caching
+    useEffect(() => {
+        if (suppliersFromAPI && Array.isArray(suppliersFromAPI)) {
+            const data = suppliersFromAPI;
+            // Sort by name for readability
+            data.sort((a, b) => (a.partyName || '').localeCompare(b.partyName || ''));
+            setSuppliers(data);
+            setFilteredSuppliers(data);
+        }
+    }, [suppliersFromAPI]);
+
+    // Auto-fill initial values from location state
+    useEffect(() => {
+        if (initialselectedValue) {
+            setpartyName(initialselectedValue);
+            console.log("Auto-filled Party Name:", initialselectedValue);
+        }
+        if (initialgsnDate) {
+            setInnoviceDate(initialgsnDate);
+            console.log("Auto-filled Invoice Date:", initialgsnDate);
+        }
+        if (initialGrinNo) {
+            setGrinNo(initialGrinNo);
+            console.log("Auto-filled GRIN No:", initialGrinNo);
+        }
+        if (initialGsn) {
+            setGsn(initialGsn);
+            console.log("Auto-filled GSN:", initialGsn);
+        }
+        if (initialGrinDate) {
+            setGrinDate(initialGrinDate);
+            console.log("Auto-filled GRIN Date:", initialGrinDate);
+        }
+        if (initialGsnDate) {
+            setGsnDate(initialGsnDate);
+            console.log("Auto-filled GSN Date:", initialGsnDate);
+        }
+    }, [initialselectedValue, initialgsnDate, initialGrinNo, initialGsn, initialGrinDate, initialGsnDate]);
 
     useEffect(() => {
         const getData = async () => {

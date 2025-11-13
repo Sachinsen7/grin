@@ -1,9 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
 import style from '../Attendee/Inputgrin.module.css';
 import styles from "../Attendee/Fileupload.module.css"; // Import the CSS module
 import TableComponent from '../../Components/Table/TableEntry'; // Import the TableComponent
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
+import { validateFile, FILE_VALIDATION_CONFIG } from '../../utils/fileValidation';
+import { useGsnData, useSuppliers } from '../../hooks/useApiData';
 
 export default function Gsn() {
     const [grinNo, setGrinNo] = useState("");
@@ -66,37 +68,32 @@ export default function Gsn() {
     const [isCompanyPopupVisible, setIsCompanyPopupVisible] = useState(false);
     const companyPopupRef = useRef(null); // Ref for company popup
 
-    // Function to get latest GSN number
-    const getLatestGsnNumber = async () => {
-        try {
-            const url = process.env.REACT_APP_BACKEND_URL;
-            const token = localStorage.getItem('authToken');
-            const res = await axios.get(`${url}/gsn/getdata`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-
-            if (res.data && res.data.length > 0) {
-                // Sort by creation date to get the latest
-                const sortedData = res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                const latestEntry = sortedData[0];
-                if (latestEntry && latestEntry.gsn) {
-                    setLatestGsnNumber(latestEntry.gsn);
-                }
-            }
-        } catch (err) {
-            console.log("Error fetching latest GSN number:", err);
-        }
-    };
-
     const handleFileChange = (e) => {
-        setFile(e.target.files[0]);
+        const file = e.target.files[0];
+        const validation = validateFile(file, 'documents');
+        
+        if (!validation.isValid) {
+            alert(`❌ File validation failed:\n${validation.error}`);
+            e.target.value = ''; // Clear the input
+            return;
+        }
+        
+        setFile(file);
+        console.log('✓ File validated and selected:', file.name);
     };
 
     const handlePhotoChange = (e) => {
-        setPhoto(e.target.files[0]);
+        const file = e.target.files[0];
+        const validation = validateFile(file, 'images');
+        
+        if (!validation.isValid) {
+            alert(`❌ Photo validation failed:\n${validation.error}`);
+            e.target.value = ''; // Clear the input
+            return;
+        }
+        
+        setPhoto(file);
+        console.log('✓ Photo validated and selected:', file.name);
     };
 
     const handleTableChange = (index, field, value) => {
@@ -229,40 +226,37 @@ export default function Gsn() {
         }
     };
 
+    // Use React Query hooks for caching
+    const token = localStorage.getItem('authToken');
+    const { data: gsnDataFromAPI } = useGsnData(token);
+    const { data: suppliersFromAPI } = useSuppliers();
+
+    // Process GSN data with useMemo
     useEffect(() => {
-        const getData = async () => {
-            try {
-                const url = process.env.REACT_APP_BACKEND_URL;
-                const token = localStorage.getItem('authToken');
-                const res = await axios.get(`${url}/gsn/getdata`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json'
-                    }
-                });
-                setbackendData(res.data);
-            } catch (err) {
-                console.log(err);
+        if (gsnDataFromAPI && Array.isArray(gsnDataFromAPI)) {
+            setbackendData(gsnDataFromAPI);
+            
+            // Get latest GSN number from cached data
+            if (gsnDataFromAPI.length > 0) {
+                const sortedData = gsnDataFromAPI.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const latestEntry = sortedData[0];
+                if (latestEntry && latestEntry.gsn) {
+                    setLatestGsnNumber(latestEntry.gsn);
+                }
             }
-        };
-        const loadSuppliers = async () => {
-            try {
-                const url = process.env.REACT_APP_BACKEND_URL;
-                const response = await axios.get(`${url}/api/suppliers`);
-                const data = Array.isArray(response.data) ? response.data : [];
-                // Do NOT de-duplicate; show all old and new entries
-                // Sort by name for readability
-                data.sort((a, b) => (a.partyName || '').localeCompare(b.partyName || ''));
-                setSuppliers(data);
-                setFilteredSuppliers(data);
-            } catch (e) {
-                console.log('Failed to load suppliers', e);
-            }
-        };
-        getData();
-        loadSuppliers();
-        getLatestGsnNumber(); // Get latest GSN number when component loads
-    }, []);
+        }
+    }, [gsnDataFromAPI]);
+
+    // Process suppliers data with useMemo
+    useEffect(() => {
+        if (suppliersFromAPI && Array.isArray(suppliersFromAPI)) {
+            const data = suppliersFromAPI;
+            // Sort by name for readability
+            data.sort((a, b) => (a.partyName || '').localeCompare(b.partyName || ''));
+            setSuppliers(data);
+            setFilteredSuppliers(data);
+        }
+    }, [suppliersFromAPI]);
 
     useEffect(() => {
         if (!partyName) {

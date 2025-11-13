@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import { useSuppliers } from '../hooks/useApiData';
 
 export default function SupplierList() {
   const url = process.env.REACT_APP_BACKEND_URL;
+  // Use React Query for caching
+  const { data: fetchedSuppliers = [], isLoading: loading, error } = useSuppliers();
+  
   const [suppliers, setSuppliers] = useState([]);
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [expanded, setExpanded] = useState(null); // partyName of expanded row
   const [details, setDetails] = useState({}); // { [partyName]: [{gsn, grinNo}] }
   const [detailsLoading, setDetailsLoading] = useState(false);
@@ -30,49 +32,28 @@ export default function SupplierList() {
     mobileNo: ''
   });
 
+  // Update suppliers when fetched data changes
   useEffect(() => {
-    const url = process.env.REACT_APP_BACKEND_URL;
-    fetch(`${url}/api/suppliers`)
-      .then(res => {
-        if (!res.ok) throw new Error('Failed to fetch');
-        return res.json();
-      })
-      .then(data => {
-        // Server wraps response as { success: true, data: [...] }
-        let suppliers = data;
-        if (data && data.data && Array.isArray(data.data)) {
-          suppliers = data.data;
-        } else if (!Array.isArray(suppliers)) {
-          console.error('Suppliers API returned unexpected format:', data);
-          throw new Error('Invalid suppliers data from server');
-        }
-        
-        // Unique filter: only by partyName (ignore case and spaces)
-        const uniqueSuppliers = suppliers.filter((supplier, index, self) => {
-          const currName = (supplier.partyName || '').trim().toLowerCase();
-          return index === self.findIndex(s =>
-            (s.partyName || '').trim().toLowerCase() === currName
-          );
-        });
-
-        // Sort alphabetically by partyName
-        uniqueSuppliers.sort((a, b) => {
-          const nameA = (a.partyName || '').trim().toLowerCase();
-          const nameB = (b.partyName || '').trim().toLowerCase();
-          return nameA.localeCompare(nameB);
-        });
-
-        setSuppliers(uniqueSuppliers);
-        setFilteredSuppliers(uniqueSuppliers);
-        setLoading(false);
-      })
-      .catch(err => {
-        setError(err.message);
-        setLoading(false);
+    if (fetchedSuppliers && fetchedSuppliers.length > 0) {
+      // Unique filter: only by partyName (ignore case and spaces)
+      const uniqueSuppliers = fetchedSuppliers.filter((supplier, index, self) => {
+        const currName = (supplier.partyName || '').trim().toLowerCase();
+        return index === self.findIndex(s =>
+          (s.partyName || '').trim().toLowerCase() === currName
+        );
       });
-  }, []);
 
-  // Filter suppliers based on search criteria
+      // Sort alphabetically by partyName
+      uniqueSuppliers.sort((a, b) => {
+        const nameA = (a.partyName || '').trim().toLowerCase();
+        const nameB = (b.partyName || '').trim().toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+      setSuppliers(uniqueSuppliers);
+      setFilteredSuppliers(uniqueSuppliers);
+    }
+  }, [fetchedSuppliers]);  // Filter suppliers based on search criteria
   useEffect(() => {
     let filtered = suppliers.filter(supplier => {
       const partyNameMatch = (supplier.partyName || '').toLowerCase().includes(searchFilters.partyName.toLowerCase());

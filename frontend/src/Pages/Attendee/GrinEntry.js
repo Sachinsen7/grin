@@ -4,6 +4,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import { useEffect } from 'react';
 import axios from 'axios';
+import { validateFile } from '../../utils/fileValidation';
 
 export default function GsnEntry() {
   const navigate = useNavigate();
@@ -192,7 +193,17 @@ const handleSelectChange = (event) => {
 };
 
   const handleFileChange = (e) => {
-    setBillFile(e.target.files[0]);
+    const file = e.target.files[0];
+    const validation = validateFile(file, 'documents');
+    
+    if (!validation.isValid) {
+      alert(`❌ Bill file validation failed:\n${validation.error}`);
+      e.target.value = ''; // Clear the input
+      return;
+    }
+    
+    setBillFile(file);
+    console.log('✓ Bill file validated and selected:', file.name);
   };
 
   const handleSubmitBill = async (e) => {
