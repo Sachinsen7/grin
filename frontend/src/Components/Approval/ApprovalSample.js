@@ -5,6 +5,7 @@ import TableComponent from '../Table/Table.rendering'
 import LogOutComponent from '../LogOut/LogOutComponent';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import toast from 'react-hot-toast';
 
 export default function Sample({ managerType }) {
     const [visibleItem, setVisibleItem] = useState(null);
@@ -95,16 +96,16 @@ export default function Sample({ managerType }) {
             }
         };
 
-    // Fetching GSN data on initial load
+    
     useEffect(() => {
         fetchingGsnData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
     }, [managerType]);
 
-    // Fetching GRN data on initial load
+    
     useEffect(() => {
         fetchingGrnData();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    
     }, []);
 
     const showHandler = (index) => {
@@ -133,7 +134,7 @@ export default function Sample({ managerType }) {
         const partyGrnDocs = list.filter(doc => doc.partyName === partyName);
 
         if (partyGsnDocs.length === 0 && partyGrnDocs.length === 0) {
-            alert('Could not find any documents for this party');
+            toast.error('Could not find any documents for this party');
             return;
         }
 
@@ -154,16 +155,16 @@ export default function Sample({ managerType }) {
                  }
             });
             console.log(`(${managerType}) Verification Response:`, response.data);
-            alert('Verification status saved successfully');
+            toast.success('Verification status saved successfully');
             // Refetch both GSN and GRN data to update the UI
             await Promise.all([fetchingGsnData(), fetchingGrnData()]); 
         } catch (err) {
             console.error(`(${managerType}) Error saving verification status`, err);
             if (err.response) {
                 console.error(`(${managerType}) Verification Error Response:`, err.response.data);
-                alert(`Error: ${err.response.data.message || 'Could not save status'}`);
+                toast.error(`Error: ${err.response.data.message || 'Could not save status'}`);
             } else {
-                alert('An error occurred while saving the status.');
+                toast.error('An error occurred while saving the status.');
             }
         }
     };
@@ -234,7 +235,7 @@ export default function Sample({ managerType }) {
         });
     }
 
-    // **** ADDED: PDF Download Handler ****
+   
     const handleDownloadPDF = (index, groupIndex) => {
         const item = combinedList[index];
         if (!item) return;
@@ -298,7 +299,7 @@ export default function Sample({ managerType }) {
         return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension);
     };
 
-    // Add function to combine GSN and GRN data
+ 
     const combineData = () => {
         if (isGsnDataLoaded && isListDataLoaded) {
             const combined = {};
@@ -353,14 +354,14 @@ export default function Sample({ managerType }) {
         }
     };
 
-    // Update useEffect to use combined data
+   
     useEffect(() => {
         if (isGsnDataLoaded && isListDataLoaded) {
             combineData();
         }
     }, [isGsnDataLoaded, isListDataLoaded, gsnList, list]);
 
-    // Update search filtering to use combined list
+   
     useEffect(() => {
         if (isGsnDataLoaded && isListDataLoaded) {
             let filtered = combinedList;
@@ -416,17 +417,17 @@ export default function Sample({ managerType }) {
                     const isApprovedByCurrentManager = !!item[fieldName]; 
                     const statusText = isApprovedByCurrentManager ? "(Approved)" : "(Not Approved)";
 
-                    // Add back the checkbox enabled logic
+                    
                     let isCheckboxEnabled = false;
                     if (managerType === 'Auditor') {
-                        // Auditor can now approve regardless of other managers
-                        isCheckboxEnabled = true; // Enable for Auditor
+                       
+                        isCheckboxEnabled = true; 
                     } else {
-                        // For other managers, enable if there are GSN or GRN documents
+                        
                         isCheckboxEnabled = (gsnDocuments && gsnDocuments.length > 0) || (grnDocuments && grnDocuments.length > 0);
                     }
 
-                    // Get the first GSN document for header display with safe access
+                   
                     const firstGsnDoc = gsnDocuments && gsnDocuments.length > 0 ? gsnDocuments[0] : {};
                     const firstGrnDoc = grnDocuments && grnDocuments.length > 0 ? grnDocuments[0] : {};
 
@@ -523,7 +524,7 @@ export default function Sample({ managerType }) {
                                             </tbody>
                                         </table>
 
-                                                                    {/* Party Details Table */}
+                                                                    
                                     <div className={styles.grinDetails}>
                                         <label htmlFor=""><h5>Supplier Details</h5></label>
                                         <table>
@@ -653,19 +654,19 @@ export default function Sample({ managerType }) {
                                                                     <div style={{
                                                                         marginTop: '20px',
                                                                         padding: '10px 15px',
-                                                                        backgroundColor: 'rgba(252, 185, 0, 0.2)', // A light orange/pinkish background
+                                                                        backgroundColor: 'rgba(252, 185, 0, 0.2)',
                                                                         borderRadius: '8px',
                                                                         textAlign: 'center',
                                                                         fontSize: '0.9em',
                                                                         color: '#333',
                                                                         maxWidth: '250px',
-                                                                        margin: '20px auto 0 auto' // Center the block
+                                                                        margin: '20px auto 0 auto' 
                                                                     }}>
                                                                         <strong>CREATED AT (GSN)</strong><br/>
                                                                         {formatDate(gsnDoc.createdAt) || 'N/A'}
                                                                     </div>
 
-                                                                    {/* Photo */}
+                                                                    {}
                                                                     {gsnDoc.photoPath && (
                                     <div style={{
                                             width: "90%", margin: "20px auto", padding: "15px", 
@@ -708,7 +709,7 @@ export default function Sample({ managerType }) {
                                                             <div style={{ backgroundColor: 'rgba(218, 216, 224, 0.2)', borderRadius: '8px', padding: '15px', marginBottom: '15px' }}>
                                                                 <h4 style={{ textAlign: 'center', margin: '0 0 15px 0' }}>GRIN Document</h4>
                                     <div className={styles.grinDetails}>
-                                                                    {/* GRIN Details Table */}
+                                                                    {}
                                         <div><label htmlFor=""><h5>GRIN Details</h5></label></div>
                                         <table>
                                             <thead>
@@ -733,7 +734,7 @@ export default function Sample({ managerType }) {
                                             </tbody>
                                         </table>
 
-                                                                    {/* Party Details Table */}
+                                                                    {}
                                     <div className={styles.grinDetails}>
                                         <label htmlFor=""><h5>Supplier Details</h5></label>
                                         <table>
@@ -863,7 +864,7 @@ export default function Sample({ managerType }) {
                                     <div style={{
                                         marginTop: '20px',
                                         padding: '10px 15px',
-                                        backgroundColor: 'rgba(153, 0, 239, 0.2)', // A light purple/pinkish background
+                                        backgroundColor: 'rgba(153, 0, 239, 0.2)', 
                                         borderRadius: '8px',
                                         textAlign: 'center',
                                         fontSize: '0.9em',

@@ -6,6 +6,7 @@ import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
 import { useCombinedData } from '../../hooks/useApiData';
+import toast from 'react-hot-toast';
 
 export default function Accountant({ managerType }) {
     const [visibleItem, setVisibleItem] = useState(null);
@@ -90,6 +91,8 @@ export default function Accountant({ managerType }) {
         });
 
         const combinedListData = Object.values(combined);
+          
+            combinedListData.sort((a, b) => getLatestDate(b) - getLatestDate(a));
 
         // Function to get the latest createdAt from a group
         const getLatestDate = (item) => {
@@ -113,8 +116,8 @@ export default function Accountant({ managerType }) {
             setCombinedList(processedList);
             setIsDataLoaded(true);
 
-            // Set initial state of the checkboxes based on fetched data
-            const initialSelectedValue = processedList.reduce((acc, item) => {
+            
+            const initialSelectedValue = combinedListData.reduce((acc, item) => {
                 if (fieldName && item.hasOwnProperty(fieldName)) {
                     acc[item.partyName] = item[fieldName] === true ? 'checked' : 'not_checked';
                 } else {
@@ -215,15 +218,15 @@ export default function Accountant({ managerType }) {
                  }
             });
             console.log(`(${managerType}) Verification Response:`, response.data);
-            alert('Verification status saved successfully');
+            toast.success('Verification status saved successfully');
             await fetchAndCombineData();
         } catch (err) {
             console.error(`(${managerType}) Error saving verification status`, err);
             if (err.response) {
                 console.error(`(${managerType}) Verification Error Response:`, err.response.data);
-                alert(`Error: ${err.response.data.message || 'Could not save status'}`);
+                toast.error(`Error: ${err.response.data.message || 'Could not save status'}`);
             } else {
-                alert('An error occurred while saving the status.');
+                toast.error('An error occurred while saving the status.');
             }
         }
     };
@@ -329,7 +332,7 @@ export default function Accountant({ managerType }) {
                     const isApprovedByCurrentManager = !!item[fieldName];
                     const statusText = isApprovedByCurrentManager ? "(Approved)" : "(Not Approved)";
 
-                    // Get the first GSN document for header display
+                    
                     const firstGsnDoc = gsnDocuments[0] || {};
                     const firstGrnDoc = grnDocuments[0] || {};
 
@@ -380,7 +383,7 @@ export default function Accountant({ managerType }) {
                             <div style={{ display: "flex", flexDirection: "row" }}>
                                 {/* GSN Section */}
                                 <div className={styles.completeBlock} style={{ display: visibleItem === index ? 'block' : 'none' }}>
-                                    {/* Group GSN and GRIN documents by their order */}
+                                    {}
                                     {(() => {
                                         const maxLength = Math.max(gsnDocuments.length, grnDocuments.length);
                                         const groups = [];
@@ -551,13 +554,13 @@ export default function Accountant({ managerType }) {
                                                                 <div style={{
                                                                     marginTop: '20px',
                                                                     padding: '10px 15px',
-                                                                    backgroundColor: 'rgba(252, 185, 0, 0.2)', // A light orange/pinkish background
+                                                                    backgroundColor: 'rgba(252, 185, 0, 0.2)', 
                                                                     borderRadius: '8px',
                                                                     textAlign: 'center',
                                                                     fontSize: '0.9em',
                                                                     color: '#333',
                                                                     maxWidth: '250px',
-                                                                    margin: '20px auto 0 auto' // Center the block
+                                                                    margin: '20px auto 0 auto' 
                                                                 }}>
                                                                     <strong>CREATED AT (GSN)</strong><br/>
                                                                     {formatDate(gsnDoc.createdAt) || 'N/A'}
@@ -754,7 +757,7 @@ export default function Accountant({ managerType }) {
                                                                 <div style={{
                                                                     marginTop: '20px',
                                                                     padding: '10px 15px',
-                                                                    backgroundColor: 'rgba(153, 0, 239, 0.2)', // A light purple/pinkish background
+                                                                    backgroundColor: 'rgba(153, 0, 239, 0.2)',
                                                                     borderRadius: '8px',
                                                                     textAlign: 'center',
                                                                     fontSize: '0.9em',

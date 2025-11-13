@@ -52,7 +52,7 @@
 }
 
 .entryDetails span {
-    flex-basis: 30%; /* Adjust as needed */
+    flex-basis: 30%; 
     text-align: left;
 }
 
@@ -65,4 +65,3 @@
     color: #333;
 }
 
-/* Add styles for TableRenderingComponent if needed, or ensure its own CSS module is imported */ 

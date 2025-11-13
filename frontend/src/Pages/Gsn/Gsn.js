@@ -6,6 +6,7 @@ import TableComponent from '../../Components/Table/TableEntry'; // Import the Ta
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import { validateFile, FILE_VALIDATION_CONFIG } from '../../utils/fileValidation';
 import { useGsnData, useSuppliers } from '../../hooks/useApiData';
+import toast from 'react-hot-toast';
 
 export default function Gsn() {
     const [grinNo, setGrinNo] = useState("");
@@ -67,6 +68,36 @@ export default function Gsn() {
     const [filteredCompanies, setFilteredCompanies] = useState([]);
     const [isCompanyPopupVisible, setIsCompanyPopupVisible] = useState(false);
     const companyPopupRef = useRef(null); // Ref for company popup
+
+    // Function to get latest GSN number
+    const getLatestGsnNumber = async () => {
+        try {
+            const url = process.env.REACT_APP_BACKEND_URL;
+            const token = localStorage.getItem('authToken');
+            //  const res = await axios.get(`${url}/gsn/getdata`, {
+             const res = await axios.get(`${url}/api/v1/gsn/getdata`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+
+            // Normalize response to array
+            const data = res && res.data ? res.data : [];
+            const arr = Array.isArray(data) ? data : (data ? [data] : []);
+
+            if (arr.length > 0) {
+                // Sort by creation date to get the latest
+                const sortedData = arr.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                const latestEntry = sortedData[0];
+                if (latestEntry && latestEntry.gsn) {
+                    setLatestGsnNumber(latestEntry.gsn);
+                }
+            }
+        } catch (err) {
+            console.log("Error fetching latest GSN number:", err);
+        }
+    };
 
     const handleFileChange = (e) => {
         const file = e.target.files[0];
@@ -155,8 +186,27 @@ export default function Gsn() {
     const submitHandler = async (e) => {
         e.preventDefault();
 
+        // Client-side validation to avoid server-side validation errors
+        // Ensure required fields are present
+        if (!grinNo || (typeof grinNo === 'string' && grinNo.trim() === '')) {
+            toast.error('GRIN No is required');
+            return;
+        }
+        if (!gsn || (typeof gsn === 'string' && gsn.trim() === '')) {
+            toast.error('GSN is required');
+            return;
+        }
+        if (!partyName || (typeof partyName === 'string' && partyName.trim() === '')) {
+            toast.error('Supplier Name is required');
+            return;
+        }
+
+        // Debug: log the key values before creating FormData
+        console.debug('Submitting GSN form with', { grinNo, gsn, partyName, grinDate, gsnDate });
+
         const formData = new FormData();
-        formData.append("grinNo", grinNo);
+        // formData.append("grinNo", grinNo);
+        formData.append("grinNo", Number(grinNo));
         formData.append("grinDate", grinDate);
         formData.append("gsn", gsn);
         formData.append("gsnDate", gsnDate);
@@ -203,15 +253,17 @@ export default function Gsn() {
         try {
             const url = process.env.REACT_APP_BACKEND_URL;
             const token = localStorage.getItem('authToken');
-            console.log("Sending to URL:", `${url}/gsn/upload-data`);
+            // console.log("Sending to URL:", `${url}/gsn/upload-data`);
+            console.log("Sending to URL:", `${url}/api/v1/gsn/upload-data`);
             console.log("Token present:", !!token);
-            const response = await axios.post(`${url}/gsn/upload-data`, formData, {
+            //  const response = await axios.post(`${url}/gsn/upload-data`, formData, {
+             const response = await axios.post(`${url}/api/v1/gsn/upload-data`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
             });
             console.log(response);
-            alert("Details Submitted Successfully");
+            toast.success("Details Submitted Successfully");
             resetForm();
         } catch (error) {
             console.error('=== GSN Upload Error ===');
@@ -219,9 +271,9 @@ export default function Gsn() {
             if (error.response) {
                 console.error('Status:', error.response.status);
                 console.error('Error response:', error.response.data);
-                alert(`Error: ${error.response.data.message || 'Error in uploading data'}\n\nDetails: ${JSON.stringify(error.response.data, null, 2)}`);
+                toast.error(`Error: ${error.response.data.message || 'Error in uploading data'}\n\nDetails: ${JSON.stringify(error.response.data, null, 2)}`);
             } else {
-                alert("Error in uploading data: " + error.message);
+                toast.error("Error in uploading data: " + error.message);
             }
         }
     };
@@ -233,16 +285,37 @@ export default function Gsn() {
 
     // Process GSN data with useMemo
     useEffect(() => {
-        if (gsnDataFromAPI && Array.isArray(gsnDataFromAPI)) {
-            setbackendData(gsnDataFromAPI);
-            
-            // Get latest GSN number from cached data
-            if (gsnDataFromAPI.length > 0) {
-                const sortedData = gsnDataFromAPI.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-                const latestEntry = sortedData[0];
-                if (latestEntry && latestEntry.gsn) {
-                    setLatestGsnNumber(latestEntry.gsn);
-                }
+        const getData = async () => {
+            try {
+                const url = process.env.REACT_APP_BACKEND_URL;
+                const token = localStorage.getItem('authToken');
+                //  const res = await axios.get(`${url}/gsn/getdata`, {
+                 const res = await axios.get(`${url}/api/v1/gsn/getdata`, {
+
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
+                // Normalize backend data into an array so later .filter/.reduce won't fail
+                const data = res && res.data ? res.data : [];
+                setbackendData(Array.isArray(data) ? data : (data ? [data] : []));
+            } catch (err) {
+                console.log(err);
+            }
+        };
+        const loadSuppliers = async () => {
+            try {
+                const url = process.env.REACT_APP_BACKEND_URL;
+                const response = await axios.get(`${url}/api/suppliers`);
+                const data = Array.isArray(response.data) ? response.data : [];
+                // Do NOT de-duplicate; show all old and new entries
+                // Sort by name for readability
+                data.sort((a, b) => (a.partyName || '').localeCompare(b.partyName || ''));
+                setSuppliers(data);
+                setFilteredSuppliers(data);
+            } catch (e) {
+                console.log('Failed to load suppliers', e);
             }
         }
     }, [gsnDataFromAPI]);
@@ -465,7 +538,7 @@ export default function Gsn() {
                         <form action="" onSubmit={submitHandler} style={{ margin: 'clamp(12px, 3vw, 18px) clamp(4px, 2vw, 8px)', width: "100%", boxSizing: 'border-box' }}>
                             <div className={styles.form}>
                                 <div className={styles.formRow}>
-                                    <label className={styles.label}>GSN :</label>
+                                    <label className={styles.label}>GRIN NO :</label>
                                     <input
                                         required
                                         className={styles.input}
@@ -484,7 +557,7 @@ export default function Gsn() {
                                 </div>
 
                                 <div className={styles.formRow}>
-                                    <label className={styles.label}>GRIN NO :</label>
+                                    <label className={styles.label}>GSN :</label>
                                     <input
                                         required
                                         className={styles.input}

@@ -2,12 +2,7 @@ import { useState, useEffect, useCallback, useMemo, memo } from 'react';
 import axiosInstance from '../utils/axiosConfig';
 import { useDebounce } from '../hooks/useDebounce';
 
-/**
- * OPTIMIZED COMPONENT EXAMPLE
- * This shows best practices for preventing unnecessary re-renders
- */
 
-// Memoized child component - only re-renders when props change
 const SupplierItem = memo(({ supplier, onSelect }) => {
     return (
         <div onClick={() => onSelect(supplier)}>
@@ -22,10 +17,10 @@ const OptimizedExample = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // Debounce search to prevent excessive API calls
+    
     const debouncedSearch = useDebounce(searchTerm, 300);
 
-    // Memoized callback - doesn't recreate on every render
+    
     const loadSuppliers = useCallback(async () => {
         setLoading(true);
         try {
@@ -38,18 +33,18 @@ const OptimizedExample = () => {
         }
     }, []); // Empty deps - function never changes
 
-    // Memoized callback with dependency
+   
     const handleSelectSupplier = useCallback((supplier) => {
         console.log('Selected:', supplier);
-        // Handle selection
-    }, []); // Add dependencies if needed
+       
+    }, []); 
 
-    // Load data once on mount
+    
     useEffect(() => {
         loadSuppliers();
     }, [loadSuppliers]);
 
-    // Memoized filtered list - only recalculates when dependencies change
+   
     const filteredSuppliers = useMemo(() => {
         if (!debouncedSearch) return suppliers;
 

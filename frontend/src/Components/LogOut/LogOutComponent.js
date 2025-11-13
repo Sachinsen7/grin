@@ -22,15 +22,15 @@ export default function LogOutComponent() {
   };
 
   const handleLogOut = () => {
-    // Reset sidebar to closed state (original position)
+    
     setSidebar(true);
-    // Remove sidebar-visible class to reset body and content positioning
+    
     try {
       document.body.classList.remove('sidebar-visible');
     } catch (e) {
-      // ignore in non-browser environments
+      
     }
-    // Clear auth tokens and navigate to home
+   
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
     navigate('/');

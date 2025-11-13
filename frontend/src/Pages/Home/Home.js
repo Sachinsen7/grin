@@ -2,6 +2,7 @@ import React, { useEffect, } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './Home.module.css';
 import { useUser } from '../../Usercontext';
+import toast from 'react-hot-toast';
 
 export default function Home() {
   const { setRole } = useUser();
@@ -17,7 +18,7 @@ export default function Home() {
     if (password === '123') {
       navigate('/supplier-list');
     } else if (password !== null) {
-      alert('Incorrect password!');
+      toast.error('Incorrect password!');
     }
   };
 

@@ -2,6 +2,7 @@ import React from 'react'
 import { NavLink } from 'react-router-dom'
 import styles from './Admin.module.css'
 import LogOutComponent from '../../Components/LogOut/LogOutComponent'
+import toast from 'react-hot-toast'
 
 export default function Admin() {
   const style = {
@@ -25,10 +26,7 @@ export default function Admin() {
   return (
     <div className={styles.outerContainer}>
       <LogOutComponent/>
-    {/* <video autoPlay muted loop className={styles.videoBackground}>
-      <source src="/video.mp4" type="video/mp4" />
-      Your browser does not support the video tag.
-    </video> */}
+    {}
    
     <div className={styles.innerContainer}>
       <NavLink to='/view-user'><button style={style.button} >View Users</button></NavLink>

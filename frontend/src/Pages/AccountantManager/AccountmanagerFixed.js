@@ -5,6 +5,7 @@ import TableComponent from '../../Components/Table/Table.rendering';
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
+import toast from 'react-hot-toast';
 
 export default function Accountant() {
     const [visibleItem, setVisibleItem] = useState(null);
@@ -27,7 +28,7 @@ export default function Accountant() {
     const url = process.env.REACT_APP_BACKEND_URL;
     const fieldName = managerFieldMap[managerType];
 
-    // Function to fetch and combine data
+    
     const fetchAndCombineData = async () => {
             try {
             const token = localStorage.getItem('authToken');
@@ -59,7 +60,7 @@ export default function Accountant() {
 
             const combined = {};
             
-            // Process sorted GSN documents
+           
             sortedGsnData.forEach(doc => {
                 if (!combined[doc.partyName]) {
                     combined[doc.partyName] = {
@@ -101,7 +102,7 @@ export default function Accountant() {
 
             const combinedListData = Object.values(combined);
 
-            // Function to get the latest createdAt from a group
+            
             const getLatestDate = (item) => {
                 const dates = [
                     ...(item.gsnDocuments || []).map(d => new Date(d.createdAt)),
@@ -117,7 +118,7 @@ export default function Accountant() {
             setCombinedList(combinedListData);
             setIsDataLoaded(true);
 
-            // Set initial state of the checkboxes based on fetched data
+           
             const initialSelectedValue = combinedListData.reduce((acc, item) => {
                 if (fieldName && item.hasOwnProperty(fieldName)) {
                     acc[item.partyName] = item[fieldName] === true ? 'checked' : 'not_checked';
@@ -229,15 +230,15 @@ export default function Accountant() {
                  }
             });
             console.log(`(${managerType}) Verification Response:`, response.data);
-            alert('Verification status saved successfully');
+            toast.success('Verification status saved successfully');
             await fetchAndCombineData();
         } catch (err) {
             console.error(`(${managerType}) Error saving verification status`, err);
             if (err.response) {
                 console.error(`(${managerType}) Verification Error Response:`, err.response.data);
-                alert(`Error: ${err.response.data.message || 'Could not save status'}`);
+                toast.error(`Error: ${err.response.data.message || 'Could not save status'}`);
             } else {
-                alert('An error occurred while saving the status.');
+                toast.error('An error occurred while saving the status.');
             }
         }
     };

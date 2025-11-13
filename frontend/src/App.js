@@ -1,10 +1,10 @@
 import React from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // ✅ Added Navigate
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import SessionManager from './Components/SessionManager.js/activityinactivity';
 import { UserProvider } from './Usercontext';
 import LoginCard from './Components/Login/LoginCard';
 import Home from './Pages/Home/Home';
-import PrivateRoute from './Components/Login/private.route'; // ✅ Use this instead of redeclaring
+import PrivateRoute from './Components/Login/private.route';
 import Attendee from './Pages/Attendee/Attendee';
 import Generalmanager from './Pages/General.anager/Generalmanager';
 import Purchasemanager from './Pages/PurchaseManager/Purchasemanager';

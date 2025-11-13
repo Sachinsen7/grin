@@ -19,9 +19,9 @@ export default function GsnEntry() {
   const [selectedGsnDate, setSelectedGsnDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPartySelect, setShowPartySelect] = useState(false);
-  const [mode, setMode] = useState(''); // 'create' or 'upload'
+  const [mode, setMode] = useState(''); 
   const [billFile, setBillFile] = useState(null);
-  const [uploadStep, setUploadStep] = useState(1); // 1: party select, 2: file upload
+  const [uploadStep, setUploadStep] = useState(1); 
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
@@ -31,7 +31,7 @@ export default function GsnEntry() {
       const url = process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('authToken');
       
-      // Get GSN party data
+     
       const gsnRes = await axios.get(`${url}/gsn/getdata`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
@@ -54,8 +54,7 @@ export default function GsnEntry() {
       console.log("GRIN data:", grinData);
       
       if (forUpload) {
-        // For upload mode, we want to show parties that DO have GRINs
-        // but DON'T have bills uploaded yet
+        
         const partiesWithoutBills = grinData.filter(entry => {
           console.log(`Party: ${entry.partyName}, Has file: ${!!entry.file}`);
           return !entry.file; // Filter out entries that already have a file
@@ -64,8 +63,7 @@ export default function GsnEntry() {
         console.log("Parties without bills:", partiesWithoutBills);
         setFilteredParties(partiesWithoutBills);
       } else {
-        // For create mode, implement new logic
-        // Count GSN and GRIN entries for each party
+        
         const partyCounts = {};
         
         // Count GSN entries
@@ -86,13 +84,13 @@ export default function GsnEntry() {
         
         console.log("Party counts:", partyCounts);
         
-        // Filter parties where GSN count > GRIN count
+        
         const filteredPartyList = gsnData.filter(party => {
           const counts = partyCounts[party.partyName];
           return counts && counts.gsn > counts.grin;
         });
         
-        // Remove duplicates based on partyName
+        
         const uniqueParties = Array.from(new Set(filteredPartyList.map(p => p.partyName)))
           .map(partyName => filteredPartyList.find(p => p.partyName === partyName));
         
@@ -125,24 +123,24 @@ export default function GsnEntry() {
 const handleSelectChange = (event) => {
     const selectedIndex = event.target.selectedIndex;
     if (selectedIndex === 0) {
-      // If "Select Party Name" is selected, do nothing
+     
       return;
     }
 
     const selectedOption = event.target.selectedOptions[0];
     const partyName = selectedOption.value;
     
-    // Find all GSN entries for this party and sort by date to get the most recent
+    
     const partyGsnEntries = backendData
-      .filter(p => p.partyName === partyName && p.grinNo) // Only get GSN entries
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); // Sort by date, newest first
+      .filter(p => p.partyName === partyName && p.grinNo) 
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
     
     if (partyGsnEntries.length === 0) {
       console.error("No GSN entries found for selected party");
       return;
     }
 
-    // Get the most recent GSN entry
+    
     const mostRecentGsn = partyGsnEntries[0];
     console.log("Most recent GSN entry:", mostRecentGsn);
 
@@ -157,7 +155,7 @@ const handleSelectChange = (event) => {
         return date instanceof Date && !isNaN(date) ? date.toISOString().split('T')[0] : '';
       };
       
-      // Set state values from the most recent GSN data
+      
       const invoiceDate = mostRecentGsn.innoviceDate;
       const grinNo = mostRecentGsn.grinNo || '';
       const gsn = mostRecentGsn.gsn || '';
@@ -173,7 +171,7 @@ const handleSelectChange = (event) => {
         gsnDate
       });
       
-      // Navigate to Attendee page with the data
+      
       navigate('/grin-dashboard/entry', {
         state: {
           selectedvalue: partyName,
@@ -182,11 +180,11 @@ const handleSelectChange = (event) => {
           selectedGsn: gsn,
           selectedGrinDate: grinDate,
           selectedGsnDate: gsnDate,
-          isNewEntry: true // Add flag to indicate this is a new entry
+          isNewEntry: true 
         }
       });
     } else if (mode === 'upload') {
-      // Move to next step for file upload
+      
       console.log("Selected party data for UPLOAD:", mostRecentGsn);
       setUploadStep(2);
     }
@@ -214,14 +212,14 @@ const handleSelectChange = (event) => {
       return;
     }
     
-    // Use the _id from the selectedParty (which is a GRIN entry in upload mode)
+    
     if (!selectedParty || !selectedParty._id) {
       setMessage("No party selected or invalid party data (missing _id)");
       console.error("Selected party is missing or has no _id:", selectedParty);
       return;
     }
     
-    const partyIdToUpdate = selectedParty._id; // Store the ID before resetting state
+    const partyIdToUpdate = selectedParty._id; 
     
     try {
       setSubmitting(true);
@@ -250,20 +248,17 @@ const handleSelectChange = (event) => {
         return p._id !== partyIdToUpdate;
       }));
       
-      // Reset the form fields
+     
       setBillFile(null);
-      // Keep uploadStep at 2 initially to show success message, then reset if needed or go back
-      // setUploadStep(1); 
+      
       setSelectedParty(null);
       setSelectedValue('');
       
-      // Go back to party selection after a delay
+      
       setTimeout(() => {
-        setUploadStep(1); // Go back to party selection step
+        setUploadStep(1); 
         setMessage('');
-        // Optional: Re-fetch data if you want the list to be fully up-to-date 
-        // in case other changes happened, but filtering locally is faster for immediate feedback.
-        // fetchPartyData(true);
+      
       }, 2000); 
       
     } catch (error) {
