@@ -7,8 +7,9 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import Modal from 'react-modal';
 import TableEntry from '../../Components/Table/TableEntry';
+import toast from 'react-hot-toast';
 
-// Format date function
+
 const formatDate = (oldFormat) => {
     if (!oldFormat) return "N/A";
     const date = new Date(oldFormat);
@@ -26,7 +27,7 @@ const formatDate = (oldFormat) => {
     return `${formattedDate}, ${formattedTime}`;
 };
 
-// Add a new function to format date only with year
+
 const formatDateOnly = (oldFormat) => {
     if (!oldFormat) return "N/A";
     const date = new Date(oldFormat);
@@ -37,7 +38,7 @@ const formatDateOnly = (oldFormat) => {
     });
 };
 
-// Add a new function to format time only
+
 const formatTimeOnly = (oldFormat) => {
     if (!oldFormat) return "N/A";
     const date = new Date(oldFormat);
@@ -54,7 +55,7 @@ export default function ViewForm({ managerType }) {
     const [combinedList, setCombinedList] = useState([]);
     const url = process.env.REACT_APP_BACKEND_URL;
 
-    // State for search
+    
     const [searchTerm, setSearchTerm] = useState('');
     const [filteredCombinedList, setFilteredCombinedList] = useState([]);
 
@@ -114,7 +115,7 @@ export default function ViewForm({ managerType }) {
                 
                 pdf.save(`${sanitizedPartyName}_Group${groupIndex + 1}_Approved.pdf`);
 
-                // Restore display
+                
                 elementsToHide.forEach((el, i) => {
                     el.style.display = originalDisplayValues.elementsToHide[i];
                 });
@@ -123,7 +124,7 @@ export default function ViewForm({ managerType }) {
                 }
             }).catch(err => {
                 console.error("Error generating PDF:", err);
-                // Restore display on error
+                
                 elementsToHide.forEach((el, i) => {
                     el.style.display = originalDisplayValues.elementsToHide[i];
                 });
@@ -244,7 +245,7 @@ export default function ViewForm({ managerType }) {
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
             filtered = combinedList.filter(item => {
-                // Check party name
+                
                 const partyNameMatch = item.partyName.toLowerCase().includes(searchLower);
                 
                 // Check GRN/GRIN in both GSN and GRN documents
@@ -287,13 +288,13 @@ export default function ViewForm({ managerType }) {
             });
             setCombinedList(prev => prev.filter(item => item.partyName !== partyName));
             setFilteredCombinedList(prev => prev.filter(item => item.partyName !== partyName));
-            alert('Party deleted successfully!');
+            toast.success('Party deleted successfully!');
         } catch (err) {
             let msg = 'Error deleting party.';
             if (err.response && err.response.data && err.response.data.message) {
                 msg += ' ' + err.response.data.message;
             }
-            alert(msg);
+            toast.error(msg);
             console.error(err);
         }
     };
@@ -423,7 +424,7 @@ export default function ViewForm({ managerType }) {
             if (editGsnData && editGsnData.partyName) {
                 console.log('=== GSN UPDATE PROCESS START ===');
                 
-                // Clean and validate the data before sending
+                
                 const cleanedGsnData = {};
                 
                 // Only copy specific fields that we want to update
@@ -500,7 +501,7 @@ export default function ViewForm({ managerType }) {
             if (editGrnData && editGrnData.partyName) {
                 console.log('=== GRN UPDATE PROCESS START ===');
                 
-                // Clean and validate the data before sending
+                
                 const cleanedGrnData = {};
                 
                 // Only copy specific fields that we want to update
@@ -584,7 +585,7 @@ export default function ViewForm({ managerType }) {
                 successMessage = 'GRIN document updated successfully!';
             }
             
-            alert(successMessage);
+            toast.success(successMessage);
             
             // Refresh the data instead of reloading the page
             window.location.reload();
@@ -600,7 +601,7 @@ export default function ViewForm({ managerType }) {
                 errorMessage += ' ' + err.message;
             }
             
-            alert(errorMessage);
+            toast.error(errorMessage);
         }
     };
 
@@ -859,7 +860,7 @@ export default function ViewForm({ managerType }) {
                                                         fontSize: '0.9em',
                                                         color: '#333',
                                                         maxWidth: '250px',
-                                                        margin: '20px auto 0 auto' // Center the block
+                                                        margin: '20px auto 0 auto' 
                                                     }}>
                                                         <strong>CREATED AT (GSN)</strong><br/>
                                                         {formatDate(gsnDoc.createdAt) || 'N/A'}
@@ -1056,13 +1057,13 @@ export default function ViewForm({ managerType }) {
                                                     <div style={{
                                                         marginTop: '20px',
                                                         padding: '10px 15px',
-                                                        backgroundColor: 'rgba(153, 0, 239, 0.2)', // A light purple/pinkish background
+                                                        backgroundColor: 'rgba(153, 0, 239, 0.2)', 
                                                         borderRadius: '8px',
                                                         textAlign: 'center',
                                                         fontSize: '0.9em',
                                                         color: '#333',
                                                         maxWidth: '250px',
-                                                        margin: '20px auto 0 auto' // Center the block
+                                                        margin: '20px auto 0 auto' 
                                                     }}>
                                                         <strong>CREATED AT (GRIN)</strong><br/>
                                                         {formatDate(grnDoc.createdAt) || 'N/A'}

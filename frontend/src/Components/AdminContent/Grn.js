@@ -5,6 +5,7 @@ import TableComponent from '../../Components/Table/Table.rendering';
 import LogOutComponent from '../LogOut/LogOutComponent';
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import toast from 'react-hot-toast';
 
 export default function Grn({ managerType }) {
     const [visibleItem, setVisibleItem] = useState(null);
@@ -21,7 +22,7 @@ export default function Grn({ managerType }) {
             const imgData = canvas.toDataURL("image/png");
             const pdf = new jsPDF("p", "mm", "a4");
 
-            const imgWidth = 210; // A4 width in mm
+            const imgWidth = 210; 
             const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
             pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
@@ -40,7 +41,7 @@ export default function Grn({ managerType }) {
 
 
 
-    // Fetching data from API
+   
     useEffect(() => {
         const fetchingData = async () => {
             try {
@@ -63,7 +64,7 @@ export default function Grn({ managerType }) {
                 const fieldName = managerFieldMap[managerType]; 
                 console.log('Field name for manager type:', fieldName);
 
-                // Set initial state of the checkboxes based on fetched data
+                
                 const initialSelectedValue = fetchedList.reduce((acc, item) => {
                     acc[item._id] = item[fieldName] === true ? 'checked' : 'not_checked';
                     return acc;
@@ -88,33 +89,33 @@ export default function Grn({ managerType }) {
         setVisibleItem(visibleItem === index ? null : index);
     };
     
-    // Handle form submission
+ 
   
 
-    // Handle radio input change
+    
     const handleRadioChange = async (e, _id) => {
         e.preventDefault();
     
-        // Toggle status based on current state
+        
         const newHiddenState = !showHideState[_id];
     console.log(newHiddenState)
         try {
             const url = process.env.REACT_APP_BACKEND_URL;
             
-            // Send the update request to the backend
+            
             await axios.post(`${url}/verify`, {
                 _Id: _id,
                 
                 isHidden: newHiddenState, 
             });
     
-           // Toggle visibility state for hiding/showing the item
+           
             setShowHideState(prevState => ({
                 ...prevState,
                 [_id]: newHiddenState
             }));
     
-            alert(`Document is now ${newHiddenState ? 'Hidden' : 'Visible'} successfully`);
+            toast.success(`Document is now ${newHiddenState ? 'Hidden' : 'Visible'} successfully`);
         } catch (err) {
             console.error("Error updating visibility status", err);
         }
@@ -156,7 +157,7 @@ export default function Grn({ managerType }) {
                     createdAt
                 } = item;
 
-                // const isAccountManagerEnabled = GeneralManagerSigned && PurchaseManagerSigned && StoreManagerSigned;
+                
 
 
                 const date = new Date(createdAt);
@@ -244,7 +245,7 @@ export default function Grn({ managerType }) {
                                     </tbody>
                                 </table>
                             </div>
-                            {/* Material Info */}
+                            {}
                             <div style={{
                                 border: "1px solid #ccc",
                                 width: "90%",
@@ -291,16 +292,7 @@ export default function Grn({ managerType }) {
                                     color: '#34495e',
                                 }}>{formattedDate}</p>
                             </div>
-                            {/* <div style={{ width: "100%" }}>
-                                <h2>Here is file</h2>
-                                {file ? (
-                                    <a href={`process.env.LOCAL_HOST_PORT/files/${file}`} target="_blank" rel="noopener noreferrer">
-                                        View/Download File
-                                    </a>
-                                ) : (
-                                    <p>No file available</p>
-                                )}
-                            </div> */}
+                            {}
 
                             <div style={{
                                 width: "100%",
@@ -363,16 +355,16 @@ export default function Grn({ managerType }) {
                                         <input
                                             name={`checkbox-${index}`}
                                             style={{
-                                                width: '12px', /* Adjust width */
-                                                height: '20px', /* Adjust height */
-                                                transform: 'scale(1.5)', /* Increase size */
+                                                width: '12px', 
+                                                height: '20px', 
+                                                transform: 'scale(1.5)',
                                                 cursor: 'pointer',
                                                 marginLeft: '10px'
                                             }}
                                             value='checked'
                                             type="checkbox"
                                             checked={GeneralManagerSigned}
-                                        // checked={selectedValue[_id] === 'checked'}
+                                        
                                         />
                                     </div>
                                     <div>
@@ -380,9 +372,9 @@ export default function Grn({ managerType }) {
                                         <input
                                             name={`checkbox-${index}`}
                                             style={{
-                                                width: '12px', /* Adjust width */
-                                                height: '20px', /* Adjust height */
-                                                transform: 'scale(1.5)', /* Increase size */
+                                                width: '12px', 
+                                                height: '20px', 
+                                                transform: 'scale(1.5)', 
                                                 cursor: 'pointer',
                                                 marginLeft: '10px'
                                             }}
@@ -391,7 +383,7 @@ export default function Grn({ managerType }) {
 
                                             checked={StoreManagerSigned}
 
-                                        // checked={selectedValue[_id] === 'checked'}
+                                        
                                         />
                                     </div>
                                     <div>
@@ -399,9 +391,9 @@ export default function Grn({ managerType }) {
                                         <input
                                             name={`checkbox-${index}`}
                                             style={{
-                                                width: '12px', /* Adjust width */
-                                                height: '20px', /* Adjust height */
-                                                transform: 'scale(1.5)', /* Increase size */
+                                                width: '12px', 
+                                                height: '20px', 
+                                                transform: 'scale(1.5)', 
                                                 cursor: 'pointer',
                                                 marginLeft: '10px'
                                             }}
@@ -418,9 +410,9 @@ export default function Grn({ managerType }) {
                                         <input
                                             name={`checkbox-${index}`}
                                             style={{
-                                                width: '12px', /* Adjust width */
-                                                height: '20px', /* Adjust height */
-                                                transform: 'scale(1.5)', /* Increase size */
+                                                width: '12px', 
+                                                height: '20px', 
+                                                transform: 'scale(1.5)',
                                                 cursor: 'pointer',
                                                 marginLeft: '10px'
                                             }}
@@ -441,17 +433,17 @@ export default function Grn({ managerType }) {
                                             margin: '5px',
 
                                             padding: "0 10px",
-                                            minWidth: "80px",       // Increase padding for better touch interaction
+                                            minWidth: "80px",      
                                             borderRadius: '15px',
-                                            border: '2px solid transparent', // Solid border for better contrast
+                                            border: '2px solid transparent', 
                                             backgroundColor: 'rgba(230, 216, 224, 0.8)',
                                             color: 'black',
-                                            fontSize: '1rem',      // Relative font size for scalability
-                                            transition: 'background-color 0.3s ease',  // Add smooth hover effect
+                                            fontSize: '1rem',      
+                                            transition: 'background-color 0.3s ease',  
                                             }}
                                             onMouseEnter={(e) => e.target.style.backgroundColor = "#0056b3"}
                                             onMouseLeave={(e) => e.target.style.backgroundColor = "rgba(230, 216, 224, 0.8)"}
-                                          // onChange={() => handleRadioChange(_id, 'checked')}
+                                        
                                           onClick={(e) => handleRadioChange(e, _id)}
 
                                         >  {showHideState[_id] ? 'UnHide' : 'Hide'}</button>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function SupplierList() {
   const url = process.env.REACT_APP_BACKEND_URL;
@@ -6,12 +7,12 @@ export default function SupplierList() {
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState(null); // partyName of expanded row
-  const [details, setDetails] = useState({}); // { [partyName]: [{gsn, grinNo}] }
+  const [expanded, setExpanded] = useState(null); 
+  const [details, setDetails] = useState({}); 
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState(null);
-  const [editIdx, setEditIdx] = useState(null); // index of row being edited
-  const [editData, setEditData] = useState({}); // temp data for editing
+  const [editIdx, setEditIdx] = useState(null);
+  const [editData, setEditData] = useState({}); 
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
@@ -38,7 +39,7 @@ export default function SupplierList() {
         return res.json();
       })
       .then(data => {
-        // Server wraps response as { success: true, data: [...] }
+        
         let suppliers = data;
         if (data && data.data && Array.isArray(data.data)) {
           suppliers = data.data;
@@ -47,7 +48,7 @@ export default function SupplierList() {
           throw new Error('Invalid suppliers data from server');
         }
         
-        // Unique filter: only by partyName (ignore case and spaces)
+        
         const uniqueSuppliers = suppliers.filter((supplier, index, self) => {
           const currName = (supplier.partyName || '').trim().toLowerCase();
           return index === self.findIndex(s =>
@@ -55,7 +56,7 @@ export default function SupplierList() {
           );
         });
 
-        // Sort alphabetically by partyName
+      
         uniqueSuppliers.sort((a, b) => {
           const nameA = (a.partyName || '').trim().toLowerCase();
           const nameB = (b.partyName || '').trim().toLowerCase();
@@ -72,7 +73,7 @@ export default function SupplierList() {
       });
   }, []);
 
-  // Filter suppliers based on search criteria
+  
   useEffect(() => {
     let filtered = suppliers.filter(supplier => {
       const partyNameMatch = (supplier.partyName || '').toLowerCase().includes(searchFilters.partyName.toLowerCase());
@@ -157,10 +158,10 @@ export default function SupplierList() {
       setSuppliers(suppliers.map((s, i) => i === editIdx ? editData : s));
       setFilteredSuppliers(filteredSuppliers.map((s, i) => i === editIdx ? editData : s));
       setEditIdx(null);
-      alert('Supplier updated successfully!');
+      toast.success('Supplier updated successfully!');
     } catch (err) {
       console.error('Update error:', err);
-      alert('Update failed: ' + err.message);
+      toast.error('Update failed: ' + err.message);
     }
     setActionLoading(false);
   };
@@ -181,10 +182,10 @@ export default function SupplierList() {
       
       setSuppliers(suppliers.filter(s => s.partyName !== partyName));
       setFilteredSuppliers(filteredSuppliers.filter(s => s.partyName !== partyName));
-      alert('Supplier deleted successfully!');
+      toast.success('Supplier deleted successfully!');
     } catch (err) {
       console.error('Delete error:', err);
-      alert('Delete failed: ' + err.message);
+      toast.error('Delete failed: ' + err.message);
     }
     setActionLoading(false);
   };
@@ -236,10 +237,10 @@ export default function SupplierList() {
         gstNo: '',
         mobileNo: ''
       });
-      alert('Supplier added successfully!');
+      toast.success('Supplier added successfully!');
     } catch (err) {
       console.error('Add supplier error:', err);
-      alert('Add failed: ' + err.message);
+      toast.error('Add failed: ' + err.message);
     }
     setAddLoading(false);
   };
@@ -257,11 +258,11 @@ export default function SupplierList() {
   if (loading) return <div style={{ padding: '2rem' }}>Loading...</div>;
   if (error) return <div style={{ padding: '2rem', color: 'red' }}>Error: {error}</div>;
 
-  // Gradient background style (copied from Gsn.js)
+  
   const containerStyle = {
     minHeight: '100vh',
     width: '100vw',
-    overflow: 'auto', // Allow scrolling
+    overflow: 'auto', 
     textAlign: 'center',
     padding: '20px',
     background: 'linear-gradient(-45deg, #fcb900, #9900ef, #ff6900, #00ff07)',
@@ -287,7 +288,7 @@ export default function SupplierList() {
     }
   `;
 
-  // Table container style
+
   const tableContainerStyle = {
     width: '90%',
     marginTop: '2rem',
@@ -297,7 +298,7 @@ export default function SupplierList() {
     overflow: 'hidden',
   };
 
-  // Header table style (fixed)
+  
   const headerTableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
@@ -307,9 +308,9 @@ export default function SupplierList() {
 
   // Body wrapper style (scrollable)
   const bodyWrapperStyle = {
-    maxHeight: '60vh', // Limit height to enable scrolling
-    overflowY: 'auto', // Enable vertical scrolling
-    overflowX: 'hidden', // Hide horizontal scrolling
+    maxHeight: '60vh', 
+    overflowY: 'auto',
+    overflowX: 'hidden',
   };
 
   // Body table style
@@ -322,13 +323,13 @@ export default function SupplierList() {
   const cellStyle = {
     border: '1px solid #ccc',
     padding: '8px',
-    backgroundColor: '#f5f5f5', // light gray for all cells
+    backgroundColor: '#f5f5f5', 
   };
   const theadCellStyle = {
     ...cellStyle,
     backgroundColor: 'rgba(174, 145, 253, 0.8)',
     fontWeight: 'bold',
-    color: '#fff', // white text
+    color: '#fff', 
   };
   const buttonStyle = {
     backgroundColor: 'rgba(190, 190, 191, 0.8)',
@@ -359,7 +360,7 @@ export default function SupplierList() {
     gap: '10px'
   };
 
-  // Search container style
+ 
   const searchContainerStyle = {
     width: '90%',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -369,7 +370,7 @@ export default function SupplierList() {
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
   };
 
-  // Search input style
+  
   const searchInputStyle = {
     width: '100%',
     padding: '8px 12px',
@@ -379,7 +380,7 @@ export default function SupplierList() {
     marginBottom: '8px',
   };
 
-  // Search label style
+ 
   const searchLabelStyle = {
     display: 'block',
     marginBottom: '5px',
@@ -388,7 +389,7 @@ export default function SupplierList() {
     fontSize: '14px',
   };
 
-  // Clear button style
+ 
   const clearButtonStyle = {
     backgroundColor: '#ff6b6b',
     color: 'white',

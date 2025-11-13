@@ -14,7 +14,7 @@ const SessionManager = () => {
       if (decodedToken.exp < currentTime) {
         localStorage.removeItem('authToken');
         localStorage.removeItem('userRole');
-        navigate('/'); // Redirect to login
+        navigate('/'); 
       }
     }
   };
@@ -23,24 +23,24 @@ const SessionManager = () => {
     checkTokenValidity();
     const intervalId = setInterval(() => {
       checkTokenValidity();
-    }, 60000); // Check token every minute
+    }, 60000); 
 
-    return () => clearInterval(intervalId); // Cleanup interval
+    return () => clearInterval(intervalId); 
   }, [navigate]);
 
   // Logout function due to inactivity
   const logOutUser = useCallback(() => {
     localStorage.removeItem('authToken');
     localStorage.removeItem('userRole');
-    navigate('/'); // Redirect to login
+    navigate('/'); 
   }, [navigate]);
 
   useEffect(() => {
     let logoutTimer;
 
     const resetTimer = () => {
-      clearTimeout(logoutTimer); // Clear existing timer
-      logoutTimer = setTimeout(logOutUser, 300000); // 2 minutes = 120000 ms
+      clearTimeout(logoutTimer); 
+      logoutTimer = setTimeout(logOutUser, 300000); 
     };
 
     const activityEvents = ['mousemove', 'mousedown','mouseup',  'keypress','keydown', 'keyup', 'scroll', 'touchstart','touchmove','touchend', 'wheel','resize',];
@@ -49,17 +49,17 @@ const SessionManager = () => {
       window.addEventListener(event, resetTimer);
     });
 
-    resetTimer(); // Start the initial timer when component mounts
+    resetTimer(); 
 
     return () => {
-      clearTimeout(logoutTimer); // Cleanup timer
+      clearTimeout(logoutTimer); 
       activityEvents.forEach((event) => {
         window.removeEventListener(event, resetTimer);
       });
     };
   }, [logOutUser]);
 
-  return null; // No UI needed, just logic
+  return null; 
 };
 
 export default SessionManager;

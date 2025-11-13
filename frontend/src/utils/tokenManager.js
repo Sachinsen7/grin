@@ -4,9 +4,9 @@ const TOKEN_KEY = 'authToken';
 const ROLE_KEY = 'userRole';
 const TOKEN_EXPIRY_KEY = 'tokenExpiry';
 
-// Token will expire in 15 minutes (as set in backend)
-const TOKEN_LIFETIME = 15 * 60 * 1000; // 15 minutes in milliseconds
-const REFRESH_BEFORE = 2 * 60 * 1000; // Refresh 2 minutes before expiry
+
+const TOKEN_LIFETIME = 15 * 60 * 1000; 
+const REFRESH_BEFORE = 2 * 60 * 1000; 
 
 class TokenManager {
     constructor() {
@@ -98,7 +98,7 @@ class TokenManager {
             return;
         }
 
-        // Schedule refresh before token expires
+       
         const refreshTime = Math.max(0, timeUntilExpiry - REFRESH_BEFORE);
 
         this.refreshTimer = setTimeout(() => {

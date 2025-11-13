@@ -28,9 +28,7 @@ export const useApi = (url, options = {}) => {
     return { data, loading, error, refetch: fetchData };
 };
 
-/**
- * Hook for POST requests
- */
+
 export const useApiPost = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);

@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 import Styles from './Admin.module.css';
-import Signup from '../../Components/Signup/Signup'; // Assuming you have a SignIn component
+import Signup from '../../Components/Signup/Signup'; 
 import axios from 'axios';
 import LogOutComponent from '../LogOut/LogOutComponent';
-import { FaTimes } from 'react-icons/fa'; // Import a close icon from react-icons
+import { FaTimes } from 'react-icons/fa'; 
+import toast from 'react-hot-toast';
 
 export default function Admin() {
   const [add, setadd] = useState('');
   const [users, setUsers] = useState(null);
   const [fetched, setFetched] = useState();
-  const [managers, setManagers] = useState([]); // Initialize as empty array
+  const [managers, setManagers] = useState([]); 
   const [show, setShow] = useState(false);
   const [position, setPosition] = useState('');
   const [list, setList] = useState('');
@@ -22,28 +23,28 @@ export default function Admin() {
   };
 
   const handleClick = (fetchEndpoint, listTitle) => {
-    // Only fetch if the section is being opened or endpoint changes
+    
     if (!show || fetched !== fetchEndpoint) {
         setFetched(fetchEndpoint);
-        setShow(true); // Ensure list is shown when clicking members
+        setShow(true); 
         setList(listTitle);
     } else {
-        setShow(false); // Hide if clicking the same section again
-        setFetched(null); // Clear fetched endpoint
+        setShow(false); 
+        setFetched(null); 
     }
   };
 
   useEffect(() => {
     const getAllData = async () => {
-      if (!fetched) { // Only fetch if 'fetched' endpoint is set
-          setManagers([]); // Clear managers if no endpoint selected
+      if (!fetched) { 
+          setManagers([]); 
           return;
       }
       try {
         const token = localStorage.getItem('authToken');
         if (!token) {
             console.error("No auth token found");
-            // Handle missing token, maybe redirect to login
+           
             return;
         }
         const url = process.env.REACT_APP_BACKEND_URL;
@@ -60,13 +61,13 @@ export default function Admin() {
         console.error("Error fetching data:", err);
         if (err.response) {
             console.error("Error Response:", err.response.data);
-            // Maybe show an error message to the user
+            
         }
-        setManagers([]); // Clear managers on error
+        setManagers([]); 
       }
     };
     getAllData();
-  }, [fetched, reload]); // Depend on fetched and reload
+  }, [fetched, reload]); 
 
   const handleAdd = (signupEndpoint, rolePosition) => {
     setadd(signupEndpoint);
@@ -79,7 +80,7 @@ export default function Admin() {
          console.error("Missing ID or endpoint for deletion");
          return;
      }
-     // Confirmation dialog
+    
      if (!window.confirm(`Are you sure you want to delete user ${_id}?`)) {
         return;
      }
@@ -99,22 +100,22 @@ export default function Admin() {
             'Content-Type': 'application/json',
           },
         });
-        alert('User deleted successfully!');
-        setReload((prev) => !prev); // Trigger data refetch
+        toast.success('User deleted successfully!');
+        setReload((prev) => !prev); 
       } catch (err) {
         console.error("Error deleting user:", err);
         if (err.response) {
             console.error("Delete Error Response:", err.response.data);
-             alert(`Error deleting user: ${err.response.data.message || 'Server error'}`);
+             toast.error(`Error deleting user: ${err.response.data.message || 'Server error'}`);
         } else {
-             alert('Error deleting user. Network error or server unavailable.');
+             toast.error('Error deleting user. Network error or server unavailable.');
         }
       }
     };
     postDelete();
   };
 
-  // Helper to create manager sections
+  
   const renderManagerSection = (name, role, signupPath, getAllPath) => (
           <div
             className={Styles.admin}
@@ -182,7 +183,7 @@ export default function Admin() {
           className={Styles.outerContainer}
           style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}
           >
-          {/* Render existing manager sections using the helper */}
+          {}
           {renderManagerSection('Admin', 'Admin', '/sign-up/admin', '/getAll/admin')}
           {renderManagerSection('GSN', 'gsn', '/sign-up/gsn', '/getAll/gsn')}
           {renderManagerSection('GRIN', 'GRIN', '/sign-up/attendee', '/getAll/attendee')}
@@ -190,14 +191,14 @@ export default function Admin() {
           {renderManagerSection('Store Manager', 'Store Manager', '/sign-up/storemanager', '/getAll/storemanager')}
           {renderManagerSection('General Manager', 'General Manager', '/sign-up/generalmanager', '/getAll/generalmanager')}
          
-          {/* **** ADDED: Auditor Section **** */}
+          {}
           {renderManagerSection('Auditor', 'Auditor', '/sign-up/auditor', '/getAll/auditor')}
-          {/* **** END ADDED **** */}
+          {}
 
-          {/* Render Account Manager Section */} 
+          {} 
           {renderManagerSection('Account Manager', 'Account Manager', '/sign-up/accountmanager', '/getAll/accountmanager')}
           
-          {/* List of Members (conditional rendering) */}
+          {}
           <div className="list" style={{ 
               display: show ? 'block' : 'none', 
               width: '90%', 
@@ -211,7 +212,7 @@ export default function Admin() {
                  <h3 style={{ color: 'black', margin: 0 }}>{list} Members</h3>
                  <FaTimes 
                     style={{ cursor: 'pointer', fontSize: '20px' }} 
-                    onClick={() => setShow(false)} // Close button for the list
+                    onClick={() => setShow(false)} 
                 />
             </div>
             {managers.length > 0 ? (
@@ -253,7 +254,7 @@ export default function Admin() {
         </div>
       </div>
 
-      {/* Modal for Signup Form */}
+      {}
       {isModalOpen && (
         <div style={{
             position: 'fixed',

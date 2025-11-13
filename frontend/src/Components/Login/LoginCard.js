@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import tokenManager from '../../utils/tokenManager';
+import toast from 'react-hot-toast';
 
 export default function LoginCard({ value, onLogin }) {
   const [username, setUsername] = useState("");
@@ -25,16 +26,14 @@ export default function LoginCard({ value, onLogin }) {
         username,
         password,
       }, {
-        withCredentials: true // Important for refresh token cookie
+        withCredentials: true 
       });
 
-      // Backend returns { success: true, data: { accessToken: "..." } }
       const token = response.data.data?.accessToken || response.data.token;
 
       if (token) {
-        // Use token manager for secure token storage with expiry tracking
         tokenManager.setToken(token, role);
-        alert(`You are Logged In`);
+        toast.success(`You are Logged In`);
 
         switch (role) {
           case 'admin':
@@ -67,7 +66,7 @@ export default function LoginCard({ value, onLogin }) {
       }
     } catch (error) {
       const errorMessage = error.response?.data?.message || "An unexpected error occurred. Please try again.";
-      alert(errorMessage);
+      toast.error(errorMessage);
       console.error('Error during login', error);
     }
   };
