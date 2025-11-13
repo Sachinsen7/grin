@@ -1,24 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { useSuppliers } from '../hooks/useApiData';
 import toast from 'react-hot-toast';
 
 export default function SupplierList() {
   const url = process.env.REACT_APP_BACKEND_URL;
-  // Use React Query for caching
-  const { data: fetchedSuppliers = [], isLoading: loading, error } = useSuppliers();
-  
+
   const [suppliers, setSuppliers] = useState([]);
   const [filteredSuppliers, setFilteredSuppliers] = useState([]);
- 
   const [details, setDetails] = useState({}); // { [partyName]: [{gsn, grinNo}] }
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [expanded, setExpanded] = useState(null); 
-  const [details, setDetails] = useState({}); 
+  const [expanded, setExpanded] = useState(null);
   const [detailsLoading, setDetailsLoading] = useState(false);
   const [detailsError, setDetailsError] = useState(null);
   const [editIdx, setEditIdx] = useState(null);
-  const [editData, setEditData] = useState({}); 
+  const [editData, setEditData] = useState({});
   const [actionLoading, setActionLoading] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [newSupplier, setNewSupplier] = useState({
@@ -37,7 +32,7 @@ export default function SupplierList() {
     mobileNo: ''
   });
 
-  // Update suppliers when fetched data changes
+  // Fetch suppliers on mount
   useEffect(() => {
     const url = process.env.REACT_APP_BACKEND_URL;
     fetch(`${url}/api/suppliers`)
@@ -46,7 +41,6 @@ export default function SupplierList() {
         return res.json();
       })
       .then(data => {
-        
         let suppliers = data;
         if (data && data.data && Array.isArray(data.data)) {
           suppliers = data.data;
@@ -54,8 +48,7 @@ export default function SupplierList() {
           console.error('Suppliers API returned unexpected format:', data);
           throw new Error('Invalid suppliers data from server');
         }
-        
-        
+
         const uniqueSuppliers = suppliers.filter((supplier, index, self) => {
           const currName = (supplier.partyName || '').trim().toLowerCase();
           return index === self.findIndex(s =>
@@ -63,21 +56,23 @@ export default function SupplierList() {
           );
         });
 
-      
         uniqueSuppliers.sort((a, b) => {
           const nameA = (a.partyName || '').trim().toLowerCase();
           const nameB = (b.partyName || '').trim().toLowerCase();
           return nameA.localeCompare(nameB);
         });
 
-      // Sort alphabetically by partyName
-      uniqueSuppliers.sort((a, b) => {
-        const nameA = (a.partyName || '').trim().toLowerCase();
-        const nameB = (b.partyName || '').trim().toLowerCase();
-        return nameA.localeCompare(nameB);
+        setSuppliers(uniqueSuppliers);
+        setFilteredSuppliers(uniqueSuppliers);
+        setLoading(false);
+      })
+      .catch(err => {
+        setError(err.message);
+        setLoading(false);
       });
+  }, []);
 
-  
+
   useEffect(() => {
     let filtered = suppliers.filter(supplier => {
       const partyNameMatch = (supplier.partyName || '').toLowerCase().includes(searchFilters.partyName.toLowerCase());
@@ -151,13 +146,13 @@ export default function SupplierList() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData)
       });
-      
+
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to update');
       }
-      
+
       // Update local state
       setSuppliers(suppliers.map((s, i) => i === editIdx ? editData : s));
       setFilteredSuppliers(filteredSuppliers.map((s, i) => i === editIdx ? editData : s));
@@ -177,13 +172,13 @@ export default function SupplierList() {
       const res = await fetch(`${url}/api/supplier/${encodeURIComponent(partyName)}`, {
         method: 'DELETE'
       });
-      
+
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to delete');
       }
-      
+
       setSuppliers(suppliers.filter(s => s.partyName !== partyName));
       setFilteredSuppliers(filteredSuppliers.filter(s => s.partyName !== partyName));
       toast.success('Supplier deleted successfully!');
@@ -218,20 +213,20 @@ export default function SupplierList() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newSupplier)
       });
-      
+
       const data = await res.json();
-      
+
       if (!res.ok) {
         throw new Error(data.error || 'Failed to add supplier');
       }
-      
+
       // Add to local state
       const updatedSuppliers = [...suppliers, data].sort((a, b) => {
         const nameA = (a.partyName || '').trim().toLowerCase();
         const nameB = (b.partyName || '').trim().toLowerCase();
         return nameA.localeCompare(nameB);
       });
-      
+
       setSuppliers(updatedSuppliers);
       setFilteredSuppliers(updatedSuppliers);
       setShowAddModal(false);
@@ -262,11 +257,11 @@ export default function SupplierList() {
   if (loading) return <div style={{ padding: '2rem' }}>Loading...</div>;
   if (error) return <div style={{ padding: '2rem', color: 'red' }}>Error: {error}</div>;
 
-  
+
   const containerStyle = {
     minHeight: '100vh',
     width: '100vw',
-    overflow: 'auto', 
+    overflow: 'auto',
     textAlign: 'center',
     padding: '20px',
     background: 'linear-gradient(-45deg, #fcb900, #9900ef, #ff6900, #00ff07)',
@@ -302,7 +297,7 @@ export default function SupplierList() {
     overflow: 'hidden',
   };
 
-  
+
   const headerTableStyle = {
     width: '100%',
     borderCollapse: 'collapse',
@@ -312,7 +307,7 @@ export default function SupplierList() {
 
   // Body wrapper style (scrollable)
   const bodyWrapperStyle = {
-    maxHeight: '60vh', 
+    maxHeight: '60vh',
     overflowY: 'auto',
     overflowX: 'hidden',
   };
@@ -327,13 +322,13 @@ export default function SupplierList() {
   const cellStyle = {
     border: '1px solid #ccc',
     padding: '8px',
-    backgroundColor: '#f5f5f5', 
+    backgroundColor: '#f5f5f5',
   };
   const theadCellStyle = {
     ...cellStyle,
     backgroundColor: 'rgba(174, 145, 253, 0.8)',
     fontWeight: 'bold',
-    color: '#fff', 
+    color: '#fff',
   };
   const buttonStyle = {
     backgroundColor: 'rgba(190, 190, 191, 0.8)',
@@ -364,7 +359,7 @@ export default function SupplierList() {
     gap: '10px'
   };
 
- 
+
   const searchContainerStyle = {
     width: '90%',
     backgroundColor: 'rgba(255, 255, 255, 0.9)',
@@ -374,7 +369,7 @@ export default function SupplierList() {
     boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
   };
 
-  
+
   const searchInputStyle = {
     width: '100%',
     padding: '8px 12px',
@@ -384,7 +379,7 @@ export default function SupplierList() {
     marginBottom: '8px',
   };
 
- 
+
   const searchLabelStyle = {
     display: 'block',
     marginBottom: '5px',
@@ -393,7 +388,7 @@ export default function SupplierList() {
     fontSize: '14px',
   };
 
- 
+
   const clearButtonStyle = {
     backgroundColor: '#ff6b6b',
     color: 'white',
@@ -409,10 +404,10 @@ export default function SupplierList() {
     <div style={containerStyle}>
       <style>{globalStyles}</style>
       <h2 style={{ color: '#fff', marginTop: '2rem' }}>Supplier List</h2>
-      
+
       {/* Add Supplier Button */}
       <div style={{ marginBottom: '20px' }}>
-        <button 
+        <button
           onClick={handleAddSupplier}
           style={{
             backgroundColor: '#28a745',
@@ -493,11 +488,11 @@ export default function SupplierList() {
         <table style={headerTableStyle}>
           <thead>
             <tr>
-              <th style={{...theadCellStyle, width: '25%'}}>Supplier Name</th>
-              <th style={{...theadCellStyle, width: '35%'}}>Address</th>
-              <th style={{...theadCellStyle, width: '20%'}}>GST No</th>
-              <th style={{...theadCellStyle, width: '20%'}}>Mobile No</th>
-              <th style={{...theadCellStyle, width: '20%'}}>Actions</th>
+              <th style={{ ...theadCellStyle, width: '25%' }}>Supplier Name</th>
+              <th style={{ ...theadCellStyle, width: '35%' }}>Address</th>
+              <th style={{ ...theadCellStyle, width: '20%' }}>GST No</th>
+              <th style={{ ...theadCellStyle, width: '20%' }}>Mobile No</th>
+              <th style={{ ...theadCellStyle, width: '20%' }}>Actions</th>
             </tr>
           </thead>
         </table>
@@ -506,87 +501,87 @@ export default function SupplierList() {
         <div style={bodyWrapperStyle}>
           <table style={bodyTableStyle}>
             <tbody>
-          {filteredSuppliers.map((s, idx) => (
-            <React.Fragment key={idx}>
-              <tr>
-                {editIdx === idx ? (
-                  <>
-                    <td style={{...cellStyle, width: '25%'}}>
-                      <input name="partyName" value={editData.partyName} onChange={handleEditChange} style={{width: '100%', padding: '4px'}} />
-                    </td>
-                    <td style={{...cellStyle, width: '35%'}}>
-                      <input name="address" value={editData.address} onChange={handleEditChange} style={{width: '100%', padding: '4px'}} />
-                    </td>
-                    <td style={{...cellStyle, width: '20%'}}>
-                      <input name="gstNo" value={editData.gstNo} onChange={handleEditChange} style={{width: '100%', padding: '4px'}} />
-                    </td>
-                    <td style={{...cellStyle, width: '20%'}}>
-                      <input name="mobileNo" value={editData.mobileNo} onChange={handleEditChange} style={{width: '100%', padding: '4px'}} />
-                    </td>
-                    <td style={{...cellStyle, width: '20%'}}>
-                      <button style={buttonStyle} onClick={() => handleEditSave(s.partyName)} disabled={actionLoading}>Save</button>
-                      <button style={buttonStyle} onClick={() => setEditIdx(null)} disabled={actionLoading}>Cancel</button>
-                    </td>
-                  </>
-                ) : (
-                  <>
-                    <td style={{ ...cellStyle, color: 'blue', cursor: 'pointer', textDecoration: 'underline', backgroundColor: '#f5f5f5', width: '25%' }}
-                      onClick={() => handlePartyClick(s.partyName)}
-                    >
-                      {s.partyName}
-                    </td>
-                    <td style={{...cellStyle, width: '35%'}}>{s.address || 'N/A'}</td>
-                    <td style={{...cellStyle, width: '20%'}}>{s.gstNo || 'N/A'}</td>
-                    <td style={{...cellStyle, width: '20%'}}>{s.mobileNo || 'N/A'}</td>
-                    <td style={{...cellStyle, width: '20%'}}>
-                      <div style={buttonGroupStyle}>
-                        <button
-                          style={editButtonStyle}
-                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0069d9'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#007bff'; }}
-                          onClick={() => handleEdit(idx)}
-                          disabled={actionLoading}
+              {filteredSuppliers.map((s, idx) => (
+                <React.Fragment key={idx}>
+                  <tr>
+                    {editIdx === idx ? (
+                      <>
+                        <td style={{ ...cellStyle, width: '25%' }}>
+                          <input name="partyName" value={editData.partyName} onChange={handleEditChange} style={{ width: '100%', padding: '4px' }} />
+                        </td>
+                        <td style={{ ...cellStyle, width: '35%' }}>
+                          <input name="address" value={editData.address} onChange={handleEditChange} style={{ width: '100%', padding: '4px' }} />
+                        </td>
+                        <td style={{ ...cellStyle, width: '20%' }}>
+                          <input name="gstNo" value={editData.gstNo} onChange={handleEditChange} style={{ width: '100%', padding: '4px' }} />
+                        </td>
+                        <td style={{ ...cellStyle, width: '20%' }}>
+                          <input name="mobileNo" value={editData.mobileNo} onChange={handleEditChange} style={{ width: '100%', padding: '4px' }} />
+                        </td>
+                        <td style={{ ...cellStyle, width: '20%' }}>
+                          <button style={buttonStyle} onClick={() => handleEditSave(s.partyName)} disabled={actionLoading}>Save</button>
+                          <button style={buttonStyle} onClick={() => setEditIdx(null)} disabled={actionLoading}>Cancel</button>
+                        </td>
+                      </>
+                    ) : (
+                      <>
+                        <td style={{ ...cellStyle, color: 'blue', cursor: 'pointer', textDecoration: 'underline', backgroundColor: '#f5f5f5', width: '25%' }}
+                          onClick={() => handlePartyClick(s.partyName)}
                         >
-                          Edit
-                        </button>
-                        <button
-                          style={deleteButtonStyle}
-                          onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#c82333'; }}
-                          onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; }}
-                          onClick={() => handleDelete(s.partyName)}
-                          disabled={actionLoading}
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </td>
-                  </>
-                )}
-              </tr>
-              {expanded === s.partyName && (
-                <tr>
-                  <td colSpan={5} style={{ ...cellStyle, background: '#f9f9f9', width: '100%' }}>
-                    {detailsLoading && <div>Loading details...</div>}
-                    {detailsError && <div style={{ color: 'red' }}>Error: {detailsError}</div>}
-                    {details[s.partyName] && details[s.partyName].length > 0 ? (
-                      <div>
-                        <b>GSN/GRIN Numbers:</b>
-                        <ul style={{ margin: '8px 0 0 0' }}>
-                          {details[s.partyName].map((entry, i) => (
-                            <li key={i}>
-                              GSN: {entry.gsn || '-'} | GRIN: {entry.grinNo || '-'}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ) : details[s.partyName] && details[s.partyName].length === 0 ? (
-                      <div>No GSN/GRIN numbers found for this party.</div>
-                    ) : null}
-                  </td>
-                </tr>
-              )}
-            </React.Fragment>
-          ))}
+                          {s.partyName}
+                        </td>
+                        <td style={{ ...cellStyle, width: '35%' }}>{s.address || 'N/A'}</td>
+                        <td style={{ ...cellStyle, width: '20%' }}>{s.gstNo || 'N/A'}</td>
+                        <td style={{ ...cellStyle, width: '20%' }}>{s.mobileNo || 'N/A'}</td>
+                        <td style={{ ...cellStyle, width: '20%' }}>
+                          <div style={buttonGroupStyle}>
+                            <button
+                              style={editButtonStyle}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0069d9'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#007bff'; }}
+                              onClick={() => handleEdit(idx)}
+                              disabled={actionLoading}
+                            >
+                              Edit
+                            </button>
+                            <button
+                              style={deleteButtonStyle}
+                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#c82333'; }}
+                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; }}
+                              onClick={() => handleDelete(s.partyName)}
+                              disabled={actionLoading}
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </td>
+                      </>
+                    )}
+                  </tr>
+                  {expanded === s.partyName && (
+                    <tr>
+                      <td colSpan={5} style={{ ...cellStyle, background: '#f9f9f9', width: '100%' }}>
+                        {detailsLoading && <div>Loading details...</div>}
+                        {detailsError && <div style={{ color: 'red' }}>Error: {detailsError}</div>}
+                        {details[s.partyName] && details[s.partyName].length > 0 ? (
+                          <div>
+                            <b>GSN/GRIN Numbers:</b>
+                            <ul style={{ margin: '8px 0 0 0' }}>
+                              {details[s.partyName].map((entry, i) => (
+                                <li key={i}>
+                                  GSN: {entry.gsn || '-'} | GRIN: {entry.grinNo || '-'}
+                                </li>
+                              ))}
+                            </ul>
+                          </div>
+                        ) : details[s.partyName] && details[s.partyName].length === 0 ? (
+                          <div>No GSN/GRIN numbers found for this party.</div>
+                        ) : null}
+                      </td>
+                    </tr>
+                  )}
+                </React.Fragment>
+              ))}
             </tbody>
           </table>
         </div>
@@ -615,16 +610,16 @@ export default function SupplierList() {
             boxShadow: '0 4px 20px rgba(0, 0, 0, 0.3)',
             position: 'relative'
           }}>
-            <h3 style={{ 
-              margin: '0 0 20px 0', 
-              color: '#333', 
+            <h3 style={{
+              margin: '0 0 20px 0',
+              color: '#333',
               textAlign: 'center',
               borderBottom: '2px solid #28a745',
               paddingBottom: '10px'
             }}>
               Add New Supplier
             </h3>
-            
+
             <form onSubmit={handleAddSubmit}>
               <div style={{ marginBottom: '15px' }}>
                 <label style={{
@@ -736,10 +731,10 @@ export default function SupplierList() {
                 />
               </div>
 
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: '15px' 
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '15px'
               }}>
                 <button
                   type="button"
