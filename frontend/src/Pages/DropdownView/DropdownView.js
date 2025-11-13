@@ -11,7 +11,7 @@ export default function DropdownView() {
     const navigate = useNavigate();
     const url = process.env.REACT_APP_BACKEND_URL;
 
-    // Create a map to store unique items and their details
+    
     const [itemsMap, setItemsMap] = useState(new Map());
     const [displayData, setDisplayData] = useState([]);
     const [consolidatedItems, setConsolidatedItems] = useState([]);
@@ -30,7 +30,7 @@ export default function DropdownView() {
                 });
                 setInventoryData(response.data);
 
-                // Process data to create unique items map and consolidated view
+                
                 const newItemsMap = new Map();
                 const itemTotals = new Map();
                 
@@ -38,7 +38,7 @@ export default function DropdownView() {
                     if (entry.tableData && Array.isArray(entry.tableData)) {
                         entry.tableData.forEach(item => {
                             if (item.item) {
-                                // Add to items map for detailed view
+                               
                                 if (!newItemsMap.has(item.item)) {
                                     newItemsMap.set(item.item, []);
                                 }
@@ -55,7 +55,7 @@ export default function DropdownView() {
                                 
                                 newItemsMap.get(item.item).push(processedItem);
 
-                                // Update consolidated totals
+                              
                                 if (!itemTotals.has(item.item)) {
                                     itemTotals.set(item.item, {
                                         item: item.item,
@@ -78,7 +78,7 @@ export default function DropdownView() {
                     }
                 });
 
-                // Create consolidated items array
+                
                 const consolidatedArray = Array.from(itemTotals.values()).map(totals => ({
                     ...totals,
                     totalQuantity: totals.totalQuantity.toFixed(2),
@@ -103,7 +103,7 @@ export default function DropdownView() {
         setShowDetailView(false);
         if (itemName) {
             const itemDetails = itemsMap.get(itemName) || [];
-            // Sort by date before setting the data
+          
             const sortedDetails = [...itemDetails].sort((a, b) => 
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
@@ -113,7 +113,7 @@ export default function DropdownView() {
         }
     };
 
-    // Handle item click from consolidated view
+    
     const handleItemClick = (itemName) => {
         const itemDetails = itemsMap.get(itemName) || [];
         const sortedDetails = [...itemDetails].sort((a, b) => 
@@ -124,7 +124,7 @@ export default function DropdownView() {
         setShowDetailView(true);
     };
 
-    // Main container style
+   
     const mainContainerStyle = {
         minHeight: '100vh',
         width: '100vw',
@@ -144,7 +144,7 @@ export default function DropdownView() {
         justifyContent: 'flex-start',
     };
 
-    // Table container style
+   
     const tableContainerStyle = {
         width: '90%',
         marginTop: '2rem',
@@ -154,7 +154,7 @@ export default function DropdownView() {
         overflow: 'hidden',
     };
 
-    // Add gradient animation keyframes
+    
     const gradientAnimation = `
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
@@ -165,7 +165,7 @@ export default function DropdownView() {
         }
     `;
 
-    // Table styles
+   
     const tableStyle = {
         width: '100%',
         borderCollapse: 'collapse',

@@ -18,8 +18,8 @@ const TableComponent = ({ tableData }) => {
         width: "100%",
         maxWidth: "100%",
         position: "relative",
-        height: "800px", // Increased height from 600px to 800px
-        overflow: "hidden" // Hide overflow for the container
+        height: "800px", 
+        overflow: "hidden"
     };
 
     const tableStyle = {

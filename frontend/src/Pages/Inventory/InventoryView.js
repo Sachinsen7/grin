@@ -52,7 +52,7 @@ export default function InventoryView() {
         fetchInventoryData();
     }, [url]);
 
-    // Filter and sort data whenever allTableData or searchTerm changes
+   
     useEffect(() => {
         let filtered = allTableData;
         
@@ -66,7 +66,7 @@ export default function InventoryView() {
         // Filter by date
         if (dateSearch) {
             const searchDate = new Date(dateSearch);
-            searchDate.setHours(0, 0, 0, 0); // Reset time part for date comparison
+            searchDate.setHours(0, 0, 0, 0); 
             
             filtered = filtered.filter(item => {
                 if (!item.createdAt) return false;
@@ -76,7 +76,7 @@ export default function InventoryView() {
             });
         }
 
-        // Sort alphabetically by item name
+       
         filtered = filtered.sort((a, b) => {
             const nameA = (a.item || "").toLowerCase();
             const nameB = (b.item || "").toLowerCase();
@@ -88,19 +88,9 @@ export default function InventoryView() {
         setFilteredTableData(filtered);
     }, [allTableData, searchTerm, dateSearch]);
 
-    // This formatDate function might not be needed here anymore unless TableRenderingComponent uses it
-    // Or if you add a date column directly in this component's table rendering logic
-    // const formatDate = (dateString) => {
-    //     if (!dateString) return "N/A";
-    //     const date = new Date(dateString);
-    //     return date.toLocaleDateString('en-GB', { 
-    //         day: '2-digit', 
-    //         month: '2-digit', 
-    //         year: 'numeric' 
-    //     });
-    // };
+    
 
-    // Inline style for main background
+    
     const mainContainerStyle = {
         minHeight: '100vh',
         width: '100vw',
@@ -122,16 +112,16 @@ export default function InventoryView() {
 
     // Inline style for table container
     const tableContainerStyle = {
-        width: '96%', // make table area bigger
+        width: '96%',
         marginTop: '2rem',
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-        backgroundColor: 'transparent', // transparent table container
+        backgroundColor: 'transparent', 
         overflow: 'hidden',
-        fontSize: '16px' // slightly larger text inside table
+        fontSize: '16px'
     };
 
-    // Add gradient animation keyframes
+    
     const gradientAnimation = `
     @keyframes gradientAnimation {
         0% { background-position: 0% 50%; }
@@ -155,7 +145,7 @@ export default function InventoryView() {
             `}</style>
             <LogOutComponent />
             
-            {/* Dropdown View Button */}
+            {}
             <button
                 onClick={() => navigate('/dropdown-view')}
                 style={{
@@ -176,7 +166,7 @@ export default function InventoryView() {
 
             <h2 className={styles.title}>Item Inward Register</h2>
 
-            {/* Search inputs for item name and date */}
+            {}
             <div style={{ 
                 marginBottom: '20px', 
                 textAlign: 'center',

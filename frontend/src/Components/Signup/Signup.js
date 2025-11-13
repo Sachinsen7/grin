@@ -8,6 +8,7 @@ import axios from 'axios';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import style from '../../Pages/Home/Home.module.css'
+import toast from 'react-hot-toast';
 export default function LoginCard({ toadd, hide, position }) {
     const [username, setUsername] = useState("")
     const [name, setName] = useState("")
@@ -41,7 +42,7 @@ export default function LoginCard({ toadd, hide, position }) {
                     }
                 }
             )
-            alert('Successfully Saved')
+            toast.success('Successfully Saved')
             hide()
 
 
@@ -56,23 +57,11 @@ export default function LoginCard({ toadd, hide, position }) {
 
     return (
         <>
- {/* style={{
-                    width:"100%",
-                    display:"flex",
-                    height: "500px",
-                    // padding: '40px',
-                    backgroundColor: 'rgba(218, 216, 224, 0.6)',
-                    justifyContent:"center",
-                    alignItems:"center",
-                    
-
-                    
-
-                }} */}
+ {}
            
 
                 <Form style={{
-                    // border: "1px solid #ccc",
+                    
                     padding: "15px",
                     display: "flex",
                    justifyContent:"center",

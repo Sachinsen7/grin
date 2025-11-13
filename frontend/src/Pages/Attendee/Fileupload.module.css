@@ -131,21 +131,21 @@
 
 .formRow {
   display: flex;
-  align-items: center; /* Aligns items vertically in the center (or change to "baseline" for bottom alignment) */
+  align-items: center; 
 }
 
 .label {
-  margin-right: 10px; /* Adjust the spacing between the label and the first input */
+  margin-right: 10px; 
  
 }
 
 .input {
-  flex: 1; /* This ensures the input field takes up the available space */
+  flex: 1;
  
 }
 
 .dateInput {
-   /* This ensures the hidden input takes up the same amount of space */
-  margin-left: 10px; /* Optional: add some space between the visible input and the hidden one */
+   
+  margin-left: 10px; 
  
 }

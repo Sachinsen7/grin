@@ -29,21 +29,21 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
 
-        // If token expired and we haven't retried yet
+       
         if (error.response?.status === 401 && !originalRequest._retry) {
             originalRequest._retry = true;
 
             try {
-                // Try to refresh the token
+              
                 const newToken = await tokenManager.refreshToken();
 
                 if (newToken) {
-                    // Retry the original request with new token
+                    
                     originalRequest.headers.Authorization = `Bearer ${newToken}`;
                     return axiosInstance(originalRequest);
                 }
             } catch (refreshError) {
-                // Refresh failed, redirect to login
+                
                 tokenManager.clearToken();
                 window.location.href = '/';
                 return Promise.reject(refreshError);

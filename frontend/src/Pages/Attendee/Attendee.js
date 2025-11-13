@@ -1,10 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import axios from 'axios';
 import style from './Inputgrin.module.css';
-import styles from './Fileupload.module.css'; // Import the CSS module
-import TableComponent from '../../Components/Table/TableEntry'; // Import the TableComponent
+import styles from './Fileupload.module.css';
+import TableComponent from '../../Components/Table/TableEntry'; 
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import { useLocation } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 export default function Attendee() {
     const location = useLocation();
@@ -33,9 +34,9 @@ export default function Attendee() {
     const [lrDate, setLrDate] = useState('');
     const [transName, setTransName] = useState('');
     const [vehicleNo, setVehicleNo] = useState('');
-    const [materialInfo, setMaterialInfo] = useState(''); // State for textarea
+    const [materialInfo, setMaterialInfo] = useState(''); 
     const [file, setFile] = useState(null);
-    const [photo, setPhoto] = useState(null); // Add photo state
+    const [photo, setPhoto] = useState(null); 
 
     // Add state for new fields
     const [gstNo, setGstNo] = useState("");
@@ -47,11 +48,11 @@ export default function Attendee() {
     const [address, setAddress] = useState("");
     const [mobileNo, setMobileNo] = useState("");
 
-    // State for calculated total amount
+    
     const [totalAmount, setTotalAmount] = useState(0);
     const [materialTotal, setMaterialTotal] = useState(0);
 
-    // State for latest GSN number
+   
     const [latestGsnNumber, setLatestGsnNumber] = useState("");
 
     const [tableData, setTableData] = useState(
@@ -127,7 +128,7 @@ export default function Attendee() {
         setFile(e.target.files[0]);
     };
 
-    // Add handler for photo change
+    
     const handlePhotoChange = (e) => {
         setPhoto(e.target.files[0]);
     };
@@ -136,7 +137,7 @@ export default function Attendee() {
         const updatedData = [...tableData];
         updatedData[index][field] = value;
 
-        // Calculate total for the row when quantity or price changes
+       
         if (field === 'quantityValue' || field === 'priceValue') {
             const quantity = parseFloat(updatedData[index].quantityValue) || 0;
             const price = parseFloat(updatedData[index].priceValue) || 0;
@@ -163,8 +164,8 @@ export default function Attendee() {
         setVehicleNo('');
         setMaterialInfo('');
         setFile(null);
-        setPhoto(null); // Reset photo
-        // Reset new fields
+        setPhoto(null); 
+      
         setGstNo('');
         setCgst('');
         setSgst('');
@@ -173,8 +174,8 @@ export default function Attendee() {
         setCompanyName('');
         setAddress('');
         setMobileNo('');
-        setTotalAmount(0); // Reset total amount
-        setMaterialTotal(0); // Reset material total
+        setTotalAmount(0); 
+        setMaterialTotal(0);
 
         setTableData(
             Array.from({ length: 20 }, (_, index) => ({
@@ -188,7 +189,7 @@ export default function Attendee() {
         );
     };
 
-    // useEffect for calculating total amount
+    
     useEffect(() => {
         let subTotal = 0;
         tableData.forEach(row => {
@@ -197,14 +198,13 @@ export default function Attendee() {
             subTotal += qty * price;
         });
 
-        // Set material total (Before Tax Total)
         setMaterialTotal(subTotal);
 
         const cgstPercent = parseFloat(cgst) || 0;
         const sgstPercent = parseFloat(sgst) || 0;
         const igstPercent = parseFloat(igst) || 0;
 
-        // Calculate GST Tax as percentage of materialTotal
+        
         let taxTotal = 0;
         if (igstPercent > 0) {
             taxTotal = (subTotal * igstPercent) / 100;
@@ -236,8 +236,8 @@ export default function Attendee() {
         formData.append('lrDate', lrDate);
         formData.append('transName', transName);
         formData.append('vehicleNo', vehicleNo);
-        formData.append('materialInfo', materialInfo); // Append textarea content
-        formData.append('tableData', JSON.stringify(tableData)); // Append table data as JSON
+        formData.append('materialInfo', materialInfo); 
+        formData.append('tableData', JSON.stringify(tableData)); 
 
         // Log and Append new fields
         console.log("Frontend Sending - GST:", gstNo, "CGST:", cgst, "SGST:", sgst, "IGST:", igst);
@@ -250,8 +250,8 @@ export default function Attendee() {
         formData.append("companyName", companyName);
         formData.append("address", address);
         formData.append("mobileNo", mobileNo);
-        formData.append("totalAmount", totalAmount.toString()); // Convert to string to ensure proper transmission
-        formData.append("materialTotal", materialTotal.toString()); // Append material total
+        formData.append("totalAmount", totalAmount.toString());
+        formData.append("materialTotal", materialTotal.toString());
 
         if (file) {
             formData.append('file', file);
@@ -268,7 +268,7 @@ export default function Attendee() {
             const token = localStorage.getItem('authToken');
             console.log("Submitting to URL:", `${url}/upload-data`);
             console.log("Using token:", token ? "Token exists" : "No token found");
-            console.log("FormData contents:", Object.fromEntries(formData.entries())); // Debug log
+            console.log("FormData contents:", Object.fromEntries(formData.entries())); 
 
             const response = await axios.post(`${url}/upload-data`, formData, {
                 headers: {
@@ -277,16 +277,16 @@ export default function Attendee() {
             });
             console.log("Response:", response.data);
 
-            // Show appropriate message based on whether entry was created or updated
+            
             if (response.status === 200) {
-                alert('Entry Updated Successfully');
+                toast.success('Entry Updated Successfully');
             } else {
-                alert('Entry Created Successfully');
+                toast.success('Entry Created Successfully');
             }
 
             resetForm();
         } catch (error) {
-            alert('Error in uploading data');
+            toast.error('Error in uploading data');
             console.error('Error uploading file:', error);
             if (error.response) {
                 console.error('Error response:', error.response.data);
@@ -326,7 +326,7 @@ export default function Attendee() {
         };
         getData();
         loadSuppliers();
-        getLatestGsnNumber(); // Get latest GSN number when component loads
+        getLatestGsnNumber();
     }, []);
 
     useEffect(() => {
@@ -338,10 +338,10 @@ export default function Attendee() {
         setFilteredSuppliers(filtered);
     }, [partyName, suppliers]);
 
-    // Auto-fill company details when partyName changes
+    
     useEffect(() => {
         if (!partyName) return;
-        // Find all entries with matching partyName (case-insensitive)
+        
         const matches = backendData.filter(
             (entry) => entry.partyName && entry.partyName.toLowerCase() === partyName.toLowerCase()
         );
@@ -374,7 +374,7 @@ export default function Attendee() {
         setAddress(party.address || '');
         setGstNo(party.gstNo || '');
         setMobileNo(party.mobileNo || '');
-        setIsVisible(false); // Close popup after selection
+        setIsVisible(false); 
     };
 
     // Inline CSS Styles
@@ -555,9 +555,9 @@ export default function Attendee() {
                                 </div>
                             </div>
 
-                            {/* Party Details */}
+                            {}
                             <div className={styles.form}>
-                                {/* Party Name Input */}
+                                {}
                                 <div className={styles.formRow} style={{ position: 'relative' }}>
                                     <label className={styles.label}>Supplier Name:</label>
                                     <input
@@ -601,7 +601,7 @@ export default function Attendee() {
                                             </ul>
                                         </div>
                                     </div>
-                                    {/* Hidden Dummy Input */}
+                                    {}
                                     <input
                                         type="text"
                                         className={`${styles.dateInput} ${styles.dummy}`}
@@ -713,10 +713,10 @@ export default function Attendee() {
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Address:</label>
                                     <textarea
-                                        className={styles.input} // Use input style or create a textarea style
+                                        className={styles.input} 
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        rows={3} // Adjust rows as needed
+                                        rows={3} 
                                     />
                                 </div>
                                 <div className={styles.formRow}>
@@ -732,7 +732,7 @@ export default function Attendee() {
                                     <label className={styles.label}>Mobile No:</label>
                                     <input
                                         className={styles.input}
-                                        type="tel" // Use tel type for mobile numbers
+                                        type="tel"
                                         value={mobileNo}
                                         onChange={(e) => setMobileNo(e.target.value)}
                                     />
@@ -756,7 +756,7 @@ export default function Attendee() {
                                         value={cgst}
                                         onChange={(e) => {
                                             setCgst(e.target.value);
-                                            if (e.target.value) setIgst(''); // Clear IGST when CGST is entered
+                                            if (e.target.value) setIgst('');
                                         }}
                                     />
                                 </div>
@@ -769,7 +769,7 @@ export default function Attendee() {
                                         value={sgst}
                                         onChange={(e) => {
                                             setSgst(e.target.value);
-                                            if (e.target.value) setIgst(''); // Clear IGST when SGST is entered
+                                            if (e.target.value) setIgst(''); 
                                         }}
                                     />
                                 </div>
@@ -783,8 +783,8 @@ export default function Attendee() {
                                         onChange={(e) => {
                                             setIgst(e.target.value);
                                             if (e.target.value) {
-                                                setCgst(''); // Clear CGST when IGST is entered
-                                                setSgst(''); // Clear SGST when IGST is entered
+                                                setCgst('');
+                                                setSgst(''); 
                                             }
                                         }}
                                     />
@@ -800,29 +800,28 @@ export default function Attendee() {
                                     />
                                 </div>
 
-                                {/* Display Calculated Total Amount */}
+                                {}
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Total Amount:</label>
                                     <input
                                         className={styles.input}
                                         type="text"
-                                        value={totalAmount.toFixed(2)} // Format to 2 decimal places
-                                        readOnly // Make it non-editable
-                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }} // Style for read-only
+                                        value={totalAmount.toFixed(2)} 
+                                        readOnly
+                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }} 
                                     />
                                 </div>
                             </div>
                             {/* End Added Section */}
 
-                            {/* Material Information (Table) */}
+                            {}
                             <div className={styles.forms}>
                                 <div
                                     className={styles.formRow}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
-                                        //  backgroundColor:"rgba(218, 216, 224, 0.8)" 
-                                        //  backgroundColor: 'rgba(218, 216, 224, 0.6)',
+                                      
                                         borderRadius: '15px',
                                     }}
                                 >

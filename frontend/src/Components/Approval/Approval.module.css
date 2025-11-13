@@ -37,8 +37,7 @@
 }
 
 table {
-  /* width: 100%;
-  border-collapse: collapse; */
+ 
   width: 100%;
   border: 2px solid red;
   border-collapse: collapse;
@@ -50,16 +49,14 @@ table {
 
 th{
   background-color: rgba(218, 216, 224, 0.6);
-  /* rgba(218, 216, 224, 0.6); */
+  
   color:black;
   padding: 10px;
   font-size: 1.2rem;
   font-weight:300;
 }
 td {
-  /* border: 1px solid black;
-  padding: 8px;
-  text-align: left; */
+
   color: black;
   padding: 10px;
   border: 1px solid #ddd;
