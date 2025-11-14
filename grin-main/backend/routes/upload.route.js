@@ -35,22 +35,22 @@ const storage = multer.diskStorage({
 
 // File filter for images (optional but recommended)
 const imageFileFilter = (req, file, cb) => {
-    if (file.fieldname === "photo") {
-        // 1. Check MIME Type
-        const isMimeValid = file.mimetype.startsWith('image/');
-        
-        // 2. Check File Extension
-        const allowedExtensions = /\.(jpg|jpeg|png|gif)$/i; // Use regex for case-insensitive check
-        const isExtValid = allowedExtensions.test(file.originalname);
+  if (file.fieldname === "photo") {
+    // 1. Check MIME Type
+    const isMimeValid = file.mimetype.startsWith('image/');
 
-        if (isMimeValid && isExtValid) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only JPG, JPEG, PNG, and GIF images are allowed.'), false);
-        }
+    // 2. Check File Extension
+    const allowedExtensions = /\.(jpg|jpeg|png|gif)$/i; // Use regex for case-insensitive check
+    const isExtValid = allowedExtensions.test(file.originalname);
+
+    if (isMimeValid && isExtValid) {
+      cb(null, true);
     } else {
-        cb(null, true); // Accept other files (like the bill)
+      cb(new Error('Invalid file type. Only JPG, JPEG, PNG, and GIF images are allowed.'), false);
     }
+  } else {
+    cb(null, true); // Accept other files (like the bill)
+  }
 };
 
 
@@ -58,9 +58,9 @@ const imageFileFilter = (req, file, cb) => {
 const multerErrorHandler = (err, req, res, next) => {
   if (err) {
     console.error("Multer error:", err);
-    return res.status(400).json({ 
-      message: 'File upload error', 
-      error: err.message 
+    return res.status(400).json({
+      message: 'File upload error',
+      error: err.message
     });
   }
   next();
@@ -68,26 +68,27 @@ const multerErrorHandler = (err, req, res, next) => {
 
 // Configure multer to handle multiple fields
 const upload = multer({
-    storage: storage,
-    fileFilter: imageFileFilter, // Apply the filter
-    limits: { fileSize: 1024 * 1024 * 5 } // Optional: Limit file size (e.g., 5MB)
+  storage: storage,
+  fileFilter: imageFileFilter, // Apply the filter
+  limits: { fileSize: 1024 * 1024 * 5 } // Optional: Limit file size (e.g., 5MB)
 })
 
 // Update route to use upload.fields()
-router.post('/', 
-  auth.authMiddleware, 
-   validate(entrySchema),
-  function(req, res, next) {
+// Note: Multer must come BEFORE validation because it parses the multipart/form-data
+router.post('/',
+  auth.authMiddleware,
+  function (req, res, next) {
     console.log("Upload request received");
     console.log("Request headers:", req.headers);
     next();
   },
   upload.fields([
-    { name: 'file', maxCount: 1 }, 
+    { name: 'file', maxCount: 1 },
     { name: 'photo', maxCount: 1 }
   ]),
   multerErrorHandler,
-  function(req, res, next) {
+  validate(entrySchema),
+  function (req, res, next) {
     console.log("Files uploaded successfully");
     console.log("Request files:", req.files);
     next();

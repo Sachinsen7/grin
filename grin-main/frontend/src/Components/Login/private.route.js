@@ -6,15 +6,20 @@
 
 import React from 'react';
 import { Navigate } from 'react-router-dom';
+import tokenManager from '../../utils/tokenManager';
 
 const PrivateRoute = ({ allowedRole, children }) => {
-  const userRole = localStorage.getItem('role'); // 
+  const token = tokenManager.getToken();
+  const userRole = tokenManager.getRole();
 
-  if (!userRole) {
+  // Check if token exists and is valid
+  if (!token || !tokenManager.isTokenValid()) {
+    tokenManager.clearToken();
     return <Navigate to="/" />;
   }
 
-  if (userRole !== allowedRole) {
+  // Check if user role matches the allowed role
+  if (!userRole || userRole !== allowedRole) {
     return <Navigate to="/" />;
   }
 

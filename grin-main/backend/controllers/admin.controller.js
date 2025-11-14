@@ -21,23 +21,23 @@ const adminHandler = {
         }
 
         const accessToken = jwt.sign(
-            { userId: user._id, role: 'admin' }, 
-            process.env.SECRET_KEY, 
-            { expiresIn: '15m' }
+            { userId: user._id, role: 'admin' },
+            process.env.SECRET_KEY,
+            { expiresIn: '24h' }
         );
         const refreshToken = jwt.sign(
-            { userId: user._id }, 
-            process.env.REFRESH_TOKEN_SECRET, 
+            { userId: user._id },
+            process.env.REFRESH_TOKEN_SECRET,
             { expiresIn: '7d' }
         );
         res.cookie('jwt', refreshToken, {
-            httpOnly: true, 
+            httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
-            sameSite: 'Strict', 
+            sameSite: 'Strict',
             maxAge: 7 * 24 * 60 * 60 * 1000
         });
 
-       return sendSuccess(res, { accessToken: accessToken }, 200);
+        return sendSuccess(res, { accessToken: accessToken }, 200);
     },
     addauthority: async (req, res) => {
         const { username, password, name } = req.body

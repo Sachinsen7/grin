@@ -12,33 +12,33 @@ export default function GsnEntry() {
   const [filteredParties, setFilteredParties] = useState([])
   const [selectedvalue, setSelectedValue] = useState('')
   const [selectedParty, setSelectedParty] = useState(null)
- const [innoviceDate, setinnoviceDate] = useState('');
+  const [innoviceDate, setinnoviceDate] = useState('');
   const [selectedGrinNo, setSelectedGrinNo] = useState('');
   const [selectedGsn, setSelectedGsn] = useState('');
   const [selectedGrinDate, setSelectedGrinDate] = useState('');
   const [selectedGsnDate, setSelectedGsnDate] = useState('');
   const [loading, setLoading] = useState(false);
   const [showPartySelect, setShowPartySelect] = useState(false);
-  const [mode, setMode] = useState(''); 
+  const [mode, setMode] = useState('');
   const [billFile, setBillFile] = useState(null);
-  const [uploadStep, setUploadStep] = useState(1); 
+  const [uploadStep, setUploadStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState('');
 
   const fetchPartyData = async (forUpload = false) => {
-        try {
+    try {
       setLoading(true);
       const url = process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('authToken');
-      
-     
+
+
       const gsnRes = await axios.get(`${url}/gsn/getdata`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
       });
-      
+
       // Get existing GRIN entries
       const grinRes = await axios.get(`${url}/entries/getdata1`, {
         headers: {
@@ -46,26 +46,26 @@ export default function GsnEntry() {
           'Content-Type': 'application/json'
         }
       });
-      
+
       const gsnData = gsnRes.data;
       const grinData = grinRes.data || [];
-      
+
       console.log("GSN data:", gsnData);
       console.log("GRIN data:", grinData);
-      
+
       if (forUpload) {
-        
+
         const partiesWithoutBills = grinData.filter(entry => {
           console.log(`Party: ${entry.partyName}, Has file: ${!!entry.file}`);
           return !entry.file; // Filter out entries that already have a file
         });
-        
+
         console.log("Parties without bills:", partiesWithoutBills);
         setFilteredParties(partiesWithoutBills);
       } else {
-        
+
         const partyCounts = {};
-        
+
         // Count GSN entries
         gsnData.forEach(entry => {
           if (!partyCounts[entry.partyName]) {
@@ -73,7 +73,7 @@ export default function GsnEntry() {
           }
           partyCounts[entry.partyName].gsn++;
         });
-        
+
         // Count GRIN entries
         grinData.forEach(entry => {
           if (!partyCounts[entry.partyName]) {
@@ -81,26 +81,26 @@ export default function GsnEntry() {
           }
           partyCounts[entry.partyName].grin++;
         });
-        
+
         console.log("Party counts:", partyCounts);
-        
-        
+
+
         const filteredPartyList = gsnData.filter(party => {
           const counts = partyCounts[party.partyName];
           return counts && counts.gsn > counts.grin;
         });
-        
-        
+
+
         const uniqueParties = Array.from(new Set(filteredPartyList.map(p => p.partyName)))
           .map(partyName => filteredPartyList.find(p => p.partyName === partyName));
-        
+
         console.log("Filtered parties (GSN > GRIN):", uniqueParties);
         setFilteredParties(uniqueParties);
       }
-      
+
       setbackendData([...gsnData, ...grinData]);
       setLoading(false);
-        } catch (err) {
+    } catch (err) {
       console.log("Error fetching party data:", err);
       setLoading(false);
       setFilteredParties([]);
@@ -120,33 +120,33 @@ export default function GsnEntry() {
     fetchPartyData(true);
   }
 
-const handleSelectChange = (event) => {
+  const handleSelectChange = (event) => {
     const selectedIndex = event.target.selectedIndex;
     if (selectedIndex === 0) {
-     
+
       return;
     }
 
     const selectedOption = event.target.selectedOptions[0];
     const partyName = selectedOption.value;
-    
-    
+
+
     const partyGsnEntries = backendData
-      .filter(p => p.partyName === partyName && p.grinNo) 
-      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)); 
-    
+      .filter(p => p.partyName === partyName && p.grinNo)
+      .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
     if (partyGsnEntries.length === 0) {
       console.error("No GSN entries found for selected party");
       return;
     }
 
-    
+
     const mostRecentGsn = partyGsnEntries[0];
     console.log("Most recent GSN entry:", mostRecentGsn);
 
     setSelectedParty(mostRecentGsn);
     setSelectedValue(partyName);
-    
+
     if (mode === 'create') {
       // Format dates
       const formatDate = (dateString) => {
@@ -154,14 +154,14 @@ const handleSelectChange = (event) => {
         const date = new Date(dateString);
         return date instanceof Date && !isNaN(date) ? date.toISOString().split('T')[0] : '';
       };
-      
-      
+
+
       const invoiceDate = mostRecentGsn.innoviceDate;
       const grinNo = mostRecentGsn.grinNo || '';
       const gsn = mostRecentGsn.gsn || '';
       const grinDate = formatDate(mostRecentGsn.grinDate);
       const gsnDate = formatDate(mostRecentGsn.gsnDate);
-      
+
       console.log("Selected party data for CREATE:", {
         partyName,
         invoiceDate,
@@ -170,8 +170,8 @@ const handleSelectChange = (event) => {
         grinDate,
         gsnDate
       });
-      
-      
+
+
       navigate('/grin-dashboard/entry', {
         state: {
           selectedvalue: partyName,
@@ -180,87 +180,87 @@ const handleSelectChange = (event) => {
           selectedGsn: gsn,
           selectedGrinDate: grinDate,
           selectedGsnDate: gsnDate,
-          isNewEntry: true 
+          isNewEntry: true
         }
       });
     } else if (mode === 'upload') {
-      
+
       console.log("Selected party data for UPLOAD:", mostRecentGsn);
       setUploadStep(2);
     }
-};
+  };
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     const validation = validateFile(file, 'documents');
-    
+
     if (!validation.isValid) {
       alert(`❌ Bill file validation failed:\n${validation.error}`);
       e.target.value = ''; // Clear the input
       return;
     }
-    
+
     setBillFile(file);
     console.log('✓ Bill file validated and selected:', file.name);
   };
 
   const handleSubmitBill = async (e) => {
     e.preventDefault();
-    
+
     if (!billFile) {
       setMessage("Please select a bill file to upload");
       return;
     }
-    
-    
+
+
     if (!selectedParty || !selectedParty._id) {
       setMessage("No party selected or invalid party data (missing _id)");
       console.error("Selected party is missing or has no _id:", selectedParty);
       return;
     }
-    
-    const partyIdToUpdate = selectedParty._id; 
-    
+
+    const partyIdToUpdate = selectedParty._id;
+
     try {
       setSubmitting(true);
       setMessage("Uploading bill...");
-      
+
       const formData = new FormData();
       formData.append('file', billFile);
       formData.append('partyId', partyIdToUpdate); // Pass the GRIN entry ID
-      
+
       const url = process.env.REACT_APP_BACKEND_URL;
       const token = localStorage.getItem('authToken');
-      
+
       console.log("Submitting bill update for partyId:", partyIdToUpdate);
       const response = await axios.post(`${url}/entries/update-bill`, formData, {
         headers: {
           'Authorization': `Bearer ${token}`
         }
       });
-      
+
       console.log("Upload response:", response.data);
       setMessage("Bill uploaded successfully!");
-      
+
       // Remove the successfully updated party from the filtered list
       setFilteredParties(prevParties => prevParties.filter(p => {
         console.log(`Comparing p._id: ${p._id} with partyIdToUpdate: ${partyIdToUpdate}`);
         return p._id !== partyIdToUpdate;
       }));
-      
-     
+
+
       setBillFile(null);
-      
+
       setSelectedParty(null);
       setSelectedValue('');
-      
-      
+
+
       setTimeout(() => {
-        setUploadStep(1); 
+        setUploadStep(1);
         setMessage('');
-      
-      }, 2000); 
-      
+
+      }, 2000);
+
     } catch (error) {
       console.error("Error uploading bill:", error);
       setMessage(error.response?.data?.message || "Error uploading bill. Please try again.");
@@ -279,20 +279,20 @@ const handleSelectChange = (event) => {
     setMessage('');
   };
 
-const containerStyle = {
-  textAlign: 'center',
-  minHeight: '100vh',
-  padding: '20px',
-  background: 'linear-gradient(-45deg, #fcb900, #9900ef, #ff6900, #00ff07)',
-  backgroundSize: '400% 400%',
-  animation: 'gradientAnimation 12s ease infinite',
-  borderRadius: '10px',
-  boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
-  marginLeft: 'auto',
-  marginRight: 'auto',
-};
+  const containerStyle = {
+    textAlign: 'center',
+    minHeight: '100vh',
+    padding: '20px',
+    background: 'linear-gradient(-45deg, #fcb900, #9900ef, #ff6900, #00ff07)',
+    backgroundSize: '400% 400%',
+    animation: 'gradientAnimation 12s ease infinite',
+    borderRadius: '10px',
+    boxShadow: '0 4px 10px rgba(0, 0, 0, 0.1)',
+    marginLeft: 'auto',
+    marginRight: 'auto',
+  };
 
-const globalStyles = `
+  const globalStyles = `
 @keyframes gradientAnimation {
   0% { background-position: 0% 50%; }
   25% { background-position: 50% 100%; }
@@ -324,51 +324,56 @@ const globalStyles = `
   }
 }
 `;
-  
+
   const buttonStyle = {
     backgroundColor: 'rgba(218, 216, 224, 0.8)',
     border: 'none',
     borderRadius: '28px',
     color: 'black',
-    fontSize: '20px',
+    fontSize: '18px',
     fontFamily: `'Poppins', sans-serif`,
     fontWeight: 'normal',
     cursor: 'pointer',
     transition: 'all 0.3s ease',
-    padding: '10px 20px',
+    padding: '12px 32px',
     margin: '10px',
+    minWidth: '200px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   };
-  
+
   const selectStyle = {
     width: 'auto',
+    minWidth: '400px',
     height: "42px",
-    padding: "5px",
-            border: 'none',
-            borderRadius: '28px',
-            color: 'black',
-            backgroundColor: 'rgba(218, 216, 224, 0.8)',
-    border: "1px black solid",
+    padding: "8px 16px",
+    border: '1px solid #ccc',
+    borderRadius: '28px',
+    color: 'black',
+    backgroundColor: 'rgba(218, 216, 224, 0.8)',
     marginBottom: '20px',
-    fontSize: '16px'
+    fontSize: '16px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   };
-  
+
   const fileInputStyle = {
     display: 'none'
   };
-  
+
   const fileInputLabelStyle = {
     backgroundColor: 'rgba(218, 216, 224, 0.8)',
     border: 'none',
     borderRadius: '28px',
     color: 'black',
-    padding: '10px 20px',
+    padding: '12px 32px',
     fontSize: '16px',
     cursor: 'pointer',
     display: 'inline-block',
     marginBottom: '20px',
-    textAlign: 'center'
+    textAlign: 'center',
+    minWidth: '200px',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)',
   };
-  
+
   const messageStyle = {
     padding: '10px',
     marginTop: '15px',
@@ -382,22 +387,28 @@ const globalStyles = `
     <div className={styles.outerContainer} style={containerStyle}>
       <LogOutComponent />
       <style>{globalStyles}</style>
-      
-      <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px'}}>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', marginTop: '50px' }}>
         {!showPartySelect ? (
           // Initial screen with buttons
           <>
-            <h2 style={{marginBottom: '30px'}}>GRIN Management</h2>
-            <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>
-              <button 
-                style={buttonStyle} 
+            <h2 style={{ marginBottom: '30px', color: '#fff' }}>GRIN Management</h2>
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '15px',
+              marginTop: '20px'
+            }}>
+              <button
+                style={buttonStyle}
                 onClick={handleCreateGrinClick}
               >
                 Create GRIN
               </button>
-              
-              <button 
-                style={buttonStyle} 
+
+              <button
+                style={buttonStyle}
                 onClick={handleUploadBillClick}
               >
                 Upload Bill
@@ -407,40 +418,40 @@ const globalStyles = `
         ) : mode === 'create' ? (
           // Create GRIN flow
           <>
-            <h2 style={{marginBottom: '30px'}}>Select a Supplier for GRIN Entry</h2>
-            
+            <h2 style={{ marginBottom: '30px', color: '#fff' }}>Select a Supplier for GRIN Entry</h2>
+
             {loading ? (
               <div>Loading Supplier data...</div>
             ) : filteredParties.length > 0 ? (
               <>
-                <select 
-                  onChange={handleSelectChange} 
+                <select
+                  onChange={handleSelectChange}
                   style={selectStyle}
                 >
-            <option value="">Select Supplier Name</option>
+                  <option value="">Select Supplier Name</option>
                   {filteredParties.map((u, i) => (
-                    <option 
+                    <option
                       key={u._id}
                       value={u.partyName}
                       data-gsn-date={u.innoviceDate}
                     >
-                     GSN: {u.gsn || 'N/A'} - GRIN: {u.grinNo || 'N/A'} - {u.partyName} 
+                      GSN: {u.gsn || 'N/A'} - GRIN: {u.grinNo || 'N/A'} - {u.partyName}
                     </option>
                   ))}
                 </select>
-                <div style={{marginTop: '20px', fontSize: '14px', color: '#444'}}>
+                <div style={{ marginTop: '20px', fontSize: '14px', color: '#444' }}>
                   Select a Supplier to create a GRIN entry with pre-filled details
                 </div>
               </>
             ) : (
-              <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '10px'}}>
+              <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '10px' }}>
                 <p>No parties available for GRIN creation.</p>
                 <p>All parties already have GRIN entries created.</p>
               </div>
             )}
-            
-            <button 
-              style={{...buttonStyle, marginTop: '20px'}} 
+
+            <button
+              style={{ ...buttonStyle, marginTop: '20px' }}
               onClick={resetForm}
             >
               Back
@@ -449,40 +460,40 @@ const globalStyles = `
         ) : mode === 'upload' && uploadStep === 1 ? (
           // Upload Bill - Party Selection Step
           <>
-            <h2 style={{marginBottom: '30px'}}>Select a Supplier to Upload Bill</h2>
-            
+            <h2 style={{ marginBottom: '30px', color: '#fff' }}>Select a Supplier to Upload Bill</h2>
+
             {loading ? (
               <div>Loading Supplier data...</div>
             ) : filteredParties.length > 0 ? (
               <>
-                <select 
-                  onChange={handleSelectChange} 
+                <select
+                  onChange={handleSelectChange}
                   style={selectStyle}
                   value={selectedvalue}
                 >
                   <option value="">Select Supplier Name</option>
                   {filteredParties.map((u, i) => (
-                    <option 
+                    <option
                       key={u._id}
                       value={u.partyName}
                     >
-                     GSN: {u.gsn || 'N/A'} - GRIN: {u.grinNo || 'N/A'} - {u.partyName} 
+                      GSN: {u.gsn || 'N/A'} - GRIN: {u.grinNo || 'N/A'} - {u.partyName}
                     </option>
-            ))}
-        </select>
-                <div style={{marginTop: '20px', fontSize: '14px', color: '#444'}}>
+                  ))}
+                </select>
+                <div style={{ marginTop: '20px', fontSize: '14px', color: '#444' }}>
                   Select a Supplier to upload a bill for their GRIN entry
                 </div>
               </>
             ) : (
-              <div style={{marginTop: '20px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '10px'}}>
+              <div style={{ marginTop: '20px', padding: '15px', backgroundColor: 'rgba(255,255,255,0.7)', borderRadius: '10px' }}>
                 <p>No GRIN entries found without bills.</p>
                 <p>All parties already have bills uploaded or no GRIN entries exist.</p>
               </div>
             )}
-            
-            <button 
-              style={{...buttonStyle, marginTop: '20px'}} 
+
+            <button
+              style={{ ...buttonStyle, marginTop: '20px' }}
               onClick={resetForm}
             >
               Back
@@ -491,10 +502,10 @@ const globalStyles = `
         ) : mode === 'upload' && uploadStep === 2 ? (
           // Upload Bill - File Upload Step
           <>
-            <h2 style={{marginBottom: '30px'}}>Upload Bill for {selectedvalue}</h2>
-            
+            <h2 style={{ marginBottom: '30px', color: '#fff' }}>Upload Bill for {selectedvalue}</h2>
+
             <form onSubmit={handleSubmitBill}>
-              <div style={{marginBottom: '20px'}}>
+              <div style={{ marginBottom: '20px' }}>
                 <label htmlFor="bill-upload" style={fileInputLabelStyle}>
                   {billFile ? billFile.name : 'Select Bill File'}
                 </label>
@@ -506,24 +517,30 @@ const globalStyles = `
                   style={fileInputStyle}
                 />
               </div>
-              
+
               <div style={messageStyle}>
                 {message}
-    </div>
-      
-              <div style={{display: 'flex', justifyContent: 'center', marginTop: '20px'}}>
-                <button 
+              </div>
+
+              <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                gap: '15px',
+                marginTop: '20px',
+                flexWrap: 'wrap'
+              }}>
+                <button
                   type="button"
-                  style={{...buttonStyle, backgroundColor: 'rgba(200, 200, 200, 0.8)'}} 
+                  style={{ ...buttonStyle, backgroundColor: 'rgba(200, 200, 200, 0.8)' }}
                   onClick={() => setUploadStep(1)}
                   disabled={submitting}
                 >
                   Back
                 </button>
-                
-                <button 
+
+                <button
                   type="submit"
-                  style={buttonStyle} 
+                  style={buttonStyle}
                   disabled={submitting || !billFile}
                 >
                   {submitting ? 'Uploading...' : 'Upload Bill'}

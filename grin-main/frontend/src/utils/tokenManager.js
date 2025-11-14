@@ -1,12 +1,15 @@
 import axios from 'axios';
 
+// Note: We can't import api.js here to avoid circular dependency
+// So we'll use axios directly for refresh token
+
 const TOKEN_KEY = 'authToken';
 const ROLE_KEY = 'userRole';
 const TOKEN_EXPIRY_KEY = 'tokenExpiry';
 
 
-const TOKEN_LIFETIME = 15 * 60 * 1000; 
-const REFRESH_BEFORE = 2 * 60 * 1000; 
+const TOKEN_LIFETIME = 24 * 60 * 60 * 1000; // 24 hours
+const REFRESH_BEFORE = 5 * 60 * 1000; // Refresh 5 minutes before expiry
 
 class TokenManager {
     constructor() {
@@ -98,7 +101,7 @@ class TokenManager {
             return;
         }
 
-       
+
         const refreshTime = Math.max(0, timeUntilExpiry - REFRESH_BEFORE);
 
         this.refreshTimer = setTimeout(() => {

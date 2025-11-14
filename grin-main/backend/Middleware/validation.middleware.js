@@ -69,10 +69,12 @@ const entrySchema = Joi.object({
     cgst: Joi.number().allow(null, ''),
     sgst: Joi.number().allow(null, ''),
     igst: Joi.number().allow(null, ''),
+    gstTax: Joi.number().allow(null, ''),
     companyName: Joi.string().allow(null, ''),
     address: Joi.string().allow(null, ''),
     mobileNo: Joi.string().allow(null, ''),
     totalAmount: Joi.number().allow(null, ''),
+    materialTotal: Joi.number().allow(null, ''),
     isNewEntry: Joi.boolean().allow(null, ''),
 
     // For tableData, which comes as a JSON string

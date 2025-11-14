@@ -43,7 +43,7 @@ exports.loginAuditor = async (req, res) => {
     const accessToken = jwt.sign(
         { userId: auditor._id, role: 'auditor' }, 
         process.env.SECRET_KEY, 
-        { expiresIn: '15m' }
+        { expiresIn: '24h' }
     );
     const refreshToken = jwt.sign(
         { userId: auditor._id }, 

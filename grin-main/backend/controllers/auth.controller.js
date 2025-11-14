@@ -13,7 +13,7 @@ const handleRefreshToken = async (req, res) => {
     if (!cookies?.jwt) {
         throw new AppError('Unauthorized: No refresh token cookie', 401, 'AUTH_002');
     }
-    
+
     const refreshToken = cookies.jwt;
 
     const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET);
@@ -34,7 +34,7 @@ const handleRefreshToken = async (req, res) => {
     const accessToken = jwt.sign(
         { userId: decoded.userId, role: 'admin' }, // TODO: Role should be dynamic
         process.env.SECRET_KEY,
-        { expiresIn: '15m' }
+        { expiresIn: '24h' }
     );
 
     logger.info('Refresh token validated, new access token issued', { userId: decoded.userId });

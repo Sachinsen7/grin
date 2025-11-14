@@ -23,7 +23,7 @@ const attendeeHandler = {
         const accessToken = jwt.sign(
             { userId: user._id, role: 'attendee' }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '15m' }
+            { expiresIn: '24h' }
         );
         const refreshToken = jwt.sign(
             { userId: user._id }, 

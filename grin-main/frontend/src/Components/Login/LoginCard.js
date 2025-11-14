@@ -3,11 +3,11 @@ import styles from './LoginCard.module.css';
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { useUser } from '../../Usercontext';
-import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import tokenManager from '../../utils/tokenManager';
 import toast from 'react-hot-toast';
+import api from '../../utils/api';
 
 export default function LoginCard({ value, onLogin }) {
   const [username, setUsername] = useState("");
@@ -21,15 +21,12 @@ export default function LoginCard({ value, onLogin }) {
     console.log(role);
     e.preventDefault();
     try {
-      const url = process.env.REACT_APP_BACKEND_URL;
-      const response = await axios.post(`${url}/log-in/${role}`, {
+      const response = await api.post(`/log-in/${role}`, {
         username,
         password,
-      }, {
-        withCredentials: true 
       });
 
-      const token = response.data.data?.accessToken || response.data.token;
+      const token = response.data.data?.accessToken || response.data.token || response.data.data?.token;
 
       if (token) {
         tokenManager.setToken(token, role);

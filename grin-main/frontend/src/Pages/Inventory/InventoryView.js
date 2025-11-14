@@ -32,11 +32,11 @@ export default function InventoryView() {
                 const combinedData = response.data.reduce((acc, entry) => {
                     if (entry.tableData && Array.isArray(entry.tableData)) {
                         const itemsWithParty = entry.tableData.map(item => ({
-                           ...item,
-                           partyName: entry.partyName || 'N/A',
-                           gsn: entry.gsn || 'N/A',
-                           grinNo: entry.grinNo || 'N/A',
-                           createdAt: entry.createdAt
+                            ...item,
+                            partyName: entry.partyName || 'N/A',
+                            gsn: entry.gsn || 'N/A',
+                            grinNo: entry.grinNo || 'N/A',
+                            createdAt: entry.createdAt
                         }));
                         return acc.concat(itemsWithParty);
                     }
@@ -52,10 +52,10 @@ export default function InventoryView() {
         fetchInventoryData();
     }, [url]);
 
-   
+
     useEffect(() => {
         let filtered = allTableData;
-        
+
         // Filter by item name
         if (searchTerm.trim() !== "") {
             filtered = filtered.filter(item =>
@@ -66,8 +66,8 @@ export default function InventoryView() {
         // Filter by date
         if (dateSearch) {
             const searchDate = new Date(dateSearch);
-            searchDate.setHours(0, 0, 0, 0); 
-            
+            searchDate.setHours(0, 0, 0, 0);
+
             filtered = filtered.filter(item => {
                 if (!item.createdAt) return false;
                 const itemDate = new Date(item.createdAt);
@@ -76,7 +76,7 @@ export default function InventoryView() {
             });
         }
 
-       
+
         filtered = filtered.sort((a, b) => {
             const nameA = (a.item || "").toLowerCase();
             const nameB = (b.item || "").toLowerCase();
@@ -88,9 +88,9 @@ export default function InventoryView() {
         setFilteredTableData(filtered);
     }, [allTableData, searchTerm, dateSearch]);
 
-    
 
-    
+
+
     const mainContainerStyle = {
         minHeight: '100vh',
         width: '100vw',
@@ -116,12 +116,12 @@ export default function InventoryView() {
         marginTop: '2rem',
         borderRadius: '8px',
         boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
-        backgroundColor: 'transparent', 
+        backgroundColor: 'transparent',
         overflow: 'hidden',
         fontSize: '16px'
     };
 
-    
+
     const gradientAnimation = `
     @keyframes gradientAnimation {
         0% { background-position: 0% 50%; }
@@ -144,8 +144,8 @@ export default function InventoryView() {
                 .inventory-table-container th { background-color: rgba(128,128,128,0.35) !important; }
             `}</style>
             <LogOutComponent />
-            
-            {}
+
+            { }
             <button
                 onClick={() => navigate('/dropdown-view')}
                 style={{
@@ -166,35 +166,42 @@ export default function InventoryView() {
 
             <h2 className={styles.title}>Item Inward Register</h2>
 
-            {}
-            <div style={{ 
-                marginBottom: '20px', 
+            {/* Search and Filter Section */}
+            <div style={{
+                marginBottom: '20px',
                 textAlign: 'center',
                 display: 'flex',
                 justifyContent: 'center',
-                gap: '20px'
+                gap: '20px',
+                alignItems: 'center'
             }}>
                 <input
                     type="text"
                     placeholder="Search by Item Name..."
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
-                    style={{ 
-                        padding: '8px', 
-                        width: '250px', 
-                        borderRadius: '5px', 
-                        border: '1px solid #ccc' 
+                    style={{
+                        padding: '10px 12px',
+                        width: '250px',
+                        height: '40px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        fontSize: '14px',
+                        boxSizing: 'border-box'
                     }}
                 />
                 <input
                     type="date"
                     value={dateSearch}
                     onChange={e => setDateSearch(e.target.value)}
-                    style={{ 
-                        padding: '8px', 
-                        width: '200px', 
-                        borderRadius: '5px', 
-                        border: '1px solid #ccc' 
+                    style={{
+                        padding: '10px 12px',
+                        width: '250px',
+                        height: '40px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        fontSize: '14px',
+                        boxSizing: 'border-box'
                     }}
                 />
             </div>

@@ -11,7 +11,7 @@ export default function DropdownView() {
     const navigate = useNavigate();
     const url = process.env.REACT_APP_BACKEND_URL;
 
-    
+
     const [itemsMap, setItemsMap] = useState(new Map());
     const [displayData, setDisplayData] = useState([]);
     const [consolidatedItems, setConsolidatedItems] = useState([]);
@@ -30,19 +30,19 @@ export default function DropdownView() {
                 });
                 setInventoryData(response.data);
 
-                
+
                 const newItemsMap = new Map();
                 const itemTotals = new Map();
-                
+
                 response.data.forEach(entry => {
                     if (entry.tableData && Array.isArray(entry.tableData)) {
                         entry.tableData.forEach(item => {
                             if (item.item) {
-                               
+
                                 if (!newItemsMap.has(item.item)) {
                                     newItemsMap.set(item.item, []);
                                 }
-                                
+
                                 const processedItem = {
                                     ...item,
                                     partyName: entry.partyName || 'N/A',
@@ -52,10 +52,10 @@ export default function DropdownView() {
                                     quantity: parseFloat(item.quantity) || 0,
                                     pricePerUnit: parseFloat(item.pricePerUnit) || 0
                                 };
-                                
+
                                 newItemsMap.get(item.item).push(processedItem);
 
-                              
+
                                 if (!itemTotals.has(item.item)) {
                                     itemTotals.set(item.item, {
                                         item: item.item,
@@ -65,11 +65,11 @@ export default function DropdownView() {
                                         description: item.description
                                     });
                                 }
-                                
+
                                 const totals = itemTotals.get(item.item);
                                 const quantity = parseFloat(item.quantity) || 0;
                                 const price = parseFloat(item.pricePerUnit) || 0;
-                                
+
                                 totals.totalQuantity += quantity;
                                 totals.totalValue += quantity * price;
                                 totals.count++;
@@ -78,7 +78,7 @@ export default function DropdownView() {
                     }
                 });
 
-                
+
                 const consolidatedArray = Array.from(itemTotals.values()).map(totals => ({
                     ...totals,
                     totalQuantity: totals.totalQuantity.toFixed(2),
@@ -103,8 +103,8 @@ export default function DropdownView() {
         setShowDetailView(false);
         if (itemName) {
             const itemDetails = itemsMap.get(itemName) || [];
-          
-            const sortedDetails = [...itemDetails].sort((a, b) => 
+
+            const sortedDetails = [...itemDetails].sort((a, b) =>
                 new Date(b.createdAt) - new Date(a.createdAt)
             );
             setDisplayData(sortedDetails);
@@ -113,10 +113,10 @@ export default function DropdownView() {
         }
     };
 
-    
+
     const handleItemClick = (itemName) => {
         const itemDetails = itemsMap.get(itemName) || [];
-        const sortedDetails = [...itemDetails].sort((a, b) => 
+        const sortedDetails = [...itemDetails].sort((a, b) =>
             new Date(b.createdAt) - new Date(a.createdAt)
         );
         setDisplayData(sortedDetails);
@@ -124,7 +124,7 @@ export default function DropdownView() {
         setShowDetailView(true);
     };
 
-   
+
     const mainContainerStyle = {
         minHeight: '100vh',
         width: '100vw',
@@ -144,7 +144,7 @@ export default function DropdownView() {
         justifyContent: 'flex-start',
     };
 
-   
+
     const tableContainerStyle = {
         width: '90%',
         marginTop: '2rem',
@@ -154,7 +154,7 @@ export default function DropdownView() {
         overflow: 'hidden',
     };
 
-    
+
     const gradientAnimation = `
         @keyframes gradientAnimation {
             0% { background-position: 0% 50%; }
@@ -165,7 +165,7 @@ export default function DropdownView() {
         }
     `;
 
-   
+
     const tableStyle = {
         width: '100%',
         borderCollapse: 'collapse',
@@ -185,7 +185,6 @@ export default function DropdownView() {
         <div style={mainContainerStyle}>
             <style>{gradientAnimation}</style>
             <LogOutComponent />
-            <h2 style={{ color: '#333', marginBottom: '20px' }}>Dropdown View</h2>
 
             {/* Back button */}
             <button
@@ -193,37 +192,50 @@ export default function DropdownView() {
                 style={{
                     position: 'absolute',
                     left: '20px',
-                    top: '20px',
+                    top: '80px',
                     padding: '8px 16px',
                     backgroundColor: '#4CAF50',
                     color: 'white',
                     border: 'none',
                     borderRadius: '4px',
-                    cursor: 'pointer'
+                    cursor: 'pointer',
+                    boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}
             >
                 Back to Inventory
             </button>
 
+            <h2 style={{ color: '#fff', marginTop: '2rem', marginBottom: '20px' }}>Dropdown View</h2>
+
             {/* Dropdown for items */}
-            <select
-                value={selectedItem}
-                onChange={(e) => handleItemSelect(e.target.value)}
-                style={{
-                    padding: '8px',
-                    marginBottom: '20px',
-                    width: '300px',
-                    borderRadius: '4px',
-                    border: '1px solid #ddd'
-                }}
-            >
-                <option value="">Select an Item</option>
-                {Array.from(itemsMap.keys()).sort().map((itemName) => (
-                    <option key={itemName} value={itemName}>
-                        {itemName}
-                    </option>
-                ))}
-            </select>
+            <div style={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                marginBottom: '20px'
+            }}>
+                <select
+                    value={selectedItem}
+                    onChange={(e) => handleItemSelect(e.target.value)}
+                    style={{
+                        padding: '10px 12px',
+                        width: '300px',
+                        height: '40px',
+                        borderRadius: '5px',
+                        border: '1px solid #ccc',
+                        fontSize: '14px',
+                        boxSizing: 'border-box',
+                        backgroundColor: 'white'
+                    }}
+                >
+                    <option value="">Select an Item</option>
+                    {Array.from(itemsMap.keys()).sort().map((itemName) => (
+                        <option key={itemName} value={itemName}>
+                            {itemName}
+                        </option>
+                    ))}
+                </select>
+            </div>
 
             {loading && <p>Loading...</p>}
             {error && <p style={{ color: 'red' }}>Error: {error}</p>}
@@ -232,7 +244,7 @@ export default function DropdownView() {
                 showDetailView ? (
                     // Detailed view
                     <div style={tableContainerStyle}>
-                        <button 
+                        <button
                             onClick={() => setShowDetailView(false)}
                             style={{
                                 padding: '8px 16px',
@@ -273,7 +285,7 @@ export default function DropdownView() {
                                             <td style={{ padding: '12px' }}>{item.quantityNo}</td>
                                             <td style={{ padding: '12px' }}>{item.quantityKg}</td>
                                             <td style={{ padding: '12px' }}>{item.price ? `₹${parseFloat(item.price).toFixed(2)}` : '-'}</td>
-                                            <td style={{ padding: '12px' }}>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', { 
+                                            <td style={{ padding: '12px' }}>{item.createdAt ? new Date(item.createdAt).toLocaleDateString('en-GB', {
                                                 day: '2-digit',
                                                 month: '2-digit',
                                                 year: 'numeric'
@@ -308,7 +320,7 @@ export default function DropdownView() {
                                             <td style={{ padding: '12px' }}>₹{item.totalValue}</td>
                                             <td style={{ padding: '12px' }}>{item.count}</td>
                                             <td style={{ padding: '12px' }}>
-                                                <button 
+                                                <button
                                                     onClick={() => handleItemClick(item.item)}
                                                     style={{
                                                         padding: '6px 12px',
@@ -351,7 +363,7 @@ export default function DropdownView() {
                                     <td style={{ padding: '12px' }}>₹{item.totalValue}</td>
                                     <td style={{ padding: '12px' }}>{item.count}</td>
                                     <td style={{ padding: '12px' }}>
-                                        <button 
+                                        <button
                                             onClick={() => handleItemClick(item.item)}
                                             style={{
                                                 padding: '6px 12px',

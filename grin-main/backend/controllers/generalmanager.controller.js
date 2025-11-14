@@ -22,7 +22,7 @@ const generalManagerHandler = {
         const accessToken = jwt.sign(
             { userId: user._id, role: 'generalmanager' }, 
             process.env.SECRET_KEY, 
-            { expiresIn: '15m' }
+            { expiresIn: '24h' }
         );
         const refreshToken = jwt.sign(
             { userId: user._id }, 

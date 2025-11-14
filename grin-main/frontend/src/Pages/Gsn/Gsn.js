@@ -74,8 +74,7 @@ export default function Gsn() {
         try {
             const url = process.env.REACT_APP_BACKEND_URL;
             const token = localStorage.getItem('authToken');
-            //  const res = await axios.get(`${url}/gsn/getdata`, {
-             const res = await axios.get(`${url}/api/v1/gsn/getdata`, {
+            const res = await axios.get(`${url}/gsn/getdata`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -102,13 +101,13 @@ export default function Gsn() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         const validation = validateFile(file, 'documents');
-        
+
         if (!validation.isValid) {
             alert(`❌ File validation failed:\n${validation.error}`);
             e.target.value = ''; // Clear the input
             return;
         }
-        
+
         setFile(file);
         console.log('✓ File validated and selected:', file.name);
     };
@@ -116,13 +115,13 @@ export default function Gsn() {
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         const validation = validateFile(file, 'images');
-        
+
         if (!validation.isValid) {
             alert(`❌ Photo validation failed:\n${validation.error}`);
             e.target.value = ''; // Clear the input
             return;
         }
-        
+
         setPhoto(file);
         console.log('✓ Photo validated and selected:', file.name);
     };
@@ -205,8 +204,7 @@ export default function Gsn() {
         console.debug('Submitting GSN form with', { grinNo, gsn, partyName, grinDate, gsnDate });
 
         const formData = new FormData();
-        // formData.append("grinNo", grinNo);
-        formData.append("grinNo", Number(grinNo));
+        formData.append("grinNo", grinNo);
         formData.append("grinDate", grinDate);
         formData.append("gsn", gsn);
         formData.append("gsnDate", gsnDate);
@@ -253,11 +251,9 @@ export default function Gsn() {
         try {
             const url = process.env.REACT_APP_BACKEND_URL;
             const token = localStorage.getItem('authToken');
-            // console.log("Sending to URL:", `${url}/gsn/upload-data`);
-            console.log("Sending to URL:", `${url}/api/v1/gsn/upload-data`);
+            console.log("Sending to URL:", `${url}/gsn/upload-data`);
             console.log("Token present:", !!token);
-            //  const response = await axios.post(`${url}/gsn/upload-data`, formData, {
-             const response = await axios.post(`${url}/api/v1/gsn/upload-data`, formData, {
+            const response = await axios.post(`${url}/gsn/upload-data`, formData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                 }
@@ -289,9 +285,7 @@ export default function Gsn() {
             try {
                 const url = process.env.REACT_APP_BACKEND_URL;
                 const token = localStorage.getItem('authToken');
-                //  const res = await axios.get(`${url}/gsn/getdata`, {
-                 const res = await axios.get(`${url}/api/v1/gsn/getdata`, {
-
+                const res = await axios.get(`${url}/gsn/getdata`, {
                     headers: {
                         'Authorization': `Bearer ${token}`,
                         'Content-Type': 'application/json'
@@ -733,8 +727,8 @@ export default function Gsn() {
                             </div>
 
                             <div className={styles.forms}>
-                                <div className={styles.formRow} style={{ width : '100%',display: "flex", flexDirection: 'column' }}>
-                                    <label  style={{fontWeight: 'bold', display : "flex"}}>Material Information:</label>
+                                <div className={styles.formRow} style={{ width: '100%', display: "flex", flexDirection: 'column' }}>
+                                    <label style={{ fontWeight: 'bold', display: "flex" }}>Material Information:</label>
                                     <TableComponent data={tableData} handleTableChange={handleTableChange} />
                                 </div>
                             </div>
@@ -898,7 +892,7 @@ export default function Gsn() {
                                         type="text"
                                         value={totalAmount.toFixed(2)}
                                         readOnly
-                                        style={{ fontWeight: 'bold', backgroundColor:'rgba(218, 216, 224, 0.6)' }}
+                                        style={{ fontWeight: 'bold', backgroundColor: 'rgba(218, 216, 224, 0.6)' }}
                                     />
                                 </div>
                             </div>

@@ -35,37 +35,38 @@ const storage = multer.diskStorage({
 
 // File filter for images (optional but recommended)
 const imageFileFilter = (req, file, cb) => {
-    if (file.fieldname === "photo") {
-        // 1. Check MIME Type
-        const isMimeValid = file.mimetype.startsWith('image/');
-        
-        // 2. Check File Extension
-        const allowedExtensions = /\.(jpg|jpeg|png|gif)$/i; // Use regex for case-insensitive check
-        const isExtValid = allowedExtensions.test(file.originalname);
+  if (file.fieldname === "photo") {
+    // 1. Check MIME Type
+    const isMimeValid = file.mimetype.startsWith('image/');
 
-        if (isMimeValid && isExtValid) {
-            cb(null, true);
-        } else {
-            cb(new Error('Invalid file type. Only JPG, JPEG, PNG, and GIF images are allowed.'), false);
-        }
+    // 2. Check File Extension
+    const allowedExtensions = /\.(jpg|jpeg|png|gif)$/i; // Use regex for case-insensitive check
+    const isExtValid = allowedExtensions.test(file.originalname);
+
+    if (isMimeValid && isExtValid) {
+      cb(null, true);
     } else {
-        cb(null, true); // Accept other files (like the bill)
+      cb(new Error('Invalid file type. Only JPG, JPEG, PNG, and GIF images are allowed.'), false);
     }
+  } else {
+    cb(null, true); // Accept other files (like the bill)
+  }
 };
 
 
 // Configure multer to handle multiple fields
 const upload = multer({
-    storage: storage,
-    fileFilter: imageFileFilter, // Apply the filter
-    limits: { fileSize: 1024 * 1024 * 5 } // Optional: Limit file size (e.g., 5MB)
+  storage: storage,
+  fileFilter: imageFileFilter, // Apply the filter
+  limits: { fileSize: 1024 * 1024 * 5 } // Optional: Limit file size (e.g., 5MB)
 })
 
 // Update route to use upload.fields()
-router.post('/', auth.authMiddleware,validate(entrySchema), upload.fields([
-    { name: 'file', maxCount: 1 }, 
-    { name: 'photo', maxCount: 1 }
-]), gsnHandler.uploaddata)
+// Note: Multer must come BEFORE validation because it parses the multipart/form-data
+router.post('/', auth.authMiddleware, upload.fields([
+  { name: 'file', maxCount: 1 },
+  { name: 'photo', maxCount: 1 }
+]), validate(entrySchema), gsnHandler.uploaddata)
 router.delete('/delete-by-party/:partyName', auth.authMiddleware, gsnHandler.deleteByParty);
 router.put('/update-by-party/:partyName', auth.authMiddleware, gsnHandler.updateByParty);
 
