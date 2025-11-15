@@ -28,13 +28,20 @@ export default function DropdownView() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                setInventoryData(response.data);
 
+                // Normalize response data to array
+                const data = Array.isArray(response.data)
+                    ? response.data
+                    : (response.data?.data && Array.isArray(response.data.data)
+                        ? response.data.data
+                        : []);
+
+                setInventoryData(data);
 
                 const newItemsMap = new Map();
                 const itemTotals = new Map();
 
-                response.data.forEach(entry => {
+                data.forEach(entry => {
                     if (entry.tableData && Array.isArray(entry.tableData)) {
                         entry.tableData.forEach(item => {
                             if (item.item) {

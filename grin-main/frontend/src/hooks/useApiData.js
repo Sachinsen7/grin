@@ -39,11 +39,14 @@ export const useGsnData = (token, options = {}) => {
           'Content-Type': 'application/json'
         }
       });
-      const data = response.data;
-      if (Array.isArray(data)) {
-        return data.filter(u => !u.isHidden);
-      }
-      throw new Error('Invalid GSN data response');
+      // Normalize response data to array
+      const data = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.data && Array.isArray(response.data.data)
+          ? response.data.data
+          : []);
+
+      return data.filter(u => !u.isHidden);
     },
     enabled: !!token, // Only fetch if token exists
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -67,11 +70,14 @@ export const useGrnData = (token, options = {}) => {
           'Content-Type': 'application/json'
         }
       });
-      const data = response.data;
-      if (Array.isArray(data)) {
-        return data.filter(u => !u.isHidden);
-      }
-      throw new Error('Invalid GRN data response');
+      // Normalize response data to array
+      const data = Array.isArray(response.data)
+        ? response.data
+        : (response.data?.data && Array.isArray(response.data.data)
+          ? response.data.data
+          : []);
+
+      return data.filter(u => !u.isHidden);
     },
     enabled: !!token, // Only fetch if token exists
     staleTime: 5 * 60 * 1000, // 5 minutes
@@ -129,8 +135,21 @@ export const useCombinedData = (token, enabled = true, options = {}) => {
         })
       ]);
 
-      const gsnData = Array.isArray(gsnRes.data) ? gsnRes.data.filter(u => !u.isHidden) : [];
-      const grnData = Array.isArray(grnRes.data) ? grnRes.data.filter(u => !u.isHidden) : [];
+      // Normalize response data to arrays
+      const gsnDataRaw = Array.isArray(gsnRes.data)
+        ? gsnRes.data
+        : (gsnRes.data?.data && Array.isArray(gsnRes.data.data)
+          ? gsnRes.data.data
+          : []);
+
+      const grnDataRaw = Array.isArray(grnRes.data)
+        ? grnRes.data
+        : (grnRes.data?.data && Array.isArray(grnRes.data.data)
+          ? grnRes.data.data
+          : []);
+
+      const gsnData = gsnDataRaw.filter(u => !u.isHidden);
+      const grnData = grnDataRaw.filter(u => !u.isHidden);
 
       return { gsnData, grnData };
     },

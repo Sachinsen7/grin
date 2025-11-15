@@ -27,9 +27,18 @@ export default function InventoryView() {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                setInventoryData(response.data);
+
+                // Normalize response data to array
+                const data = Array.isArray(response.data)
+                    ? response.data
+                    : (response.data?.data && Array.isArray(response.data.data)
+                        ? response.data.data
+                        : []);
+
+                setInventoryData(data);
+
                 // Combine all tableData into a single array
-                const combinedData = response.data.reduce((acc, entry) => {
+                const combinedData = data.reduce((acc, entry) => {
                     if (entry.tableData && Array.isArray(entry.tableData)) {
                         const itemsWithParty = entry.tableData.map(item => ({
                             ...item,
@@ -44,7 +53,8 @@ export default function InventoryView() {
                 }, []);
                 setAllTableData(combinedData);
             } catch (err) {
-                setError(err.response?.data?.message || "Failed to fetch inventory data.");
+                console.error('Inventory fetch error:', err);
+                setError(err.response?.data?.message || err.message || "Failed to fetch inventory data.");
             } finally {
                 setLoading(false);
             }

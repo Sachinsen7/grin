@@ -56,7 +56,7 @@ v1Router.use("/getdata", apiLimiter, auth.authMiddleware, require('./get.route')
 v1Router.use('/entries', apiLimiter, require('./entriesRoutes'));
 v1Router.use('/gsn/upload-data', apiLimiter, require('./gsnuploadroute'));
 v1Router.use("/gsn/getdata", apiLimiter, auth.authMiddleware, require('./gsngetroute'));
-v1Router.use('/api', apiLimiter, supplierRoutes); // Note: This will be /api/v1/api/suppliers. Ideally, remove /api from supplier.routes.js
+v1Router.use('/', apiLimiter, supplierRoutes); // Supplier routes mounted at /v1/suppliers
 
 // --- Admin Routes ---
 v1Router.post('/sign-up/admin', apiLimiter, validate(signupSchema), adminHandler.addauthority);

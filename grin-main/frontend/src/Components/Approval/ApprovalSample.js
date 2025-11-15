@@ -33,24 +33,31 @@ export default function Sample({ managerType }) {
     const url = process.env.REACT_APP_BACKEND_URL
 
     // Function to fetch GSN data (extracted for reusability)
-        const fetchingGsnData = async () => {
-            try {
+    const fetchingGsnData = async () => {
+        try {
             const token = localStorage.getItem('authToken');
             console.log('Fetching GSN data with token:', token);
-                const resData = await axios.get(`${url}/gsn/getdata`,
-                    {
-                        headers: {
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
+            const resData = await axios.get(`${url}/gsn/getdata`,
+                {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
                     }
-                );
-                const getData = resData.data;
+                }
+            );
+
+            // Normalize response data to array
+            const getData = Array.isArray(resData.data)
+                ? resData.data
+                : (resData.data?.data && Array.isArray(resData.data.data)
+                    ? resData.data.data
+                    : []);
+
             console.log('Fetched GSN Data:', getData);
 
             const fetchedList = getData.filter((u) => !u.isHidden);
 
-                // Set initial state of the checkboxes based on fetched data
+            // Set initial state of the checkboxes based on fetched data
             const initialSelectedValue = {};
             fetchedList.forEach(item => {
                 if (fieldName && item.hasOwnProperty(fieldName)) {
@@ -62,50 +69,57 @@ export default function Sample({ managerType }) {
             });
 
             setGsnList(fetchedList);
-                setSelectedValue(initialSelectedValue);
+            setSelectedValue(initialSelectedValue);
             setIsGsnDataLoaded(true);
-            } catch (err) {
+        } catch (err) {
             console.error("Error fetching GSN data", err);
             if (err.response) {
-              console.error('GSN Fetch Error Response:', err.response.data);
+                console.error('GSN Fetch Error Response:', err.response.data);
             }
-            }
-        };
+        }
+    };
 
     // Function to fetch GRN data
-        const fetchingGrnData = async () => {
-            try {
-                const token = localStorage.getItem('authToken');
-                console.log('Fetching GRN data with token:', token);
+    const fetchingGrnData = async () => {
+        try {
+            const token = localStorage.getItem('authToken');
+            console.log('Fetching GRN data with token:', token);
             const resData = await axios.get(`${url}/getdata`, {
-                        headers: { 
-                            'Authorization': `Bearer ${token}`,
-                            'Content-Type': 'application/json'
-                        }
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
             });
-                const data = resData.data;
-                console.log('Fetched GRN Data:', data);
-                const fetchedList = data.filter((u) => !u.isHidden);
+
+            // Normalize response data to array
+            const data = Array.isArray(resData.data)
+                ? resData.data
+                : (resData.data?.data && Array.isArray(resData.data.data)
+                    ? resData.data.data
+                    : []);
+
+            console.log('Fetched GRN Data:', data);
+            const fetchedList = data.filter((u) => !u.isHidden);
             setList(fetchedList);
             setIsListDataLoaded(true);
-            } catch (err) {
-                console.error("Error fetching GRN data", err);
-                 if (err.response) {
-                    console.error('GRN Fetch Error Response:', err.response.data);
-                 }
+        } catch (err) {
+            console.error("Error fetching GRN data", err);
+            if (err.response) {
+                console.error('GRN Fetch Error Response:', err.response.data);
             }
-        };
+        }
+    };
 
-    
+
     useEffect(() => {
         fetchingGsnData();
-    
+
     }, [managerType]);
 
-    
+
     useEffect(() => {
         fetchingGrnData();
-    
+
     }, []);
 
     const showHandler = (index) => {
@@ -128,7 +142,7 @@ export default function Sample({ managerType }) {
         console.log(`(${managerType}) Current selectedValue:`, selectedValue);
         const currentStatus = selectedValue[partyName] || 'not_checked';
         console.log(`(${managerType}) Current status for ${partyName}:`, currentStatus);
-        
+
         // Find all documents for this party
         const partyGsnDocs = gsnList.filter(doc => doc.partyName === partyName);
         const partyGrnDocs = list.filter(doc => doc.partyName === partyName);
@@ -144,20 +158,20 @@ export default function Sample({ managerType }) {
             status: currentStatus,
             fieldName: fieldName
         };
-        
+
         console.log(`(${managerType}) Submitting verification status:`, payload);
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.post(`${url}/verify`, payload, {
-                 headers: { 
+                headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                 }
+                }
             });
             console.log(`(${managerType}) Verification Response:`, response.data);
             toast.success('Verification status saved successfully');
             // Refetch both GSN and GRN data to update the UI
-            await Promise.all([fetchingGsnData(), fetchingGrnData()]); 
+            await Promise.all([fetchingGsnData(), fetchingGrnData()]);
         } catch (err) {
             console.error(`(${managerType}) Error saving verification status`, err);
             if (err.response) {
@@ -179,11 +193,12 @@ export default function Sample({ managerType }) {
 
     // Add useEffect for search filtering
     useEffect(() => {
+        console.log('Filter useEffect triggered:', { isGsnDataLoaded, isListDataLoaded, gsnListLength: gsnList.length, listLength: list.length });
         if (isGsnDataLoaded && isListDataLoaded) {
             let filtered = gsnList;
             if (searchTerm) {
                 const searchLower = searchTerm.toLowerCase();
-                filtered = gsnList.filter(item => 
+                filtered = gsnList.filter(item =>
                     (item.partyName && item.partyName.toLowerCase().includes(searchLower)) ||
                     (item.grinNo && item.grinNo.toLowerCase().includes(searchLower)) ||
                     (item.gsn && item.gsn.toLowerCase().includes(searchLower))
@@ -191,6 +206,7 @@ export default function Sample({ managerType }) {
             }
             // Sort by createdAt in descending order (latest first)
             filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+            console.log('Setting filteredList with', filtered.length, 'items');
             setFilteredList(filtered);
         }
     }, [searchTerm, gsnList, isGsnDataLoaded, isListDataLoaded]);
@@ -235,11 +251,11 @@ export default function Sample({ managerType }) {
         });
     }
 
-   
+
     const handleDownloadPDF = (index, groupIndex) => {
         const item = combinedList[index];
         if (!item) return;
-        
+
         const divElement = document.getElementById(`item-div-${item.partyName}-group-${groupIndex}`);
         if (!divElement) return;
 
@@ -255,11 +271,11 @@ export default function Sample({ managerType }) {
         });
 
         setTimeout(() => {
-            html2canvas(divElement, { 
+            html2canvas(divElement, {
                 scale: 2,
                 useCORS: true,
-                logging: false, 
-                backgroundColor: '#ffffff' 
+                logging: false,
+                backgroundColor: '#ffffff'
             }).then((canvas) => {
                 const imgData = canvas.toDataURL("image/png");
                 const pdf = new jsPDF("p", "mm", "a4");
@@ -299,11 +315,11 @@ export default function Sample({ managerType }) {
         return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp'].includes(extension);
     };
 
- 
+
     const combineData = () => {
         if (isGsnDataLoaded && isListDataLoaded) {
             const combined = {};
-            
+
             // Process GSN documents
             gsnList.forEach(doc => {
                 if (!combined[doc.partyName]) {
@@ -337,7 +353,7 @@ export default function Sample({ managerType }) {
             });
 
             const combinedListData = Object.values(combined);
-            
+
             // Sort by latest date
             combinedListData.sort((a, b) => {
                 const getLatestDate = (item) => {
@@ -354,31 +370,33 @@ export default function Sample({ managerType }) {
         }
     };
 
-   
+
     useEffect(() => {
         if (isGsnDataLoaded && isListDataLoaded) {
             combineData();
         }
     }, [isGsnDataLoaded, isListDataLoaded, gsnList, list]);
 
-   
+
     useEffect(() => {
+        console.log('Combined filter useEffect triggered:', { isGsnDataLoaded, isListDataLoaded, combinedListLength: combinedList.length });
         if (isGsnDataLoaded && isListDataLoaded) {
             let filtered = combinedList;
             if (searchTerm) {
                 const searchLower = searchTerm.toLowerCase();
-                filtered = combinedList.filter(item => 
+                filtered = combinedList.filter(item =>
                     (item.partyName && item.partyName.toLowerCase().includes(searchLower)) ||
-                    item.gsnDocuments.some(doc => 
+                    item.gsnDocuments.some(doc =>
                         (doc.grinNo && doc.grinNo.toLowerCase().includes(searchLower)) ||
                         (doc.gsn && doc.gsn.toLowerCase().includes(searchLower))
                     ) ||
-                    item.grnDocuments.some(doc => 
+                    item.grnDocuments.some(doc =>
                         (doc.grinNo && doc.grinNo.toLowerCase().includes(searchLower)) ||
                         (doc.gsn && doc.gsn.toLowerCase().includes(searchLower))
                     )
                 );
             }
+            console.log('Setting filteredList from combinedList with', filtered.length, 'items');
             setFilteredList(filtered);
         }
     }, [searchTerm, combinedList, isGsnDataLoaded, isListDataLoaded]);
@@ -388,20 +406,20 @@ export default function Sample({ managerType }) {
             <LogOutComponent />
             <div className={styles.outer}>
                 {/* Add Search Input */}
-                <div style={{ 
-                    padding: '10px 20px', 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                    borderRadius: '8px', 
+                <div style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
                     margin: '10px 0',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}>
-                    <input 
+                    <input
                         type="text"
                         placeholder="Search by Suppllier Name, GRN or GRIN number..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ 
-                            width: '100%', 
+                        style={{
+                            width: '100%',
                             padding: '12px',
                             borderRadius: '5px',
                             border: '1px solid #ccc',
@@ -414,20 +432,20 @@ export default function Sample({ managerType }) {
 
                 {filteredList.map((item, index) => {
                     const { partyName, gsnDocuments = [], grnDocuments = [] } = item;
-                    const isApprovedByCurrentManager = !!item[fieldName]; 
+                    const isApprovedByCurrentManager = !!item[fieldName];
                     const statusText = isApprovedByCurrentManager ? "(Approved)" : "(Not Approved)";
 
-                    
+
                     let isCheckboxEnabled = false;
                     if (managerType === 'Auditor') {
-                       
-                        isCheckboxEnabled = true; 
+
+                        isCheckboxEnabled = true;
                     } else {
-                        
+
                         isCheckboxEnabled = (gsnDocuments && gsnDocuments.length > 0) || (grnDocuments && grnDocuments.length > 0);
                     }
 
-                   
+
                     const firstGsnDoc = gsnDocuments && gsnDocuments.length > 0 ? gsnDocuments[0] : {};
                     const firstGrnDoc = grnDocuments && grnDocuments.length > 0 ? grnDocuments[0] : {};
 
@@ -442,7 +460,7 @@ export default function Sample({ managerType }) {
                                 onClick={() => showHandler(index)}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    <div style={{ 
+                                    <div style={{
                                         display: 'flex',
                                         flexDirection: 'column',
                                         gap: '5px',
@@ -452,31 +470,31 @@ export default function Sample({ managerType }) {
                                     }}>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             GSN: {firstGsnDoc?.gsn || 'N/A'}
-                                    </span>
+                                        </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             GRIN: {firstGsnDoc?.grinNo || 'N/A'}
-                                    </span>
+                                        </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             DATE: {firstGsnDoc?.grinDate ? formatDateOnly(firstGsnDoc.grinDate) : 'N/A'}
-                                    </span>
+                                        </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             TIME: {firstGsnDoc?.grinDate ? formatTimeOnly(firstGsnDoc.grinDate) : 'N/A'}
                                         </span>
                                     </div>
-                                    <span style={{ 
+                                    <span style={{
                                         fontSize: '1.1em',
                                         fontWeight: '500'
                                     }}>
-                                {partyName}
+                                        {partyName}
                                     </span>
-                                <span style={{ marginLeft: '10px', fontSize: '0.8em', color: isApprovedByCurrentManager ? 'green' : 'orange' }}>
-                                    {statusText}
-                                </span>
+                                    <span style={{ marginLeft: '10px', fontSize: '0.8em', color: isApprovedByCurrentManager ? 'green' : 'orange' }}>
+                                        {statusText}
+                                    </span>
                                 </div>
                             </h2>
 
                             <div style={{ display: "flex", flexDirection: "row" }}>
-                                {/* GSN Section */} 
+                                {/* GSN Section */}
                                 <div className={styles.completeBlock} style={{ display: visibleItem === index ? 'block' : 'none' }}>
                                     {/* Group GSN and GRIN documents by their order */}
                                     {(() => {
@@ -486,7 +504,7 @@ export default function Sample({ managerType }) {
                                         for (let i = 0; i < maxLength; i++) {
                                             const gsnDoc = gsnDocuments[i];
                                             const grnDoc = grnDocuments[i];
-                                            
+
                                             if (gsnDoc || grnDoc) {
                                                 groups.push(
                                                     <div key={`group-${i}`} id={`item-div-${partyName}-group-${i}`} className={styles.grinDetails}>
@@ -498,156 +516,156 @@ export default function Sample({ managerType }) {
                                                         {gsnDoc && (
                                                             <div style={{ backgroundColor: 'rgba(218, 216, 224, 0.2)', borderRadius: '8px', padding: '15px', marginBottom: '15px' }}>
                                                                 <h4 style={{ textAlign: 'center', margin: '0 0 15px 0' }}>GSN Document</h4>
-                                    <div className={styles.grinDetails}>
+                                                                <div className={styles.grinDetails}>
                                                                     {/* GSN Details Table */}
                                                                     <div><label htmlFor=""><h5>GSN Details</h5></label></div>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>GRIN NO.</th>
-                                                    <th>Date</th>
-                                                    <th>GSN</th>
-                                                    <th>Date</th>
-                                                    <th>P.O. No.</th>
-                                                    <th>Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
+                                                                    <table>
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>GRIN NO.</th>
+                                                                                <th>Date</th>
+                                                                                <th>GSN</th>
+                                                                                <th>Date</th>
+                                                                                <th>P.O. No.</th>
+                                                                                <th>Date</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
                                                                                 <td>{gsnDoc.grinNo}</td>
                                                                                 <td>{formatDate(gsnDoc.grinDate)}</td>
                                                                                 <td>{gsnDoc.gsn}</td>
                                                                                 <td>{formatDate(gsnDoc.gsnDate)}</td>
                                                                                 <td>{gsnDoc.poNo}</td>
                                                                                 <td>{formatDate(gsnDoc.poDate)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
 
-                                                                    
-                                    <div className={styles.grinDetails}>
-                                        <label htmlFor=""><h5>Supplier Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Supplier Name</th>
-                                                    <th>Supplier Name</th>
-                                                    <th>Supplier Invoice No.</th>
-                                                    <th>Date</th>
-                                                    <th>Address</th>
-                                                    <th>GST No</th>
-                                                    <th>Mobile No</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                                                            <td>{gsnDoc.partyName}</td>
-                                                                                            <td>{gsnDoc.companyName || 'N/A'}</td>
-                                                                                            <td>{gsnDoc.innoviceno}</td>
-                                                                                            <td>{formatDate(gsnDoc.innoviceDate)}</td>
-                                                                                            <td>{gsnDoc.address || 'N/A'}</td>
-                                                                                            <td>{gsnDoc.gstNo || 'N/A'}</td>
-                                                                                            <td>{gsnDoc.mobileNo || 'N/A'}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+
+                                                                    <div className={styles.grinDetails}>
+                                                                        <label htmlFor=""><h5>Supplier Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Supplier Name</th>
+                                                                                    <th>Supplier Name</th>
+                                                                                    <th>Supplier Invoice No.</th>
+                                                                                    <th>Date</th>
+                                                                                    <th>Address</th>
+                                                                                    <th>GST No</th>
+                                                                                    <th>Mobile No</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{gsnDoc.partyName}</td>
+                                                                                    <td>{gsnDoc.companyName || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.innoviceno}</td>
+                                                                                    <td>{formatDate(gsnDoc.innoviceDate)}</td>
+                                                                                    <td>{gsnDoc.address || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.gstNo || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.mobileNo || 'N/A'}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
                                                                     {/* Transport Details Table */}
-                                    <div className={styles.grinDetails}>
-                                        <label htmlFor=""><h5>Transport Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>L.R. No.</th>
-                                                    <th>Transporter Name</th>
-                                                    <th>Vehicle No.</th>
-                                                    <th>L.R. Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                                                            <td>{gsnDoc.lrNo}</td>
-                                                                                            <td>{gsnDoc.transName}</td>
-                                                                                            <td>{gsnDoc.vehicleNo}</td>
-                                                                                            <td>{formatDate(gsnDoc.lrDate)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    <div className={styles.grinDetails}>
+                                                                        <label htmlFor=""><h5>Transport Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>L.R. No.</th>
+                                                                                    <th>Transporter Name</th>
+                                                                                    <th>Vehicle No.</th>
+                                                                                    <th>L.R. Date</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{gsnDoc.lrNo}</td>
+                                                                                    <td>{gsnDoc.transName}</td>
+                                                                                    <td>{gsnDoc.vehicleNo}</td>
+                                                                                    <td>{formatDate(gsnDoc.lrDate)}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
-                                    {/* Amount Details */}
-                                    <div className={styles.grinDetails} style={{ marginTop: '20px' }}>
-                                        <label htmlFor=""><h5>Amount Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>CGST</th>
-                                                    <th>SGST</th>
-                                                    <th>IGST</th>
-                                                    <th>GST Tax</th>
-                                                    <th>Before Tax Total</th>
-                                                    <th>Total Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{gsnDoc.cgst || 'N/A'}</td>
-                                                    <td>{gsnDoc.sgst || 'N/A'}</td>
-                                                    <td>{gsnDoc.igst || 'N/A'}</td>
-                                                    <td>{gsnDoc.gstTax !== undefined ? gsnDoc.gstTax : 'N/A'}</td>
-                                                    <td>{gsnDoc.materialTotal !== undefined ? gsnDoc.materialTotal : 'N/A'}</td>
-                                                    <td>{gsnDoc.totalAmount || 'N/A'}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    {/* Amount Details */}
+                                                                    <div className={styles.grinDetails} style={{ marginTop: '20px' }}>
+                                                                        <label htmlFor=""><h5>Amount Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>CGST</th>
+                                                                                    <th>SGST</th>
+                                                                                    <th>IGST</th>
+                                                                                    <th>GST Tax</th>
+                                                                                    <th>Before Tax Total</th>
+                                                                                    <th>Total Amount</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{gsnDoc.cgst || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.sgst || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.igst || 'N/A'}</td>
+                                                                                    <td>{gsnDoc.gstTax !== undefined ? gsnDoc.gstTax : 'N/A'}</td>
+                                                                                    <td>{gsnDoc.materialTotal !== undefined ? gsnDoc.materialTotal : 'N/A'}</td>
+                                                                                    <td>{gsnDoc.totalAmount || 'N/A'}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
                                                                     {/* Material List */}
                                                                     {gsnDoc.tableData && gsnDoc.tableData.length > 0 && (
-                                    <div style={{
-                                        border: "1px solid #ccc",
-                                        width: "90%",
-                                        margin: "2% auto",
-                                        padding: "20px",
-                                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                        borderRadius: "8px",
-                                        backgroundColor: 'rgba(218, 216, 224, 0.6)',
-                                        fontFamily: "'Arial', sans-serif",
-                                        fontSize: "16px",
-                                        lineHeight: "1.6",
-                                        boxSizing: "border-box",
-                                        maxWidth: "1200px",
-                                        overflowWrap: "break-word",
-                                    }}>
-                                        <h5 style={{ textAlign: "center" }}>Material List (GSN)</h5>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr. No.</th>
-                                                    <th>Item</th>
-                                                    <th>Description</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price / KG</th>
-                                                    <th>Type</th>
-                                                    <th>Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {gsnDoc.tableData.map((row, idx) => (
-                                                    <tr key={idx}>
-                                                        <td>{idx + 1}</td>
-                                                        <td>{row.item}</td>
-                                                        <td>{row.description}</td>
-                                                        <td>{row.quantityValue || 'N/A'}</td>
-                                                        <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
-                                                        <td>{row.priceType || 'N/A'}</td>
-                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue)||0)*(parseFloat(row.priceValue)||0)).toFixed(2)}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                        <div style={{
+                                                                            border: "1px solid #ccc",
+                                                                            width: "90%",
+                                                                            margin: "2% auto",
+                                                                            padding: "20px",
+                                                                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                                                                            borderRadius: "8px",
+                                                                            backgroundColor: 'rgba(218, 216, 224, 0.6)',
+                                                                            fontFamily: "'Arial', sans-serif",
+                                                                            fontSize: "16px",
+                                                                            lineHeight: "1.6",
+                                                                            boxSizing: "border-box",
+                                                                            maxWidth: "1200px",
+                                                                            overflowWrap: "break-word",
+                                                                        }}>
+                                                                            <h5 style={{ textAlign: "center" }}>Material List (GSN)</h5>
+                                                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Sr. No.</th>
+                                                                                        <th>Item</th>
+                                                                                        <th>Description</th>
+                                                                                        <th>Quantity</th>
+                                                                                        <th>Price / KG</th>
+                                                                                        <th>Type</th>
+                                                                                        <th>Total</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {gsnDoc.tableData.map((row, idx) => (
+                                                                                        <tr key={idx}>
+                                                                                            <td>{idx + 1}</td>
+                                                                                            <td>{row.item}</td>
+                                                                                            <td>{row.description}</td>
+                                                                                            <td>{row.quantityValue || 'N/A'}</td>
+                                                                                            <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
+                                                                                            <td>{row.priceType || 'N/A'}</td>
+                                                                                            <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
                                                                     )}
 
                                                                     {/* CREATED AT (GSN) Card */}
@@ -660,47 +678,47 @@ export default function Sample({ managerType }) {
                                                                         fontSize: '0.9em',
                                                                         color: '#333',
                                                                         maxWidth: '250px',
-                                                                        margin: '20px auto 0 auto' 
+                                                                        margin: '20px auto 0 auto'
                                                                     }}>
-                                                                        <strong>CREATED AT (GSN)</strong><br/>
+                                                                        <strong>CREATED AT (GSN)</strong><br />
                                                                         {formatDate(gsnDoc.createdAt) || 'N/A'}
                                                                     </div>
 
-                                                                    {}
+                                                                    { }
                                                                     {gsnDoc.photoPath && (
-                                    <div style={{
-                                            width: "90%", margin: "20px auto", padding: "15px", 
-                                            border: "1px solid #ccc", borderRadius: "8px", textAlign: "center",
-                                            backgroundColor: 'rgba(218, 216, 224, 0.6)', 
-                                        }}>
-                                            <h2 style={{ color: "#007bff", fontSize: "24px", marginBottom: "15px" }}>Uploaded Photo (GSN)</h2>
-                                                                                    <img src={`${url}/${gsnDoc.photoPath}`} alt="GSN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
-                                        </div>
-                                    )}
+                                                                        <div style={{
+                                                                            width: "90%", margin: "20px auto", padding: "15px",
+                                                                            border: "1px solid #ccc", borderRadius: "8px", textAlign: "center",
+                                                                            backgroundColor: 'rgba(218, 216, 224, 0.6)',
+                                                                        }}>
+                                                                            <h2 style={{ color: "#007bff", fontSize: "24px", marginBottom: "15px" }}>Uploaded Photo (GSN)</h2>
+                                                                            <img src={`${url}/${gsnDoc.photoPath}`} alt="GSN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
+                                                                        </div>
+                                                                    )}
 
-                                    {/* View/Download Bill Button for GSN */}
-                                    {gsnDoc.file && (
-                                        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                                            <button
-                                                onClick={() => window.open(`${url}/${gsnDoc.file}`, '_blank')}
-                                                style={{
-                                                    padding: '10px 20px',
-                                                    backgroundColor: '#17a2b8',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '5px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '16px',
-                                                    transition: 'background-color 0.3s ease'
-                                                }}
-                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#138496'}
-                                                onMouseLeave={(e) => e.target.style.backgroundColor = '#17a2b8'}
-                                            >
-                                                View/Download Bill (GSN)
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
+                                                                    {/* View/Download Bill Button for GSN */}
+                                                                    {gsnDoc.file && (
+                                                                        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                                                                            <button
+                                                                                onClick={() => window.open(`${url}/${gsnDoc.file}`, '_blank')}
+                                                                                style={{
+                                                                                    padding: '10px 20px',
+                                                                                    backgroundColor: '#17a2b8',
+                                                                                    color: 'white',
+                                                                                    border: 'none',
+                                                                                    borderRadius: '5px',
+                                                                                    cursor: 'pointer',
+                                                                                    fontSize: '16px',
+                                                                                    transition: 'background-color 0.3s ease'
+                                                                                }}
+                                                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#138496'}
+                                                                                onMouseLeave={(e) => e.target.style.backgroundColor = '#17a2b8'}
+                                                                            >
+                                                                                View/Download Bill (GSN)
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
                                                             </div>
                                                         )}
 
@@ -708,232 +726,232 @@ export default function Sample({ managerType }) {
                                                         {grnDoc && (
                                                             <div style={{ backgroundColor: 'rgba(218, 216, 224, 0.2)', borderRadius: '8px', padding: '15px', marginBottom: '15px' }}>
                                                                 <h4 style={{ textAlign: 'center', margin: '0 0 15px 0' }}>GRIN Document</h4>
-                                    <div className={styles.grinDetails}>
-                                                                    {}
-                                        <div><label htmlFor=""><h5>GRIN Details</h5></label></div>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>GRIN NO.</th>
-                                                    <th>Date</th>
-                                                    <th>GSN</th>
-                                                    <th>Date</th>
-                                                    <th>P.O. No.</th>
-                                                    <th>Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                                                        <td>{grnDoc.grinNo}</td>
-                                                                                        <td>{formatDate(grnDoc.grinDate)}</td>
-                                                                                        <td>{grnDoc.gsn}</td>
-                                                                                        <td>{formatDate(grnDoc.gsnDate)}</td>
-                                                                                        <td>{grnDoc.poNo}</td>
-                                                                                        <td>{formatDate(grnDoc.poDate)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                                <div className={styles.grinDetails}>
+                                                                    { }
+                                                                    <div><label htmlFor=""><h5>GRIN Details</h5></label></div>
+                                                                    <table>
+                                                                        <thead>
+                                                                            <tr>
+                                                                                <th>GRIN NO.</th>
+                                                                                <th>Date</th>
+                                                                                <th>GSN</th>
+                                                                                <th>Date</th>
+                                                                                <th>P.O. No.</th>
+                                                                                <th>Date</th>
+                                                                            </tr>
+                                                                        </thead>
+                                                                        <tbody>
+                                                                            <tr>
+                                                                                <td>{grnDoc.grinNo}</td>
+                                                                                <td>{formatDate(grnDoc.grinDate)}</td>
+                                                                                <td>{grnDoc.gsn}</td>
+                                                                                <td>{formatDate(grnDoc.gsnDate)}</td>
+                                                                                <td>{grnDoc.poNo}</td>
+                                                                                <td>{formatDate(grnDoc.poDate)}</td>
+                                                                            </tr>
+                                                                        </tbody>
+                                                                    </table>
 
-                                                                    {}
-                                    <div className={styles.grinDetails}>
-                                        <label htmlFor=""><h5>Supplier Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>Supplier Name</th>
-                                                    <th>Supplier Name</th>
-                                                    <th>Supplier Invoice No.</th>
-                                                    <th>Date</th>
-                                                    <th>Address</th>
-                                                    <th>GST No</th>
-                                                    <th>Mobile No</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                                                            <td>{grnDoc.partyName}</td>
-                                                                                            <td>{grnDoc.companyName || 'N/A'}</td>
-                                                                                            <td>{grnDoc.innoviceno}</td>
-                                                                                            <td>{formatDate(grnDoc.innoviceDate)}</td>
-                                                                                            <td>{grnDoc.address || 'N/A'}</td>
-                                                                                            <td>{grnDoc.gstNo || 'N/A'}</td>
-                                                                                            <td>{grnDoc.mobileNo || 'N/A'}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    { }
+                                                                    <div className={styles.grinDetails}>
+                                                                        <label htmlFor=""><h5>Supplier Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>Supplier Name</th>
+                                                                                    <th>Supplier Name</th>
+                                                                                    <th>Supplier Invoice No.</th>
+                                                                                    <th>Date</th>
+                                                                                    <th>Address</th>
+                                                                                    <th>GST No</th>
+                                                                                    <th>Mobile No</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{grnDoc.partyName}</td>
+                                                                                    <td>{grnDoc.companyName || 'N/A'}</td>
+                                                                                    <td>{grnDoc.innoviceno}</td>
+                                                                                    <td>{formatDate(grnDoc.innoviceDate)}</td>
+                                                                                    <td>{grnDoc.address || 'N/A'}</td>
+                                                                                    <td>{grnDoc.gstNo || 'N/A'}</td>
+                                                                                    <td>{grnDoc.mobileNo || 'N/A'}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
-                                    {/* GRIN Amount Details */}
-                                    <div className={styles.grinDetails} style={{ marginTop: '20px' }}>
-                                        <label htmlFor=""><h5>Amount Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>CGST</th>
-                                                    <th>SGST</th>
-                                                    <th>IGST</th>
-                                                    <th>GST Tax</th>
-                                                    <th>Before Tax Total</th>
-                                                    <th>Total Amount</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                    <td>{grnDoc.cgst || 'N/A'}</td>
-                                                    <td>{grnDoc.sgst || 'N/A'}</td>
-                                                    <td>{grnDoc.igst || 'N/A'}</td>
-                                                    <td>{grnDoc.gstTax !== undefined ? grnDoc.gstTax : 'N/A'}</td>
-                                                    <td>{grnDoc.materialTotal !== undefined ? grnDoc.materialTotal : 'N/A'}</td>
-                                                    <td>{grnDoc.totalAmount || 'N/A'}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    {/* GRIN Amount Details */}
+                                                                    <div className={styles.grinDetails} style={{ marginTop: '20px' }}>
+                                                                        <label htmlFor=""><h5>Amount Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>CGST</th>
+                                                                                    <th>SGST</th>
+                                                                                    <th>IGST</th>
+                                                                                    <th>GST Tax</th>
+                                                                                    <th>Before Tax Total</th>
+                                                                                    <th>Total Amount</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{grnDoc.cgst || 'N/A'}</td>
+                                                                                    <td>{grnDoc.sgst || 'N/A'}</td>
+                                                                                    <td>{grnDoc.igst || 'N/A'}</td>
+                                                                                    <td>{grnDoc.gstTax !== undefined ? grnDoc.gstTax : 'N/A'}</td>
+                                                                                    <td>{grnDoc.materialTotal !== undefined ? grnDoc.materialTotal : 'N/A'}</td>
+                                                                                    <td>{grnDoc.totalAmount || 'N/A'}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
                                                                     {/* Transport Details Table */}
-                                    <div className={styles.grinDetails}>
-                                        <label htmlFor=""><h5>Transport Details</h5></label>
-                                        <table>
-                                            <thead>
-                                                <tr>
-                                                    <th>L.R. No.</th>
-                                                    <th>Transporter Name</th>
-                                                    <th>Vehicle No.</th>
-                                                    <th>L.R. Date</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                <tr>
-                                                                                            <td>{grnDoc.lrNo}</td>
-                                                                                            <td>{grnDoc.transName}</td>
-                                                                                            <td>{grnDoc.vehicleNo}</td>
-                                                                                            <td>{formatDate(grnDoc.lrDate)}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                    <div className={styles.grinDetails}>
+                                                                        <label htmlFor=""><h5>Transport Details</h5></label>
+                                                                        <table>
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th>L.R. No.</th>
+                                                                                    <th>Transporter Name</th>
+                                                                                    <th>Vehicle No.</th>
+                                                                                    <th>L.R. Date</th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <td>{grnDoc.lrNo}</td>
+                                                                                    <td>{grnDoc.transName}</td>
+                                                                                    <td>{grnDoc.vehicleNo}</td>
+                                                                                    <td>{formatDate(grnDoc.lrDate)}</td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
 
                                                                     {/* Material List */}
                                                                     {grnDoc.tableData && grnDoc.tableData.length > 0 && (
-                                    <div style={{
-                                        border: "1px solid #ccc",
-                                        width: "90%",
-                                        margin: "2% auto",
-                                        padding: "20px",
-                                        boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-                                        borderRadius: "8px",
-                                                                                        backgroundColor: 'rgba(218, 216, 224, 0.6)',
-                                        fontFamily: "'Arial', sans-serif",
-                                        fontSize: "16px",
-                                        lineHeight: "1.6",
-                                        boxSizing: "border-box",
-                                        maxWidth: "1200px",
-                                        overflowWrap: "break-word",
-                                    }}>
-                                        <h5 style={{ textAlign: "center" }}>Material List (GRIN)</h5>
-                                        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-                                            <thead>
-                                                <tr>
-                                                    <th>Sr. No.</th>
-                                                    <th>Item</th>
-                                                    <th>Description</th>
-                                                    <th>Quantity</th>
-                                                    <th>Price / KG</th>
-                                                    <th>Type</th>
-                                                    <th>Total</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {grnDoc.tableData.map((row, idx) => (
-                                                    <tr key={idx}>
-                                                        <td>{idx + 1}</td>
-                                                        <td>{row.item}</td>
-                                                        <td>{row.description}</td>
-                                                        <td>{row.quantityValue || 'N/A'}</td>
-                                                        <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
-                                                        <td>{row.priceType || 'N/A'}</td>
-                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue)||0)*(parseFloat(row.priceValue)||0)).toFixed(2)}</td>
-                                                    </tr>
-                                                ))}
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                                                        <div style={{
+                                                                            border: "1px solid #ccc",
+                                                                            width: "90%",
+                                                                            margin: "2% auto",
+                                                                            padding: "20px",
+                                                                            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                                                                            borderRadius: "8px",
+                                                                            backgroundColor: 'rgba(218, 216, 224, 0.6)',
+                                                                            fontFamily: "'Arial', sans-serif",
+                                                                            fontSize: "16px",
+                                                                            lineHeight: "1.6",
+                                                                            boxSizing: "border-box",
+                                                                            maxWidth: "1200px",
+                                                                            overflowWrap: "break-word",
+                                                                        }}>
+                                                                            <h5 style={{ textAlign: "center" }}>Material List (GRIN)</h5>
+                                                                            <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Sr. No.</th>
+                                                                                        <th>Item</th>
+                                                                                        <th>Description</th>
+                                                                                        <th>Quantity</th>
+                                                                                        <th>Price / KG</th>
+                                                                                        <th>Type</th>
+                                                                                        <th>Total</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    {grnDoc.tableData.map((row, idx) => (
+                                                                                        <tr key={idx}>
+                                                                                            <td>{idx + 1}</td>
+                                                                                            <td>{row.item}</td>
+                                                                                            <td>{row.description}</td>
+                                                                                            <td>{row.quantityValue || 'N/A'}</td>
+                                                                                            <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
+                                                                                            <td>{row.priceType || 'N/A'}</td>
+                                                                                            <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                                        </tr>
+                                                                                    ))}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
                                                                     )}
 
-                                    {/* CREATED AT (GRIN) Card */}
-                                    <div style={{
-                                        marginTop: '20px',
-                                        padding: '10px 15px',
-                                        backgroundColor: 'rgba(153, 0, 239, 0.2)', 
-                                        borderRadius: '8px',
-                                        textAlign: 'center',
-                                        fontSize: '0.9em',
-                                        color: '#333',
-                                        maxWidth: '250px',
-                                        margin: '20px auto 0 auto' // Center the block
-                                    }}>
-                                        <strong>CREATED AT (GRIN)</strong><br/>
-                                        {formatDate(grnDoc.createdAt) || 'N/A'}
-                                    </div>
+                                                                    {/* CREATED AT (GRIN) Card */}
+                                                                    <div style={{
+                                                                        marginTop: '20px',
+                                                                        padding: '10px 15px',
+                                                                        backgroundColor: 'rgba(153, 0, 239, 0.2)',
+                                                                        borderRadius: '8px',
+                                                                        textAlign: 'center',
+                                                                        fontSize: '0.9em',
+                                                                        color: '#333',
+                                                                        maxWidth: '250px',
+                                                                        margin: '20px auto 0 auto' // Center the block
+                                                                    }}>
+                                                                        <strong>CREATED AT (GRIN)</strong><br />
+                                                                        {formatDate(grnDoc.createdAt) || 'N/A'}
+                                                                    </div>
 
                                                                     {/* Photo */}
                                                                     {grnDoc.photoPath && (
-                                    <div style={{
-                                                                            width: "90%", margin: "20px auto", padding: "15px", 
+                                                                        <div style={{
+                                                                            width: "90%", margin: "20px auto", padding: "15px",
                                                                             border: "1px solid #ccc", borderRadius: "8px", textAlign: "center",
-                                            backgroundColor: 'rgba(218, 216, 224, 0.6)',
-                                    }}>
+                                                                            backgroundColor: 'rgba(218, 216, 224, 0.6)',
+                                                                        }}>
                                                                             <h2 style={{ color: "#007bff", fontSize: "24px", marginBottom: "15px" }}>Uploaded Photo (GRIN)</h2>
-                                                                                    <img src={`${url}/${grnDoc.photoPath}`} alt="GRIN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
-                                        </div>
-                                    )}
+                                                                            <img src={`${url}/${grnDoc.photoPath}`} alt="GRIN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
+                                                                        </div>
+                                                                    )}
 
-                                    {/* View/Download Bill Button for GRIN */}
-                                    {grnDoc.file && (
-                                        <div style={{ textAlign: 'center', margin: '20px 0' }}>
-                                            <button
-                                                onClick={() => window.open(`${url}/${grnDoc.file}`, '_blank')}
-                                                style={{
-                                                    padding: '10px 20px',
-                                                    backgroundColor: '#17a2b8',
-                                                    color: 'white',
-                                                    border: 'none',
-                                                    borderRadius: '5px',
-                                                    cursor: 'pointer',
-                                                    fontSize: '16px',
-                                                    transition: 'background-color 0.3s ease'
-                                                }}
-                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#138496'}
-                                                onMouseLeave={(e) => e.target.style.backgroundColor = '#17a2b8'}
-                                            >
-                                                View/Download Bill (GRIN)
-                                            </button>
-                                        </div>
-                                    )}
-                                </div>
-                            </div>
+                                                                    {/* View/Download Bill Button for GRIN */}
+                                                                    {grnDoc.file && (
+                                                                        <div style={{ textAlign: 'center', margin: '20px 0' }}>
+                                                                            <button
+                                                                                onClick={() => window.open(`${url}/${grnDoc.file}`, '_blank')}
+                                                                                style={{
+                                                                                    padding: '10px 20px',
+                                                                                    backgroundColor: '#17a2b8',
+                                                                                    color: 'white',
+                                                                                    border: 'none',
+                                                                                    borderRadius: '5px',
+                                                                                    cursor: 'pointer',
+                                                                                    fontSize: '16px',
+                                                                                    transition: 'background-color 0.3s ease'
+                                                                                }}
+                                                                                onMouseEnter={(e) => e.target.style.backgroundColor = '#138496'}
+                                                                                onMouseLeave={(e) => e.target.style.backgroundColor = '#17a2b8'}
+                                                                            >
+                                                                                View/Download Bill (GRIN)
+                                                                            </button>
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            </div>
                                                         )}
 
                                                         {/* Download button for this group */}
                                                         {isApprovedByCurrentManager && (
-                                                            <button 
-                                                                onClick={() => handleDownloadPDF(index, i)} 
+                                                            <button
+                                                                onClick={() => handleDownloadPDF(index, i)}
                                                                 className="download-pdf-button hide-in-pdf"
-                                                                style={{ 
-                                                                    marginTop: "10px", 
-                                                                    padding: "5px 10px", 
+                                                                style={{
+                                                                    marginTop: "10px",
+                                                                    padding: "5px 10px",
                                                                     marginBottom: "20px",
                                                                     background: "#17a2b8",
-                                                                    color: "white", 
-                                                                    border: "none", 
+                                                                    color: "white",
+                                                                    border: "none",
                                                                     cursor: "pointer",
-                                                                    display: "block" 
+                                                                    display: "block"
                                                                 }}
                                                             >
                                                                 Download Group {i + 1} PDF
                                                             </button>
-                                            )}
-                                        </div>
+                                                        )}
+                                                    </div>
                                                 );
                                             }
                                         }
@@ -942,7 +960,7 @@ export default function Sample({ managerType }) {
                                     })()}
                                 </div>
                             </div>
-                            
+
                             {/* Approval Section */}
                             <div className={`${styles.sign} hide-in-pdf`}
                                 style={{
@@ -961,21 +979,21 @@ export default function Sample({ managerType }) {
                                     <div className={styles.submission}>
                                         <div>
                                             <label htmlFor={`checkbox-${partyName}`}><h6>Approve ({managerType})</h6></label>
-                                            <br/><center>
-                                            <input
-                                                id={`checkbox-${partyName}`}
-                                                style={{
-                                                    width: '12px',
-                                                    height: '20px',
-                                                    transform: 'scale(1.5)',
-                                                    cursor: 'pointer',
-                                                    marginLeft: '10px'
-                                                }}
-                                                name={`checkbox-${partyName}`}
-                                                type="checkbox"
-                                                checked={selectedValue[partyName] === 'checked'}
-                                                onChange={() => handleRadioChange(partyName)}
-                                            />
+                                            <br /><center>
+                                                <input
+                                                    id={`checkbox-${partyName}`}
+                                                    style={{
+                                                        width: '12px',
+                                                        height: '20px',
+                                                        transform: 'scale(1.5)',
+                                                        cursor: 'pointer',
+                                                        marginLeft: '10px'
+                                                    }}
+                                                    name={`checkbox-${partyName}`}
+                                                    type="checkbox"
+                                                    checked={selectedValue[partyName] === 'checked'}
+                                                    onChange={() => handleRadioChange(partyName)}
+                                                />
                                             </center>
                                         </div>
                                     </div>

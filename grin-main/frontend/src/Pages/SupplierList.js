@@ -35,7 +35,7 @@ export default function SupplierList() {
   // Fetch suppliers on mount
   useEffect(() => {
     const url = process.env.REACT_APP_BACKEND_URL;
-    fetch(`${url}/api/suppliers`)
+    fetch(`${url}/suppliers`)
       .then(res => {
         if (!res.ok) throw new Error('Failed to fetch');
         return res.json();
@@ -113,7 +113,7 @@ export default function SupplierList() {
     if (!details[partyName]) {
       setDetailsLoading(true);
       setDetailsError(null);
-      fetch(`${url}/api/supplier-details?partyName=${encodeURIComponent(partyName)}`)
+      fetch(`${url}/supplier-details?partyName=${encodeURIComponent(partyName)}`)
         .then(res => {
           if (!res.ok) throw new Error('Failed to fetch details');
           return res.json();
@@ -141,7 +141,7 @@ export default function SupplierList() {
   const handleEditSave = async (oldPartyName) => {
     setActionLoading(true);
     try {
-      const res = await fetch(`${url}/api/supplier/${encodeURIComponent(oldPartyName)}`, {
+      const res = await fetch(`${url}/supplier/${encodeURIComponent(oldPartyName)}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(editData)
@@ -169,7 +169,7 @@ export default function SupplierList() {
     if (!window.confirm('Are you sure you want to delete this supplier?')) return;
     setActionLoading(true);
     try {
-      const res = await fetch(`${url}/api/supplier/${encodeURIComponent(partyName)}`, {
+      const res = await fetch(`${url}/supplier/${encodeURIComponent(partyName)}`, {
         method: 'DELETE'
       });
 
@@ -208,7 +208,7 @@ export default function SupplierList() {
     e.preventDefault();
     setAddLoading(true);
     try {
-      const res = await fetch(`${url}/api/suppliers`, {
+      const res = await fetch(`${url}/suppliers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(newSupplier)
@@ -535,24 +535,32 @@ export default function SupplierList() {
                         <td style={{ ...cellStyle, width: '20%' }}>{s.mobileNo || 'N/A'}</td>
                         <td style={{ ...cellStyle, width: '20%' }}>
                           <div style={buttonGroupStyle}>
-                            <button
-                              style={editButtonStyle}
-                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0069d9'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#007bff'; }}
-                              onClick={() => handleEdit(idx)}
-                              disabled={actionLoading}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              style={deleteButtonStyle}
-                              onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#c82333'; }}
-                              onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; }}
-                              onClick={() => handleDelete(s.partyName)}
-                              disabled={actionLoading}
-                            >
-                              Delete
-                            </button>
+                            {s.source === 'GSN' ? (
+                              <span style={{ fontSize: '12px', color: '#666', fontStyle: 'italic' }}>
+                                Read-only (GSN)
+                              </span>
+                            ) : (
+                              <>
+                                <button
+                                  style={editButtonStyle}
+                                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#0069d9'; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#007bff'; }}
+                                  onClick={() => handleEdit(idx)}
+                                  disabled={actionLoading}
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  style={deleteButtonStyle}
+                                  onMouseEnter={(e) => { e.currentTarget.style.backgroundColor = '#c82333'; }}
+                                  onMouseLeave={(e) => { e.currentTarget.style.backgroundColor = '#dc3545'; }}
+                                  onClick={() => handleDelete(s.partyName)}
+                                  disabled={actionLoading}
+                                >
+                                  Delete
+                                </button>
+                              </>
+                            )}
                           </div>
                         </td>
                       </>

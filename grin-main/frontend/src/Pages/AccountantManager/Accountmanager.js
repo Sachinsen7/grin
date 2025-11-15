@@ -31,7 +31,7 @@ export default function Accountant({ managerType }) {
     const token = localStorage.getItem('authToken');
 
     // Use the custom hook for combined data (handles caching automatically)
-    const { data: combinedData, isLoading, error } = useCombinedData(token);
+    const { data: combinedData, isLoading, error, refetch } = useCombinedData(token);
 
     // Process and combine data using useMemo to avoid re-processing on every render
     const processedList = useMemo(() => {
@@ -49,7 +49,7 @@ export default function Accountant({ managerType }) {
         console.log(`(${managerType}) Sorted GRN Data (from cache):`, sortedGrnData);
 
         const combined = {};
-        
+
         // Process sorted GSN documents
         sortedGsnData.forEach(doc => {
             if (!combined[doc.partyName]) {
@@ -90,10 +90,6 @@ export default function Accountant({ managerType }) {
             if (combined[doc.partyName].AccountManagerSigned === undefined) combined[doc.partyName].AccountManagerSigned = doc.AccountManagerSigned;
         });
 
-        const combinedListData = Object.values(combined);
-          
-            combinedListData.sort((a, b) => getLatestDate(b) - getLatestDate(a));
-
         // Function to get the latest createdAt from a group
         const getLatestDate = (item) => {
             const dates = [
@@ -102,6 +98,8 @@ export default function Accountant({ managerType }) {
             ].filter(d => !isNaN(d));
             return dates.length > 0 ? Math.max(...dates.map(d => d.getTime())) : 0;
         };
+
+        const combinedListData = Object.values(combined);
 
         // Sort the final combined list
         combinedListData.sort((a, b) => getLatestDate(b) - getLatestDate(a));
@@ -116,8 +114,7 @@ export default function Accountant({ managerType }) {
             setCombinedList(processedList);
             setIsDataLoaded(true);
 
-            
-            const initialSelectedValue = combinedListData.reduce((acc, item) => {
+            const initialSelectedValue = processedList.reduce((acc, item) => {
                 if (fieldName && item.hasOwnProperty(fieldName)) {
                     acc[item.partyName] = item[fieldName] === true ? 'checked' : 'not_checked';
                 } else {
@@ -135,13 +132,13 @@ export default function Accountant({ managerType }) {
         let filtered = combinedList;
         if (searchTerm) {
             const searchLower = searchTerm.toLowerCase();
-            filtered = combinedList.filter(item => 
+            filtered = combinedList.filter(item =>
                 (item.partyName && item.partyName.toLowerCase().includes(searchLower)) ||
-                item.gsnDocuments.some(doc => 
+                item.gsnDocuments.some(doc =>
                     (doc.grinNo && doc.grinNo.toLowerCase().includes(searchLower)) ||
                     (doc.gsn && doc.gsn.toLowerCase().includes(searchLower))
                 ) ||
-                item.grnDocuments.some(doc => 
+                item.grnDocuments.some(doc =>
                     (doc.grinNo && doc.grinNo.toLowerCase().includes(searchLower)) ||
                     (doc.gsn && doc.gsn.toLowerCase().includes(searchLower))
                 )
@@ -212,14 +209,14 @@ export default function Accountant({ managerType }) {
         try {
             const token = localStorage.getItem('authToken');
             const response = await axios.post(`${url}/verify`, payload, {
-                 headers: { 
+                headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
-                 }
+                }
             });
             console.log(`(${managerType}) Verification Response:`, response.data);
             toast.success('Verification status saved successfully');
-            await fetchAndCombineData();
+            await refetch();
         } catch (err) {
             console.error(`(${managerType}) Error saving verification status`, err);
             if (err.response) {
@@ -240,7 +237,7 @@ export default function Accountant({ managerType }) {
     const handleDownloadPDF = (index, groupIndex) => {
         const item = combinedList[index];
         if (!item) return;
-        
+
         const divElement = document.getElementById(`item-div-${item.partyName}-group-${groupIndex}`);
         if (!divElement) return;
 
@@ -256,11 +253,11 @@ export default function Accountant({ managerType }) {
         });
 
         setTimeout(() => {
-            html2canvas(divElement, { 
-                scale: 2, 
-                useCORS: true, 
-                logging: false, 
-                backgroundColor: '#ffffff' 
+            html2canvas(divElement, {
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
             }).then((canvas) => {
                 const imgData = canvas.toDataURL("image/png");
                 const pdf = new jsPDF("p", "mm", "a4");
@@ -299,20 +296,20 @@ export default function Accountant({ managerType }) {
             <LogOutComponent />
             <div className={styles.outer}>
                 {/* Search Input */}
-                <div style={{ 
-                    padding: '10px 20px', 
-                    backgroundColor: 'rgba(255, 255, 255, 0.1)', 
-                    borderRadius: '8px', 
+                <div style={{
+                    padding: '10px 20px',
+                    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+                    borderRadius: '8px',
                     margin: '10px 0',
                     boxShadow: '0 2px 4px rgba(0,0,0,0.1)'
                 }}>
-                    <input 
+                    <input
                         type="text"
                         placeholder="Search by Supplier Name, GRN or GRIN number..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        style={{ 
-                            width: '100%', 
+                        style={{
+                            width: '100%',
                             padding: '12px',
                             borderRadius: '5px',
                             border: '1px solid #ccc',
@@ -325,14 +322,14 @@ export default function Accountant({ managerType }) {
 
                 {/* Render Filtered List */}
                 {filteredGsnList.map((item, index) => {
-                    const { partyName, gsnDocuments, grnDocuments, 
-                            GeneralManagerSigned, StoreManagerSigned, 
-                            PurchaseManagerSigned, AccountManagerSigned } = item;
+                    const { partyName, gsnDocuments, grnDocuments,
+                        GeneralManagerSigned, StoreManagerSigned,
+                        PurchaseManagerSigned, AccountManagerSigned } = item;
 
                     const isApprovedByCurrentManager = !!item[fieldName];
                     const statusText = isApprovedByCurrentManager ? "(Approved)" : "(Not Approved)";
 
-                    
+
                     const firstGsnDoc = gsnDocuments[0] || {};
                     const firstGrnDoc = grnDocuments[0] || {};
 
@@ -347,7 +344,7 @@ export default function Accountant({ managerType }) {
                                 onClick={() => showHandler(index)}
                             >
                                 <div style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                    <div style={{ 
+                                    <div style={{
                                         display: 'flex',
                                         flexDirection: 'column',
                                         gap: '5px',
@@ -360,15 +357,15 @@ export default function Accountant({ managerType }) {
                                         </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             GRIN: {firstGsnDoc.grinNo || 'N/A'}
-                                    </span>
+                                        </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             DATE: {firstGsnDoc.grinDate ? formatDateOnly(firstGsnDoc.grinDate) : 'N/A'}
-                                    </span>
+                                        </span>
                                         <span style={{ fontSize: '0.9em', color: '#666' }}>
                                             TIME: {firstGsnDoc.grinDate ? formatTimeOnly(firstGsnDoc.grinDate) : 'N/A'}
-                                    </span>
+                                        </span>
                                     </div>
-                                    <span style={{ 
+                                    <span style={{
                                         fontSize: '1.1em',
                                         fontWeight: '500'
                                     }}>
@@ -383,7 +380,7 @@ export default function Accountant({ managerType }) {
                             <div style={{ display: "flex", flexDirection: "row" }}>
                                 {/* GSN Section */}
                                 <div className={styles.completeBlock} style={{ display: visibleItem === index ? 'block' : 'none' }}>
-                                    {}
+                                    { }
                                     {(() => {
                                         const maxLength = Math.max(gsnDocuments.length, grnDocuments.length);
                                         const groups = [];
@@ -391,7 +388,7 @@ export default function Accountant({ managerType }) {
                                         for (let i = 0; i < maxLength; i++) {
                                             const gsnDoc = gsnDocuments[i];
                                             const grnDoc = grnDocuments[i];
-                                            
+
                                             if (gsnDoc || grnDoc) {
                                                 groups.push(
                                                     <div key={`group-${i}`} id={`item-div-${partyName}-group-${i}`} className={styles.grinDetails}>
@@ -515,7 +512,7 @@ export default function Accountant({ managerType }) {
                                                                                         <td>{row.quantityValue || 'N/A'}</td>
                                                                                         <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                         <td>{row.priceType || 'N/A'}</td>
-                                                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue)||0)*(parseFloat(row.priceValue)||0)).toFixed(2)}</td>
+                                                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
                                                                                     </tr>
                                                                                 ))}
                                                                             </tbody>
@@ -554,15 +551,15 @@ export default function Accountant({ managerType }) {
                                                                 <div style={{
                                                                     marginTop: '20px',
                                                                     padding: '10px 15px',
-                                                                    backgroundColor: 'rgba(252, 185, 0, 0.2)', 
+                                                                    backgroundColor: 'rgba(252, 185, 0, 0.2)',
                                                                     borderRadius: '8px',
                                                                     textAlign: 'center',
                                                                     fontSize: '0.9em',
                                                                     color: '#333',
                                                                     maxWidth: '250px',
-                                                                    margin: '20px auto 0 auto' 
+                                                                    margin: '20px auto 0 auto'
                                                                 }}>
-                                                                    <strong>CREATED AT (GSN)</strong><br/>
+                                                                    <strong>CREATED AT (GSN)</strong><br />
                                                                     {formatDate(gsnDoc.createdAt) || 'N/A'}
                                                                 </div>
 
@@ -591,9 +588,9 @@ export default function Accountant({ managerType }) {
 
                                                                 {gsnDoc.photoPath && (
                                                                     <div style={{
-                                                                        width: "90%", margin: "20px auto", padding: "15px", 
+                                                                        width: "90%", margin: "20px auto", padding: "15px",
                                                                         border: "1px solid #ccc", borderRadius: "8px", textAlign: "center",
-                                                                        backgroundColor: 'rgba(218, 216, 224, 0.6)', 
+                                                                        backgroundColor: 'rgba(218, 216, 224, 0.6)',
                                                                     }}>
                                                                         <h2 style={{ color: "#007bff", fontSize: "24px", marginBottom: "15px" }}>Uploaded Photo (GSN)</h2>
                                                                         <img src={`${url}/${gsnDoc.photoPath}`} alt="GSN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
@@ -718,7 +715,7 @@ export default function Accountant({ managerType }) {
                                                                                         <td>{row.quantityValue || 'N/A'}</td>
                                                                                         <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                         <td>{row.priceType || 'N/A'}</td>
-                                                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue)||0)*(parseFloat(row.priceValue)||0)).toFixed(2)}</td>
+                                                                                        <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
                                                                                     </tr>
                                                                                 ))}
                                                                             </tbody>
@@ -765,7 +762,7 @@ export default function Accountant({ managerType }) {
                                                                     maxWidth: '250px',
                                                                     margin: '20px auto 0 auto' // Center the block
                                                                 }}>
-                                                                    <strong>CREATED AT (GRIN)</strong><br/>
+                                                                    <strong>CREATED AT (GRIN)</strong><br />
                                                                     {formatDate(grnDoc.createdAt) || 'N/A'}
                                                                 </div>
 
@@ -794,9 +791,9 @@ export default function Accountant({ managerType }) {
 
                                                                 {grnDoc.photoPath && (
                                                                     <div style={{
-                                                                        width: "90%", margin: "20px auto", padding: "15px", 
+                                                                        width: "90%", margin: "20px auto", padding: "15px",
                                                                         border: "1px solid #ccc", borderRadius: "8px", textAlign: "center",
-                                                                        backgroundColor: 'rgba(218, 216, 224, 0.6)', 
+                                                                        backgroundColor: 'rgba(218, 216, 224, 0.6)',
                                                                     }}>
                                                                         <h2 style={{ color: "#007bff", fontSize: "24px", marginBottom: "15px" }}>Uploaded Photo (GRIN)</h2>
                                                                         <img src={`${url}/${grnDoc.photoPath}`} alt="GRIN Uploaded Photo" style={{ maxWidth: '100%', maxHeight: '400px', objectFit: 'contain', borderRadius: '5px' }} />
@@ -807,18 +804,18 @@ export default function Accountant({ managerType }) {
 
                                                         {/* Download button for this group */}
                                                         {isApprovedByCurrentManager && (
-                                                            <button 
-                                                                onClick={() => handleDownloadPDF(index, i)} 
+                                                            <button
+                                                                onClick={() => handleDownloadPDF(index, i)}
                                                                 className="download-pdf-button hide-in-pdf"
-                                                                style={{ 
-                                                                    marginTop: "10px", 
-                                                                    padding: "5px 10px", 
+                                                                style={{
+                                                                    marginTop: "10px",
+                                                                    padding: "5px 10px",
                                                                     marginBottom: "20px",
                                                                     background: "#17a2b8",
-                                                                    color: "white", 
-                                                                    border: "none", 
+                                                                    color: "white",
+                                                                    border: "none",
                                                                     cursor: "pointer",
-                                                                    display: "block" 
+                                                                    display: "block"
                                                                 }}
                                                             >
                                                                 Download Group {i + 1} PDF
@@ -852,26 +849,26 @@ export default function Accountant({ managerType }) {
                                     <div className={styles.submission}>
                                         <div>
                                             <label htmlFor={`checkbox-${partyName}`}><h6>Approve ({managerType})</h6></label>
-                                            <br/><center>
-                                            <input
-                                                id={`checkbox-${partyName}`}
-                                                style={{
-                                                    width: '12px',
-                                                    height: '20px',
-                                                    transform: 'scale(1.5)',
-                                                    cursor: 'pointer',
-                                                    marginLeft: '10px'
-                                                }}
-                                                name={`checkbox-${partyName}`}
-                                                value='checked'
-                                                type="checkbox"
-                                                onChange={() => handleRadioChange(partyName, selectedValue[partyName] === 'checked' ? 'not_checked' : 'checked')}
-                                                checked={selectedValue[partyName] === 'checked'}
-                                            />
+                                            <br /><center>
+                                                <input
+                                                    id={`checkbox-${partyName}`}
+                                                    style={{
+                                                        width: '12px',
+                                                        height: '20px',
+                                                        transform: 'scale(1.5)',
+                                                        cursor: 'pointer',
+                                                        marginLeft: '10px'
+                                                    }}
+                                                    name={`checkbox-${partyName}`}
+                                                    value='checked'
+                                                    type="checkbox"
+                                                    onChange={() => handleRadioChange(partyName, selectedValue[partyName] === 'checked' ? 'not_checked' : 'checked')}
+                                                    checked={selectedValue[partyName] === 'checked'}
+                                                />
                                             </center>
                                         </div>
                                     </div>
-                                    <button 
+                                    <button
                                         type='submit'
                                         className="hide-in-pdf"
                                         style={{
