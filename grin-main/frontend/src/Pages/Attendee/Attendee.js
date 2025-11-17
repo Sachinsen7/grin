@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useMemo } from 'react';
 import axios from 'axios';
 import style from './Inputgrin.module.css';
 import styles from './Fileupload.module.css';
-import TableComponent from '../../Components/Table/TableEntry'; 
+import TableComponent from '../../Components/Table/TableEntry';
 import LogOutComponent from '../../Components/LogOut/LogOutComponent';
 import { useLocation } from 'react-router-dom';
 import { validateFile } from '../../utils/fileValidation';
@@ -36,9 +36,9 @@ export default function Attendee() {
     const [lrDate, setLrDate] = useState('');
     const [transName, setTransName] = useState('');
     const [vehicleNo, setVehicleNo] = useState('');
-    const [materialInfo, setMaterialInfo] = useState(''); 
+    const [materialInfo, setMaterialInfo] = useState('');
     const [file, setFile] = useState(null);
-    const [photo, setPhoto] = useState(null); 
+    const [photo, setPhoto] = useState(null);
 
     // Add state for new fields
     const [gstNo, setGstNo] = useState("");
@@ -50,11 +50,11 @@ export default function Attendee() {
     const [address, setAddress] = useState("");
     const [mobileNo, setMobileNo] = useState("");
 
-    
+
     const [totalAmount, setTotalAmount] = useState(0);
     const [materialTotal, setMaterialTotal] = useState(0);
 
-   
+
     const [latestGsnNumber, setLatestGsnNumber] = useState("");
 
     const [tableData, setTableData] = useState(
@@ -78,28 +78,28 @@ export default function Attendee() {
     const handleFileChange = (e) => {
         const file = e.target.files[0];
         const validation = validateFile(file, 'documents');
-        
+
         if (!validation.isValid) {
             alert(`❌ File validation failed:\n${validation.error}`);
             e.target.value = ''; // Clear the input
             return;
         }
-        
+
         setFile(file);
         console.log('✓ File validated and selected:', file.name);
     };
 
-    
+
     const handlePhotoChange = (e) => {
         const file = e.target.files[0];
         const validation = validateFile(file, 'images');
-        
+
         if (!validation.isValid) {
             alert(`❌ Photo validation failed:\n${validation.error}`);
             e.target.value = ''; // Clear the input
             return;
         }
-        
+
         setPhoto(file);
         console.log('✓ Photo validated and selected:', file.name);
     };
@@ -108,7 +108,7 @@ export default function Attendee() {
         const updatedData = [...tableData];
         updatedData[index][field] = value;
 
-       
+
         if (field === 'quantityValue' || field === 'priceValue') {
             const quantity = parseFloat(updatedData[index].quantityValue) || 0;
             const price = parseFloat(updatedData[index].priceValue) || 0;
@@ -135,8 +135,8 @@ export default function Attendee() {
         setVehicleNo('');
         setMaterialInfo('');
         setFile(null);
-        setPhoto(null); 
-      
+        setPhoto(null);
+
         setGstNo('');
         setCgst('');
         setSgst('');
@@ -145,7 +145,7 @@ export default function Attendee() {
         setCompanyName('');
         setAddress('');
         setMobileNo('');
-        setTotalAmount(0); 
+        setTotalAmount(0);
         setMaterialTotal(0);
 
         setTableData(
@@ -160,7 +160,7 @@ export default function Attendee() {
         );
     };
 
-    
+
     useEffect(() => {
         let subTotal = 0;
         tableData.forEach(row => {
@@ -175,7 +175,7 @@ export default function Attendee() {
         const sgstPercent = parseFloat(sgst) || 0;
         const igstPercent = parseFloat(igst) || 0;
 
-        
+
         let taxTotal = 0;
         if (igstPercent > 0) {
             taxTotal = (subTotal * igstPercent) / 100;
@@ -207,8 +207,8 @@ export default function Attendee() {
         formData.append('lrDate', lrDate);
         formData.append('transName', transName);
         formData.append('vehicleNo', vehicleNo);
-        formData.append('materialInfo', materialInfo); 
-        formData.append('tableData', JSON.stringify(tableData)); 
+        formData.append('materialInfo', materialInfo);
+        formData.append('tableData', JSON.stringify(tableData));
 
         // Log and Append new fields
         console.log("Frontend Sending - GST:", gstNo, "CGST:", cgst, "SGST:", sgst, "IGST:", igst);
@@ -239,7 +239,7 @@ export default function Attendee() {
             const token = localStorage.getItem('authToken');
             console.log("Submitting to URL:", `${url}/upload-data`);
             console.log("Using token:", token ? "Token exists" : "No token found");
-            console.log("FormData contents:", Object.fromEntries(formData.entries())); 
+            console.log("FormData contents:", Object.fromEntries(formData.entries()));
 
             const response = await axios.post(`${url}/upload-data`, formData, {
                 headers: {
@@ -248,7 +248,7 @@ export default function Attendee() {
             });
             console.log("Response:", response.data);
 
-            
+
             if (response.status === 200) {
                 toast.success('Entry Updated Successfully');
             } else {
@@ -275,7 +275,7 @@ export default function Attendee() {
     useEffect(() => {
         if (gsnDataFromAPI && Array.isArray(gsnDataFromAPI)) {
             setbackendData(gsnDataFromAPI);
-            
+
             // Get latest GSN number from cached data
             if (gsnDataFromAPI.length > 0) {
                 const sortedData = gsnDataFromAPI.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -357,7 +357,6 @@ export default function Attendee() {
         };
         getData();
         loadSuppliers();
-        getLatestGsnNumber();
     }, []);
 
     useEffect(() => {
@@ -369,10 +368,10 @@ export default function Attendee() {
         setFilteredSuppliers(filtered);
     }, [partyName, suppliers]);
 
-    
+
     useEffect(() => {
         if (!partyName) return;
-        
+
         const matches = backendData.filter(
             (entry) => entry.partyName && entry.partyName.toLowerCase() === partyName.toLowerCase()
         );
@@ -405,7 +404,7 @@ export default function Attendee() {
         setAddress(party.address || '');
         setGstNo(party.gstNo || '');
         setMobileNo(party.mobileNo || '');
-        setIsVisible(false); 
+        setIsVisible(false);
     };
 
     // Inline CSS Styles
@@ -586,9 +585,9 @@ export default function Attendee() {
                                 </div>
                             </div>
 
-                            {}
+                            { }
                             <div className={styles.form}>
-                                {}
+                                { }
                                 <div className={styles.formRow} style={{ position: 'relative' }}>
                                     <label className={styles.label}>Supplier Name:</label>
                                     <input
@@ -632,7 +631,7 @@ export default function Attendee() {
                                             </ul>
                                         </div>
                                     </div>
-                                    {}
+                                    { }
                                     <input
                                         type="text"
                                         className={`${styles.dateInput} ${styles.dummy}`}
@@ -744,10 +743,10 @@ export default function Attendee() {
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Address:</label>
                                     <textarea
-                                        className={styles.input} 
+                                        className={styles.input}
                                         value={address}
                                         onChange={(e) => setAddress(e.target.value)}
-                                        rows={3} 
+                                        rows={3}
                                     />
                                 </div>
                                 <div className={styles.formRow}>
@@ -800,7 +799,7 @@ export default function Attendee() {
                                         value={sgst}
                                         onChange={(e) => {
                                             setSgst(e.target.value);
-                                            if (e.target.value) setIgst(''); 
+                                            if (e.target.value) setIgst('');
                                         }}
                                     />
                                 </div>
@@ -815,7 +814,7 @@ export default function Attendee() {
                                             setIgst(e.target.value);
                                             if (e.target.value) {
                                                 setCgst('');
-                                                setSgst(''); 
+                                                setSgst('');
                                             }
                                         }}
                                     />
@@ -831,28 +830,28 @@ export default function Attendee() {
                                     />
                                 </div>
 
-                                {}
+                                { }
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Total Amount:</label>
                                     <input
                                         className={styles.input}
                                         type="text"
-                                        value={totalAmount.toFixed(2)} 
+                                        value={totalAmount.toFixed(2)}
                                         readOnly
-                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }} 
+                                        style={{ fontWeight: 'bold', backgroundColor: '#e9ecef' }}
                                     />
                                 </div>
                             </div>
                             {/* End Added Section */}
 
-                            {}
+                            { }
                             <div className={styles.forms}>
                                 <div
                                     className={styles.formRow}
                                     style={{
                                         display: 'flex',
                                         flexDirection: 'column',
-                                      
+
                                         borderRadius: '15px',
                                     }}
                                 >
