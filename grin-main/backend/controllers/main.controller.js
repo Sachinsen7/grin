@@ -10,21 +10,21 @@ const handler = {
 
     uploaddata: async function (req, res) {
         logger.info("=== Starting uploaddata handler ===");
-        const { 
-            grinNo, grinDate, gsn, gsnDate, poNo, poDate, 
-            partyName, innoviceno, innoviceDate, receivedFrom, 
-            lrNo, lrDate, transName, vehicleNo, 
+        const {
+            grinNo, grinDate, gsn, gsnDate, poNo, poDate,
+            partyName, innoviceno, innoviceDate, receivedFrom,
+            lrNo, lrDate, transName, vehicleNo,
             materialInfo, tableData,
             gstNo, cgst, sgst, companyName, address, mobileNo,
-            totalAmount
+            totalAmount, weightDifferenceNotes, weightDifferenceValue
         } = req.body;
-        
+
         const parsedTotalAmount = parseFloat(totalAmount) || 0;
 
         if (!grinNo || !partyName) {
             throw new AppError('Missing required fields', 400, 'BAD_REQUEST');
         }
-        
+
         let billFilePath = null;
         if (req.files && req.files.file && req.files.file.length > 0) {
             billFilePath = `files/${req.files.file[0].filename}`;
@@ -45,22 +45,24 @@ const handler = {
 
         logger.info("Creating new inventory entry");
         const newInventory = new Entries({
-            grinNo, grinDate, gsn, gsnDate, poNo, poDate, 
-            partyName, innoviceno, innoviceDate, receivedFrom, 
-            lrNo, lrDate, transName, vehicleNo, 
+            grinNo, grinDate, gsn, gsnDate, poNo, poDate,
+            partyName, innoviceno, innoviceDate, receivedFrom,
+            lrNo, lrDate, transName, vehicleNo,
             file: billFilePath,
             photoPath: photoPath,
             materialInfo,
             tableData: parsedTableData,
             gstNo, cgst, sgst, companyName, address, mobileNo,
-            totalAmount: parsedTotalAmount
+            totalAmount: parsedTotalAmount,
+            weightDifferenceNotes: weightDifferenceNotes || '',
+            weightDifferenceValue: parseFloat(weightDifferenceValue) || 0
         });
 
         await newInventory.save();
         logger.info('Inventory added successfully', { entryId: newInventory._id });
         return sendSuccess(res, { message: 'Inventory added successfully', inventory: newInventory }, 201);
     },
-    
+
     getting: async function (req, res) {
         logger.info('Fetching all GRIN entries');
         const data = await Entries.find();
@@ -81,18 +83,18 @@ const handler = {
         }
 
         const managerFieldMap = {
-          'General Manager': 'GeneralManagerSigned',
-          'Store Manager': 'StoreManagerSigned',
-          'Purchase Manager': 'PurchaseManagerSigned',
-          'Account Manager': 'AccountManagerSigned',
-          'Auditor': 'AuditorSigned'
+            'General Manager': 'GeneralManagerSigned',
+            'Store Manager': 'StoreManagerSigned',
+            'Purchase Manager': 'PurchaseManagerSigned',
+            'Account Manager': 'AccountManagerSigned',
+            'Auditor': 'AuditorSigned'
         };
-    
+
         const updateField = fieldName || managerFieldMap[managerType];
         if (!updateField) {
             throw new AppError('Invalid manager type', 400, 'BAD_REQUEST');
         }
-    
+
         const updatePayload = {
             [updateField]: status === 'checked'
         };
@@ -114,7 +116,7 @@ const handler = {
         }
 
         logger.info('Verification status updated successfully', { partyName, gsnUpdated: gsnResult.modifiedCount, grnUpdated: grnResult.modifiedCount });
-        return sendSuccess(res, { 
+        return sendSuccess(res, {
             message: 'Verification status updated successfully',
             gsnUpdated: gsnResult.modifiedCount,
             grnUpdated: grnResult.modifiedCount,
