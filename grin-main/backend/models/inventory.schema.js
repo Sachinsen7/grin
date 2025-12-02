@@ -16,6 +16,10 @@ const tableDataSchema = new mongoose.Schema({
   },
   price: {
     type: Number,
+  },
+  weightNotes: {
+    type: String,
+    default: ''
   }
 }, { _id: false }); // _id is set to false to prevent nested IDs for each row
 
