@@ -26,14 +26,15 @@ const TableComponent = ({ data, handleTableChange }) => {
             }}>
                 <thead>
                     <tr>
-                        <th style={{ width: '4%', border: 'none' }}>Sr. No.</th>
-                        <th style={{ width: '14%', border: 'none' }}>Item</th>
-                        <th style={{ width: '18%', border: 'none' }}>Description</th>
-                        <th style={{ width: '10%', border: 'none' }}>Quantity</th>
-                        <th style={{ width: '12%', border: 'none' }}>Price / KG</th>
-                        <th style={{ width: '8%', border: 'none' }}>Type</th>
-                        <th style={{ width: '12%', border: 'none' }}>Total</th>
-                        <th style={{ width: '22%', border: 'none' }}>Weight Notes</th>
+                        <th style={{ width: '3%', border: 'none' }}>Sr. No.</th>
+                        <th style={{ width: '12%', border: 'none' }}>Item</th>
+                        <th style={{ width: '16%', border: 'none' }}>Description</th>
+                        <th style={{ width: '9%', border: 'none' }}>Quantity</th>
+                        <th style={{ width: '10%', border: 'none' }}>Price / KG</th>
+                        <th style={{ width: '7%', border: 'none' }}>Type</th>
+                        <th style={{ width: '10%', border: 'none' }}>Total</th>
+                        <th style={{ width: '13%', border: 'none' }}>Weight Diff (₹)</th>
+                        <th style={{ width: '20%', border: 'none' }}>Weight Notes</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -152,6 +153,26 @@ const TableComponent = ({ data, handleTableChange }) => {
                                     type="text"
                                     value={calculateRowTotal(row)}
                                     readOnly
+                                />
+                            </td>
+                            <td style={{ border: 'none' }}>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        backgroundColor: 'rgba(255, 243, 205, 0.7)',
+                                        borderRadius: '20px',
+                                        border: '1px dashed #ff9800',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        height: '40px',
+                                        minWidth: '100px',
+                                        textAlign: 'center'
+                                    }}
+                                    type="number"
+                                    step="0.01"
+                                    value={row.weightDifference || ''}
+                                    onChange={(e) => handleTableChange(index, 'weightDifference', e.target.value)}
+                                    placeholder="0.00"
                                 />
                             </td>
                             <td style={{ border: 'none' }}>

@@ -59,6 +59,7 @@ export default function Gsn() {
             priceValue: '',
             priceType: '',
             total: 0,
+            weightDifference: 0,
             weightNotes: ''
         }))
     );
@@ -185,6 +186,7 @@ export default function Gsn() {
                 priceValue: '',
                 priceType: '',
                 total: 0,
+                weightDifference: 0,
                 weightNotes: ''
             }))
         );
