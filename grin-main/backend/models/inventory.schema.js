@@ -83,12 +83,12 @@ const entrySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  isHidden: { 
-    type: Boolean, 
-    default: false 
+  isHidden: {
+    type: Boolean,
+    default: false
   },
-  createdBy:{
-    type:String
+  createdBy: {
+    type: String
   },
   StoreManagerSigned: {
     type: Boolean,
@@ -111,6 +111,17 @@ const entrySchema = new mongoose.Schema({
   mobileNo: { type: String, required: false },
   // End Added Fields
   totalAmount: { type: Number, required: false }, // Added Total Amount field
+  // Weight Difference Fields
+  weightDifferenceNotes: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  weightDifferenceValue: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   tableData: [tableDataSchema], // Array of tableData objects
 }, { timestamps: true }); // Automatically adds createdAt and updatedAt fields
 
