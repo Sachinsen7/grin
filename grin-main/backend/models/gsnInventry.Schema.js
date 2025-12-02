@@ -4,15 +4,15 @@ const mongoose = require('mongoose');
 const tableDataSchema = new mongoose.Schema({
   item: {
     type: String,
-    
+
   },
   description: {
     type: String,
-   
+
   },
   quantityValue: {
     type: Number,
-   
+
   },
   priceValue: {
     type: Number,
@@ -23,7 +23,7 @@ const tableDataSchema = new mongoose.Schema({
   total: {
     type: Number,
   }
-}, { _id: false }); 
+}, { _id: false });
 
 const entrySchema = new mongoose.Schema({
   grinNo: {
@@ -85,12 +85,12 @@ const entrySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  isHidden: { 
-    type: Boolean, 
-    default: false 
+  isHidden: {
+    type: Boolean,
+    default: false
   },
-  createdBy:{
-    type:String
+  createdBy: {
+    type: String
   },
   StoreManagerSigned: {
     type: Boolean,
@@ -123,6 +123,17 @@ const entrySchema = new mongoose.Schema({
   gstTax: { type: Number, required: false },
   materialTotal: { type: Number, required: false },
   totalAmount: { type: Number, required: false }, // Added Total Amount field
+  // Weight Difference Fields
+  weightDifferenceNotes: {
+    type: String,
+    required: false,
+    default: ''
+  },
+  weightDifferenceValue: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   tableData: [tableDataSchema], // Array of tableData objects
 }, { timestamps: true });
 
