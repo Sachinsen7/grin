@@ -23,6 +23,10 @@ const tableDataSchema = new mongoose.Schema({
   total: {
     type: Number,
   },
+  weightDifference: {
+    type: Number,
+    default: 0
+  },
   weightNotes: {
     type: String,
     default: ''

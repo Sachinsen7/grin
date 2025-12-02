@@ -17,6 +17,10 @@ const tableDataSchema = new mongoose.Schema({
   price: {
     type: Number,
   },
+  weightDifference: {
+    type: Number,
+    default: 0
+  },
   weightNotes: {
     type: String,
     default: ''
