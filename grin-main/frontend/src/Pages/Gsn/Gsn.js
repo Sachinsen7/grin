@@ -44,6 +44,10 @@ export default function Gsn() {
     const [totalAmount, setTotalAmount] = useState(0);
     const [materialTotal, setMaterialTotal] = useState(0);
 
+    // State for weight difference notes
+    const [weightDifferenceNotes, setWeightDifferenceNotes] = useState("");
+    const [weightDifferenceValue, setWeightDifferenceValue] = useState(0);
+
     // State for latest GSN number
     const [latestGsnNumber, setLatestGsnNumber] = useState("");
 
@@ -169,6 +173,8 @@ export default function Gsn() {
         setMobileNo('');
         setTotalAmount(0); // Reset total amount
         setMaterialTotal(0); // Reset material total
+        setWeightDifferenceNotes(''); // Reset weight difference notes
+        setWeightDifferenceValue(0); // Reset weight difference value
 
         setTableData(
             Array.from({ length: 20 }, (_, index) => ({
@@ -233,6 +239,8 @@ export default function Gsn() {
         formData.append("mobileNo", mobileNo);
         formData.append("totalAmount", totalAmount); // Append calculated total amount
         formData.append("materialTotal", materialTotal); // Append material total
+        formData.append("weightDifferenceNotes", weightDifferenceNotes); // Append weight difference notes
+        formData.append("weightDifferenceValue", weightDifferenceValue); // Append weight difference value
 
         if (file) {
             formData.append("file", file);
@@ -364,27 +372,31 @@ export default function Gsn() {
             subTotal += qty * price;
         });
 
-        // Set material total (Before Tax Total)
-        setMaterialTotal(subTotal);
+        // Add weight difference to material total
+        const weightDiff = parseFloat(weightDifferenceValue) || 0;
+        const materialTotalWithDiff = subTotal + weightDiff;
+
+        // Set material total (Before Tax Total + Weight Difference)
+        setMaterialTotal(materialTotalWithDiff);
 
         const cgstPercent = parseFloat(cgst) || 0;
         const sgstPercent = parseFloat(sgst) || 0;
         const igstPercent = parseFloat(igst) || 0;
 
-        // Calculate GST Tax as percentage of materialTotal
+        // Calculate GST Tax as percentage of materialTotal (including weight difference)
         let taxTotal = 0;
         if (igstPercent > 0) {
-            taxTotal = (subTotal * igstPercent) / 100;
+            taxTotal = (materialTotalWithDiff * igstPercent) / 100;
         } else {
-            taxTotal = (subTotal * (cgstPercent + sgstPercent)) / 100;
+            taxTotal = (materialTotalWithDiff * (cgstPercent + sgstPercent)) / 100;
         }
 
         setGstTax(taxTotal);
 
-        const finalTotal = subTotal + taxTotal;
+        const finalTotal = materialTotalWithDiff + taxTotal;
         setTotalAmount(finalTotal);
 
-    }, [tableData, cgst, sgst, igst]); // Recalculate when table data, cgst, sgst, or igst changes
+    }, [tableData, cgst, sgst, igst, weightDifferenceValue]); // Recalculate when table data, cgst, sgst, igst, or weightDifferenceValue changes
 
     // Auto-fill company details when partyName changes
     useEffect(() => {
@@ -730,6 +742,61 @@ export default function Gsn() {
                                 <div className={styles.formRow} style={{ width: '100%', display: "flex", flexDirection: 'column' }}>
                                     <label style={{ fontWeight: 'bold', display: "flex" }}>Material Information:</label>
                                     <TableComponent data={tableData} handleTableChange={handleTableChange} />
+                                </div>
+                            </div>
+
+                            {/* Weight Difference Notes Section */}
+                            <div className={styles.form} style={{
+                                backgroundColor: 'rgba(255, 243, 205, 0.9)',
+                                border: '2px dashed #ff9800',
+                                marginTop: '20px',
+                                padding: '20px',
+                                borderRadius: '10px'
+                            }}>
+                                <div style={{
+                                    textAlign: 'center',
+                                    marginBottom: '15px',
+                                    fontSize: '18px',
+                                    fontWeight: 'bold',
+                                    color: '#ff6900'
+                                }}>
+                                    📝 Weight Difference Notes (Not part of item list)
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>Weight Difference (₹):</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        value={weightDifferenceValue}
+                                        onChange={(e) => setWeightDifferenceValue(e.target.value)}
+                                        placeholder="Enter weight difference amount"
+                                    />
+                                </div>
+
+                                <div className={styles.formRow} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
+                                    <label className={styles.label} style={{ marginBottom: '10px' }}>
+                                        Notes/Remarks (Explain weight variance):
+                                    </label>
+                                    <textarea
+                                        className={styles.input}
+                                        value={weightDifferenceNotes}
+                                        onChange={(e) => setWeightDifferenceNotes(e.target.value)}
+                                        rows={4}
+                                        placeholder="Example: Supplier sent 6 tons but actual weight is 5 tons 850 kg. Difference of 150 kg due to weight variance in individual pieces (±30g per piece)."
+                                        style={{ width: '100%', resize: 'vertical' }}
+                                    />
+                                </div>
+
+                                <div style={{
+                                    fontSize: '14px',
+                                    color: '#666',
+                                    marginTop: '10px',
+                                    fontStyle: 'italic',
+                                    textAlign: 'center'
+                                }}>
+                                    💡 This value will be added to the material total for final calculation
                                 </div>
                             </div>
 
