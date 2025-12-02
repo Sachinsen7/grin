@@ -33,7 +33,7 @@ const TableComponent = ({ data, handleTableChange }) => {
                         <th style={{ width: '10%', border: 'none' }}>Price / KG</th>
                         <th style={{ width: '7%', border: 'none' }}>Type</th>
                         <th style={{ width: '10%', border: 'none' }}>Total</th>
-                        <th style={{ width: '13%', border: 'none' }}>Weight Diff (₹)</th>
+                        <th style={{ width: '13%', border: 'none' }}>Weight Diff (KG)</th>
                         <th style={{ width: '20%', border: 'none' }}>Weight Notes</th>
                     </tr>
                 </thead>
