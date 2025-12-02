@@ -77,6 +77,10 @@ const entrySchema = Joi.object({
     materialTotal: Joi.number().allow(null, ''),
     isNewEntry: Joi.boolean().allow(null, ''),
 
+    // Weight Difference Fields
+    weightDifferenceNotes: Joi.string().allow(null, ''),
+    weightDifferenceValue: Joi.number().allow(null, ''),
+
     // For tableData, which comes as a JSON string
     tableData: jsonString.required() // <-- This is the fix
 });
