@@ -649,6 +649,8 @@ export default function Sample({ managerType }) {
                                                                                         <th>Price / KG</th>
                                                                                         <th>Type</th>
                                                                                         <th>Total</th>
+                                                                                        <th>Weight Diff (KG)</th>
+                                                                                        <th>Weight Notes</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
@@ -661,6 +663,12 @@ export default function Sample({ managerType }) {
                                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                             <td>{row.priceType || 'N/A'}</td>
                                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                                            <td style={{ backgroundColor: row.weightDifference ? 'rgba(255, 243, 205, 0.7)' : 'transparent', fontWeight: row.weightDifference ? 'bold' : 'normal' }}>
+                                                                                                {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : '-'}
+                                                                                            </td>
+                                                                                            <td style={{ backgroundColor: row.weightNotes ? 'rgba(255, 243, 205, 0.7)' : 'transparent', whiteSpace: 'pre-wrap', fontSize: '13px' }}>
+                                                                                                {row.weightNotes || '-'}
+                                                                                            </td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </tbody>
@@ -859,6 +867,8 @@ export default function Sample({ managerType }) {
                                                                                         <th>Price / KG</th>
                                                                                         <th>Type</th>
                                                                                         <th>Total</th>
+                                                                                        <th>Weight Diff (KG)</th>
+                                                                                        <th>Weight Notes</th>
                                                                                     </tr>
                                                                                 </thead>
                                                                                 <tbody>
