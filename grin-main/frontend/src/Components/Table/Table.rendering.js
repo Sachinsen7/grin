@@ -18,7 +18,7 @@ const TableComponent = ({ tableData }) => {
         width: "100%",
         maxWidth: "100%",
         position: "relative",
-        height: "800px", 
+        height: "800px",
         overflow: "hidden"
     };
 
@@ -57,14 +57,16 @@ const TableComponent = ({ tableData }) => {
             <table className={styles.table} style={tableStyle}>
                 <thead style={theadStyle}>
                     <tr style={trStyle}>
-                        <th style={{ width: '4%' }}>Sr. No.</th>
-                        <th style={{ width: '10%' }}>Date</th>
-                        <th style={{ width: '15%' }}>Item</th>
-                        <th style={{ width: '20%' }}>Description</th>
-                        <th style={{ width: '8%' }}>Quantity No.</th>
-                        <th style={{ width: '8%' }}>Quantity in Kgs.</th>
-                        <th style={{ width: '15%' }}>Price (₹)</th>
-                        <th style={{ width: '20%' }}>Total (₹)</th>
+                        <th style={{ width: '3%' }}>Sr. No.</th>
+                        <th style={{ width: '8%' }}>Date</th>
+                        <th style={{ width: '12%' }}>Item</th>
+                        <th style={{ width: '15%' }}>Description</th>
+                        <th style={{ width: '7%' }}>Quantity No.</th>
+                        <th style={{ width: '7%' }}>Quantity in Kgs.</th>
+                        <th style={{ width: '10%' }}>Price (₹)</th>
+                        <th style={{ width: '10%' }}>Total (₹)</th>
+                        <th style={{ width: '10%' }}>Weight Diff (KG)</th>
+                        <th style={{ width: '18%' }}>Weight Notes</th>
                     </tr>
                 </thead>
                 <tbody style={tbodyStyle}>
@@ -74,15 +76,15 @@ const TableComponent = ({ tableData }) => {
                         .map((row, index) => (
                             <React.Fragment key={index}>
                                 <tr style={trStyle}>
-                                    <td style={{ width: '4%' }}>{index + 1}</td>
-                                    <td style={{ width: '10%' }}>{row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB', {
+                                    <td style={{ width: '3%' }}>{index + 1}</td>
+                                    <td style={{ width: '8%' }}>{row.createdAt ? new Date(row.createdAt).toLocaleDateString('en-GB', {
                                         day: '2-digit',
                                         month: '2-digit',
                                         year: 'numeric'
                                     }) : '-'}</td>
-                                    <td 
-                                        style={{ 
-                                            width: '15%', 
+                                    <td
+                                        style={{
+                                            width: '12%',
                                             cursor: 'pointer',
                                             textDecoration: row.item ? 'underline' : 'none'
                                         }}
@@ -95,17 +97,32 @@ const TableComponent = ({ tableData }) => {
                                             </span>
                                         )}
                                     </td>
-                                    <td style={{ width: '20%' }}>{row.description}</td>
-                                    <td style={{ width: '8%' }}>{row.quantityNo}</td>
-                                    <td style={{ width: '8%' }}>{row.quantityKg}</td>
-                                    <td style={{ width: '15%' }}>{row.price ? `₹${parseFloat(row.price).toFixed(2)}` : '-'}</td>
-                                    <td style={{ width: '20%', fontWeight: 'bold' }}>
+                                    <td style={{ width: '15%' }}>{row.description}</td>
+                                    <td style={{ width: '7%' }}>{row.quantityNo}</td>
+                                    <td style={{ width: '7%' }}>{row.quantityKg}</td>
+                                    <td style={{ width: '10%' }}>{row.price ? `₹${parseFloat(row.price).toFixed(2)}` : '-'}</td>
+                                    <td style={{ width: '10%', fontWeight: 'bold' }}>
                                         ₹{calculateTotal(row.quantityNo, row.price)}
+                                    </td>
+                                    <td style={{
+                                        width: '10%',
+                                        backgroundColor: row.weightDifference ? 'rgba(255, 243, 205, 0.5)' : 'transparent',
+                                        fontWeight: row.weightDifference ? 'bold' : 'normal'
+                                    }}>
+                                        {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : '-'}
+                                    </td>
+                                    <td style={{
+                                        width: '18%',
+                                        backgroundColor: row.weightNotes ? 'rgba(255, 243, 205, 0.5)' : 'transparent',
+                                        fontSize: '13px',
+                                        whiteSpace: 'pre-wrap'
+                                    }}>
+                                        {row.weightNotes || '-'}
                                     </td>
                                 </tr>
                                 {expandedRows.has(index) && (
                                     <tr style={trStyle}>
-                                        <td colSpan="8" style={{
+                                        <td colSpan="10" style={{
                                             backgroundColor: 'rgba(200, 198, 206, 0.8)',
                                             padding: '10px',
                                             fontSize: '14px',
