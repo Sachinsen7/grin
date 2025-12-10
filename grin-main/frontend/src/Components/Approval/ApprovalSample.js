@@ -663,13 +663,13 @@ export default function Sample({ managerType }) {
                                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                             <td>{row.priceType || 'N/A'}</td>
-                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
+                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : (gsnDoc.discount !== undefined ? `${gsnDoc.discount}%` : '0%')}</td>
                                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
-                                                                                            <td style={{ backgroundColor: row.weightDifference ? 'rgba(255, 243, 205, 0.7)' : 'transparent', fontWeight: row.weightDifference ? 'bold' : 'normal' }}>
-                                                                                                {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : '-'}
+                                                                                            <td style={{ backgroundColor: (row.weightDifference || gsnDoc.weightDifferenceValue) ? 'rgba(255, 243, 205, 0.7)' : 'transparent', fontWeight: (row.weightDifference || gsnDoc.weightDifferenceValue) ? 'bold' : 'normal' }}>
+                                                                                                {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : (gsnDoc.weightDifferenceValue ? `${parseFloat(gsnDoc.weightDifferenceValue).toFixed(2)} KG` : '-')}
                                                                                             </td>
-                                                                                            <td style={{ backgroundColor: row.weightNotes ? 'rgba(255, 243, 205, 0.7)' : 'transparent', whiteSpace: 'pre-wrap', fontSize: '13px' }}>
-                                                                                                {row.weightNotes || '-'}
+                                                                                            <td style={{ backgroundColor: (row.weightNotes || gsnDoc.weightDifferenceNotes) ? 'rgba(255, 243, 205, 0.7)' : 'transparent', whiteSpace: 'pre-wrap', fontSize: '13px' }}>
+                                                                                                {row.weightNotes || gsnDoc.weightDifferenceNotes || '-'}
                                                                                             </td>
                                                                                         </tr>
                                                                                     ))}
@@ -883,8 +883,14 @@ export default function Sample({ managerType }) {
                                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                             <td>{row.priceType || 'N/A'}</td>
-                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
+                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : (grnDoc.discount !== undefined ? `${grnDoc.discount}%` : '0%')}</td>
                                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                                            <td style={{ backgroundColor: (row.weightDifference || grnDoc.weightDifferenceValue) ? 'rgba(255, 243, 205, 0.7)' : 'transparent', fontWeight: (row.weightDifference || grnDoc.weightDifferenceValue) ? 'bold' : 'normal' }}>
+                                                                                                {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : (grnDoc.weightDifferenceValue ? `${parseFloat(grnDoc.weightDifferenceValue).toFixed(2)} KG` : '-')}
+                                                                                            </td>
+                                                                                            <td style={{ backgroundColor: (row.weightNotes || grnDoc.weightDifferenceNotes) ? 'rgba(255, 243, 205, 0.7)' : 'transparent', whiteSpace: 'pre-wrap', fontSize: '13px' }}>
+                                                                                                {row.weightNotes || grnDoc.weightDifferenceNotes || '-'}
+                                                                                            </td>
                                                                                         </tr>
                                                                                     ))}
                                                                                 </tbody>

@@ -515,10 +515,10 @@ export default function Accountant({ managerType }) {
                                                                                         <td>{row.quantityValue || 'N/A'}</td>
                                                                                         <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                         <td>{row.priceType || 'N/A'}</td>
-                                                                                        <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
+                                                                                        <td>{row.discount !== undefined ? `${row.discount}%` : (gsnDoc.discount !== undefined ? `${gsnDoc.discount}%` : '0%')}</td>
                                                                                         <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
-                                                                                        <td>{row.weightDifference !== undefined ? row.weightDifference : 'N/A'}</td>
-                                                                                        <td>{row.weightNotes || 'N/A'}</td>
+                                                                                        <td>{row.weightDifference !== undefined ? row.weightDifference : (gsnDoc.weightDifferenceValue !== undefined ? gsnDoc.weightDifferenceValue : 'N/A')}</td>
+                                                                                        <td>{row.weightNotes || gsnDoc.weightDifferenceNotes || 'N/A'}</td>
                                                                                     </tr>
                                                                                 ))}
                                                                             </tbody>
@@ -724,10 +724,10 @@ export default function Accountant({ managerType }) {
                                                                                         <td>{row.quantityValue || 'N/A'}</td>
                                                                                         <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                         <td>{row.priceType || 'N/A'}</td>
-                                                                                        <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
+                                                                                        <td>{row.discount !== undefined ? `${row.discount}%` : (grnDoc.discount !== undefined ? `${grnDoc.discount}%` : '0%')}</td>
                                                                                         <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
-                                                                                        <td>{row.weightDifference !== undefined ? row.weightDifference : 'N/A'}</td>
-                                                                                        <td>{row.weightNotes || 'N/A'}</td>
+                                                                                        <td>{row.weightDifference !== undefined ? row.weightDifference : (grnDoc.weightDifferenceValue !== undefined ? grnDoc.weightDifferenceValue : 'N/A')}</td>
+                                                                                        <td>{row.weightNotes || grnDoc.weightDifferenceNotes || 'N/A'}</td>
                                                                                     </tr>
                                                                                 ))}
                                                                             </tbody>
