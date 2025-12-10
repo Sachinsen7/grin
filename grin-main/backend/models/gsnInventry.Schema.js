@@ -131,6 +131,12 @@ const entrySchema = new mongoose.Schema({
   gstTax: { type: Number, required: false },
   materialTotal: { type: Number, required: false },
   totalAmount: { type: Number, required: false }, // Added Total Amount field
+  // Discount Field
+  discount: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   // Weight Difference Fields
   weightDifferenceNotes: {
     type: String,

@@ -44,6 +44,9 @@ export default function Gsn() {
     const [totalAmount, setTotalAmount] = useState(0);
     const [materialTotal, setMaterialTotal] = useState(0);
 
+    // State for discount
+    const [discount, setDiscount] = useState(0);
+
     // State for weight difference notes
     const [weightDifferenceNotes, setWeightDifferenceNotes] = useState("");
     const [weightDifferenceValue, setWeightDifferenceValue] = useState(0);
@@ -59,6 +62,7 @@ export default function Gsn() {
             priceValue: '',
             priceType: '',
             total: 0,
+            discount: 0,
             weightDifference: 0,
             weightNotes: ''
         }))
@@ -136,11 +140,15 @@ export default function Gsn() {
         const updatedData = [...tableData];
         updatedData[index][field] = value;
 
-        // Calculate total for the row when quantityValue or priceValue changes
-        if (field === 'quantityValue' || field === 'priceValue') {
+        // Calculate total for the row when quantityValue, priceValue, or discount changes
+        if (field === 'quantityValue' || field === 'priceValue' || field === 'discount') {
             const quantityValue = parseFloat(updatedData[index].quantityValue) || 0;
             const priceValue = parseFloat(updatedData[index].priceValue) || 0;
-            updatedData[index].total = quantityValue * priceValue;
+            const discount = parseFloat(updatedData[index].discount) || 0;
+
+            const subtotal = quantityValue * priceValue;
+            const discountAmount = (subtotal * discount) / 100;
+            updatedData[index].total = subtotal - discountAmount;
         }
 
         setTableData(updatedData);
@@ -177,6 +185,7 @@ export default function Gsn() {
         setMaterialTotal(0); // Reset material total
         setWeightDifferenceNotes(''); // Reset weight difference notes
         setWeightDifferenceValue(0); // Reset weight difference value
+        setDiscount(0); // Reset discount
 
         setTableData(
             Array.from({ length: 20 }, (_, index) => ({
@@ -186,6 +195,7 @@ export default function Gsn() {
                 priceValue: '',
                 priceType: '',
                 total: 0,
+                discount: 0,
                 weightDifference: 0,
                 weightNotes: ''
             }))
@@ -245,6 +255,7 @@ export default function Gsn() {
         formData.append("materialTotal", materialTotal); // Append material total
         formData.append("weightDifferenceNotes", weightDifferenceNotes); // Append weight difference notes
         formData.append("weightDifferenceValue", weightDifferenceValue); // Append weight difference value
+        formData.append("discount", discount); // Append discount
 
         if (file) {
             formData.append("file", file);
@@ -373,14 +384,20 @@ export default function Gsn() {
         tableData.forEach(row => {
             const qty = parseFloat(row.quantityValue) || 0;
             const price = parseFloat(row.priceValue) || 0;
-            subTotal += qty * price;
+            const discount = parseFloat(row.discount) || 0;
+
+            const itemSubtotal = qty * price;
+            const itemDiscountAmount = (itemSubtotal * discount) / 100;
+            const itemTotal = itemSubtotal - itemDiscountAmount;
+
+            subTotal += itemTotal;
         });
 
         // Add weight difference to material total
         const weightDiff = parseFloat(weightDifferenceValue) || 0;
         const materialTotalWithDiff = subTotal + weightDiff;
 
-        // Set material total (Before Tax Total + Weight Difference)
+        // Set material total (After Item Discounts + Weight Difference)
         setMaterialTotal(materialTotalWithDiff);
 
         const cgstPercent = parseFloat(cgst) || 0;
@@ -397,10 +414,11 @@ export default function Gsn() {
 
         setGstTax(taxTotal);
 
+        // Final total is materialTotal + taxTotal (no overall discount since we have item-level discounts)
         const finalTotal = materialTotalWithDiff + taxTotal;
         setTotalAmount(finalTotal);
 
-    }, [tableData, cgst, sgst, igst, weightDifferenceValue]); // Recalculate when table data, cgst, sgst, igst, or weightDifferenceValue changes
+    }, [tableData, cgst, sgst, igst, weightDifferenceValue]); // Recalculate when table data, cgst, sgst, igst, weightDifferenceValue changes
 
     // Auto-fill company details when partyName changes
     useEffect(() => {
@@ -419,6 +437,7 @@ export default function Gsn() {
             setCgst(latest.cgst || "");
             setSgst(latest.sgst || "");
             setIgst(latest.igst || "");
+            setDiscount(latest.discount || 0);
         }
     }, [partyName, backendData]);
 
@@ -461,6 +480,7 @@ export default function Gsn() {
         setMobileNo(selectedCompanyData.mobileNo || "");
         setCgst(selectedCompanyData.cgst || "");
         setSgst(selectedCompanyData.sgst || "");
+        setDiscount(selectedCompanyData.discount || 0);
         setIsCompanyPopupVisible(false); // Hide popup after selection
     };
 
@@ -894,7 +914,7 @@ export default function Gsn() {
                                     />
                                 </div>
                                 <div className={styles.formRow}>
-                                    <label className={styles.label}>Before Tax  Total:</label>
+                                    <label className={styles.label}>Subtotal (After Item Discounts):</label>
                                     <input
                                         className={styles.input}
                                         type="text"
@@ -955,6 +975,8 @@ export default function Gsn() {
                                         style={{ fontWeight: 'bold', backgroundColor: 'rgba(218, 216, 224, 0.6)' }}
                                     />
                                 </div>
+
+
 
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Total Amount:</label>

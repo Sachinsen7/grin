@@ -14,7 +14,8 @@ const gsnHandler = {
             partyName, innoviceno, innoviceDate, lrNo, lrDate,
             transName, vehicleNo, materialInfo, tableData,
             gstNo, cgst, sgst, companyName, address, mobileNo,
-            totalAmount, weightDifferenceNotes, weightDifferenceValue
+            totalAmount, weightDifferenceNotes, weightDifferenceValue,
+            discount
         } = req.body;
 
         // Validate required fields
@@ -59,7 +60,8 @@ const gsnHandler = {
             gstNo, cgst, sgst, companyName, address, mobileNo,
             totalAmount,
             weightDifferenceNotes: weightDifferenceNotes || '',
-            weightDifferenceValue: parseFloat(weightDifferenceValue) || 0
+            weightDifferenceValue: parseFloat(weightDifferenceValue) || 0,
+            discount: parseFloat(discount) || 0
         });
 
         await newInventory.save();
