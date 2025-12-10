@@ -6,7 +6,7 @@ const EntriesTable = () => {
     const url = process.env.REACT_APP_BACKEND_URL;
 
     useEffect(() => {
-        axios.get(`${url}/api/entries`)
+        axios.get(`${url}/entries`)
             .then(response => {
                 setEntries(response.data);
             })

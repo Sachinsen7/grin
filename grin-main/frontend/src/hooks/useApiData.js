@@ -12,7 +12,7 @@ export const useSuppliers = (options = {}) => {
   return useQuery({
     queryKey: ['suppliers'],
     queryFn: async () => {
-      const response = await axios.get(`${url}/api/suppliers`);
+      const response = await axios.get(`${url}/suppliers`);
       if (response.data && response.data.data && Array.isArray(response.data.data)) {
         return response.data.data;
       }
@@ -96,7 +96,7 @@ export const useSupplierDetails = (partyName, options = {}) => {
   return useQuery({
     queryKey: ['supplier-details', partyName],
     queryFn: async () => {
-      const response = await axios.get(`${url}/api/supplier-details?partyName=${encodeURIComponent(partyName)}`);
+      const response = await axios.get(`${url}/supplier-details?partyName=${encodeURIComponent(partyName)}`);
       if (response.data && response.data.data) {
         return response.data.data;
       }

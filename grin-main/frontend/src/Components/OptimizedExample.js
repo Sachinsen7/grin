@@ -17,14 +17,14 @@ const OptimizedExample = () => {
     const [suppliers, setSuppliers] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    
+
     const debouncedSearch = useDebounce(searchTerm, 300);
 
-    
+
     const loadSuppliers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/api/suppliers');
+            const response = await axiosInstance.get('/suppliers');
             setSuppliers(response.data);
         } catch (error) {
             console.error('Error loading suppliers:', error);
@@ -33,18 +33,18 @@ const OptimizedExample = () => {
         }
     }, []); // Empty deps - function never changes
 
-   
+
     const handleSelectSupplier = useCallback((supplier) => {
         console.log('Selected:', supplier);
-       
-    }, []); 
 
-    
+    }, []);
+
+
     useEffect(() => {
         loadSuppliers();
     }, [loadSuppliers]);
 
-   
+
     const filteredSuppliers = useMemo(() => {
         if (!debouncedSearch) return suppliers;
 

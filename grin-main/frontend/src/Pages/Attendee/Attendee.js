@@ -345,7 +345,7 @@ export default function Attendee() {
         const loadSuppliers = async () => {
             try {
                 const url = process.env.REACT_APP_BACKEND_URL;
-                const response = await axios.get(`${url}/api/suppliers`);
+                const response = await axios.get(`${url}/suppliers`);
                 const data = Array.isArray(response.data) ? response.data : [];
                 // Do NOT de-duplicate; show all old and new entries
                 data.sort((a, b) => (a.partyName || '').localeCompare(b.partyName || ''));
