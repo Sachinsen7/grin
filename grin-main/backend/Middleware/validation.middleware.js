@@ -81,6 +81,9 @@ const entrySchema = Joi.object({
     weightDifferenceNotes: Joi.string().allow(null, ''),
     weightDifferenceValue: Joi.number().allow(null, ''),
 
+    // Discount Field
+    discount: Joi.number().allow(null, ''),
+
     // For tableData, which comes as a JSON string
     tableData: jsonString.required() // <-- This is the fix
 });

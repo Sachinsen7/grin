@@ -16,7 +16,8 @@ const handler = {
             lrNo, lrDate, transName, vehicleNo,
             materialInfo, tableData,
             gstNo, cgst, sgst, companyName, address, mobileNo,
-            totalAmount, weightDifferenceNotes, weightDifferenceValue
+            totalAmount, weightDifferenceNotes, weightDifferenceValue,
+            discount
         } = req.body;
 
         const parsedTotalAmount = parseFloat(totalAmount) || 0;
@@ -55,7 +56,8 @@ const handler = {
             gstNo, cgst, sgst, companyName, address, mobileNo,
             totalAmount: parsedTotalAmount,
             weightDifferenceNotes: weightDifferenceNotes || '',
-            weightDifferenceValue: parseFloat(weightDifferenceValue) || 0
+            weightDifferenceValue: parseFloat(weightDifferenceValue) || 0,
+            discount: parseFloat(discount) || 0
         });
 
         await newInventory.save();

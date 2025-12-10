@@ -17,6 +17,10 @@ const tableDataSchema = new mongoose.Schema({
   price: {
     type: Number,
   },
+  discount: {
+    type: Number,
+    default: 0
+  },
   weightDifference: {
     type: Number,
     default: 0
@@ -119,6 +123,12 @@ const entrySchema = new mongoose.Schema({
   mobileNo: { type: String, required: false },
   // End Added Fields
   totalAmount: { type: Number, required: false }, // Added Total Amount field
+  // Discount Field
+  discount: {
+    type: Number,
+    required: false,
+    default: 0
+  },
   // Weight Difference Fields
   weightDifferenceNotes: {
     type: String,
