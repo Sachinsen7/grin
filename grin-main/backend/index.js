@@ -46,17 +46,27 @@ app.use('/gsnPhotos', express.static(path.join(__dirname, 'gsnPhotos')));
 app.use('/Entryfiles', express.static(path.join(__dirname, 'Entryfiles')));
 app.use('/Entryphotos', express.static(path.join(__dirname, 'Entryphotos')));
 
+// 7. Serve React build files
+app.use(express.static(path.join(__dirname, '../frontend/build')));
+
 // --- Routes ---
-// 7. Mount your main API router
+// 8. Mount your main API router
 app.use('/api', mainRouter); // All routes are now /api/v1/...
 
-// --- Error Handling (MUST be last) ---
-// 8. 404 Handler: Catch all routes that didn't match
-app.all('*', (req, res, next) => {
-    next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404, 'NOT_FOUND'));
+// 9. Serve React app for all non-API routes (client-side routing)
+app.get('*', (req, res) => {
+    // Don't serve index.html for API routes
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ error: 'API route not found' });
+    }
+    res.sendFile(path.join(__dirname, '../frontend/build/index.html'));
 });
 
-// 9. Global Error Handler: Catches all errors passed by next()
+// --- Error Handling (MUST be last) ---
+// 10. Global Error Handler: Catches all errors passed by next()
+app.use(errorHandler);
+
+// 10. Global Error Handler: Catches all errors passed by next()
 app.use(errorHandler);
 
 // --- Start Server ---
@@ -70,12 +80,12 @@ const mongooseOptions = {
     socketTimeoutMS: 45000,
 };
 
-// 10. Connect to DB first, then start server
+// 11. Connect to DB first, then start server
 mongoose.connect(MONGO_URL, mongooseOptions)
     .then(() => {
         logger.info('MongoDB Connected with connection pooling...');
 
-        // 11. Assign app.listen to a 'server' variable
+        // 12. Assign app.listen to a 'server' variable
         const server = app.listen(PORT, (err) => {
             if (err) {
                 logger.error('Server failed to start', err);
