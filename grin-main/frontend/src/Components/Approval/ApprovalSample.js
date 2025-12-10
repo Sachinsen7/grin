@@ -648,6 +648,7 @@ export default function Sample({ managerType }) {
                                                                                         <th>Quantity</th>
                                                                                         <th>Price / KG</th>
                                                                                         <th>Type</th>
+                                                                                        <th>Discount (%)</th>
                                                                                         <th>Total</th>
                                                                                         <th>Weight Diff (KG)</th>
                                                                                         <th>Weight Notes</th>
@@ -662,6 +663,7 @@ export default function Sample({ managerType }) {
                                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                             <td>{row.priceType || 'N/A'}</td>
+                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
                                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
                                                                                             <td style={{ backgroundColor: row.weightDifference ? 'rgba(255, 243, 205, 0.7)' : 'transparent', fontWeight: row.weightDifference ? 'bold' : 'normal' }}>
                                                                                                 {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : '-'}
@@ -866,6 +868,7 @@ export default function Sample({ managerType }) {
                                                                                         <th>Quantity</th>
                                                                                         <th>Price / KG</th>
                                                                                         <th>Type</th>
+                                                                                        <th>Discount (%)</th>
                                                                                         <th>Total</th>
                                                                                         <th>Weight Diff (KG)</th>
                                                                                         <th>Weight Notes</th>
@@ -880,6 +883,7 @@ export default function Sample({ managerType }) {
                                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                                             <td>{row.priceType || 'N/A'}</td>
+                                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
                                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
                                                                                         </tr>
                                                                                     ))}

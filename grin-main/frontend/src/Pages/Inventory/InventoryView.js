@@ -45,12 +45,22 @@ export default function InventoryView() {
                             partyName: entry.partyName || 'N/A',
                             gsn: entry.gsn || 'N/A',
                             grinNo: entry.grinNo || 'N/A',
-                            createdAt: entry.createdAt
+                            createdAt: entry.createdAt,
+                            // Ensure discount field is properly mapped
+                            discount: item.discount !== undefined ? item.discount : (entry.discount !== undefined ? entry.discount : 0),
+                            // Ensure weight fields are properly mapped
+                            weightDifference: item.weightDifference !== undefined ? item.weightDifference : (entry.weightDifferenceValue !== undefined ? entry.weightDifferenceValue : undefined),
+                            weightNotes: item.weightNotes || entry.weightDifferenceNotes || undefined
                         }));
                         return acc.concat(itemsWithParty);
                     }
                     return acc;
                 }, []);
+
+                // Debug: Log the first few items to check discount field
+                console.log('Combined data sample:', combinedData.slice(0, 3));
+                console.log('Raw API response sample:', data.slice(0, 2));
+
                 setAllTableData(combinedData);
             } catch (err) {
                 console.error('Inventory fetch error:', err);

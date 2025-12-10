@@ -816,7 +816,10 @@ export default function ViewForm({ managerType }) {
                                                                         <th>Quantity</th>
                                                                         <th>Price / KG</th>
                                                                         <th>Type</th>
+                                                                        <th>Discount (%)</th>
                                                                         <th>Total</th>
+                                                                        <th>Weight Diff (KG)</th>
+                                                                        <th>Weight Notes</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -828,7 +831,10 @@ export default function ViewForm({ managerType }) {
                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                             <td>{row.priceType || 'N/A'}</td>
+                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                            <td>{row.weightDifference !== undefined ? row.weightDifference : 'N/A'}</td>
+                                                                            <td>{row.weightNotes || 'N/A'}</td>
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>
@@ -1019,7 +1025,10 @@ export default function ViewForm({ managerType }) {
                                                                         <th>Quantity</th>
                                                                         <th>Price / KG</th>
                                                                         <th>Type</th>
+                                                                        <th>Discount (%)</th>
                                                                         <th>Total</th>
+                                                                        <th>Weight Diff (KG)</th>
+                                                                        <th>Weight Notes</th>
                                                                     </tr>
                                                                 </thead>
                                                                 <tbody>
@@ -1031,7 +1040,10 @@ export default function ViewForm({ managerType }) {
                                                                             <td>{row.quantityValue || 'N/A'}</td>
                                                                             <td>{row.priceValue !== undefined ? row.priceValue : 'N/A'}</td>
                                                                             <td>{row.priceType || 'N/A'}</td>
+                                                                            <td>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                            <td>{row.weightDifference !== undefined ? row.weightDifference : 'N/A'}</td>
+                                                                            <td>{row.weightNotes || 'N/A'}</td>
                                                                         </tr>
                                                                     ))}
                                                                 </tbody>

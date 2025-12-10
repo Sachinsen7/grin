@@ -63,10 +63,11 @@ const TableComponent = ({ tableData }) => {
                         <th style={{ width: '15%' }}>Description</th>
                         <th style={{ width: '7%' }}>Quantity No.</th>
                         <th style={{ width: '7%' }}>Quantity in Kgs.</th>
-                        <th style={{ width: '10%' }}>Price (₹)</th>
-                        <th style={{ width: '10%' }}>Total (₹)</th>
-                        <th style={{ width: '10%' }}>Weight Diff (KG)</th>
-                        <th style={{ width: '18%' }}>Weight Notes</th>
+                        <th style={{ width: '9%' }}>Price (₹)</th>
+                        <th style={{ width: '7%' }}>Discount (%)</th>
+                        <th style={{ width: '9%' }}>Total (₹)</th>
+                        <th style={{ width: '9%' }}>Weight Diff (KG)</th>
+                        <th style={{ width: '16%' }}>Weight Notes</th>
                     </tr>
                 </thead>
                 <tbody style={tbodyStyle}>
@@ -100,19 +101,20 @@ const TableComponent = ({ tableData }) => {
                                     <td style={{ width: '15%' }}>{row.description}</td>
                                     <td style={{ width: '7%' }}>{row.quantityNo}</td>
                                     <td style={{ width: '7%' }}>{row.quantityKg}</td>
-                                    <td style={{ width: '10%' }}>{row.price ? `₹${parseFloat(row.price).toFixed(2)}` : '-'}</td>
-                                    <td style={{ width: '10%', fontWeight: 'bold' }}>
+                                    <td style={{ width: '9%' }}>{row.price ? `₹${parseFloat(row.price).toFixed(2)}` : '-'}</td>
+                                    <td style={{ width: '7%' }}>{row.discount !== undefined ? `${row.discount}%` : '0%'}</td>
+                                    <td style={{ width: '9%', fontWeight: 'bold' }}>
                                         ₹{calculateTotal(row.quantityNo, row.price)}
                                     </td>
                                     <td style={{
-                                        width: '10%',
+                                        width: '9%',
                                         backgroundColor: row.weightDifference ? 'rgba(255, 243, 205, 0.5)' : 'transparent',
                                         fontWeight: row.weightDifference ? 'bold' : 'normal'
                                     }}>
                                         {row.weightDifference ? `${parseFloat(row.weightDifference).toFixed(2)} KG` : '-'}
                                     </td>
                                     <td style={{
-                                        width: '18%',
+                                        width: '16%',
                                         backgroundColor: row.weightNotes ? 'rgba(255, 243, 205, 0.5)' : 'transparent',
                                         fontSize: '13px',
                                         whiteSpace: 'pre-wrap'
@@ -122,7 +124,7 @@ const TableComponent = ({ tableData }) => {
                                 </tr>
                                 {expandedRows.has(index) && (
                                     <tr style={trStyle}>
-                                        <td colSpan="10" style={{
+                                        <td colSpan="11" style={{
                                             backgroundColor: 'rgba(200, 198, 206, 0.8)',
                                             padding: '10px',
                                             fontSize: '14px',
