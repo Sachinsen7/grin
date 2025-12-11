@@ -34,10 +34,13 @@ const TableComponent = ({ data, handleTableChange }) => {
                         <th style={{ width: '11%', border: 'none' }}>Item</th>
                         <th style={{ width: '14%', border: 'none' }}>Description</th>
                         <th style={{ width: '8%', border: 'none' }}>Quantity</th>
-                        <th style={{ width: '9%', border: 'none' }}>Price / KG</th>
+                        <th style={{ width: '9%', border: 'none' }}>Price / Piece</th>
                         <th style={{ width: '6%', border: 'none' }}>Type</th>
                         <th style={{ width: '7%', border: 'none' }}>Discount (%)</th>
                         <th style={{ width: '9%', border: 'none' }}>Total</th>
+                        <th style={{ width: '8%', border: 'none' }}>Received Weight</th>
+                        <th style={{ width: '8%', border: 'none' }}>Ordered Weight</th>
+                        <th style={{ width: '8%', border: 'none' }}>Billed Weight</th>
                         <th style={{ width: '11%', border: 'none' }}>Weight Diff (KG)</th>
                         <th style={{ width: '18%', border: 'none' }}>Weight Notes</th>
                     </tr>
@@ -136,7 +139,7 @@ const TableComponent = ({ data, handleTableChange }) => {
                                     onChange={(e) => handleTableChange(index, 'priceType', e.target.value)}
                                 >
                                     <option value="">Select Type</option>
-                                    <option value="price">Price</option>
+                                    <option value="piece">Piece</option>
                                     <option value="kg">KG</option>
                                 </select>
                             </td>
@@ -180,6 +183,66 @@ const TableComponent = ({ data, handleTableChange }) => {
                                     type="text"
                                     value={calculateRowTotal(row)}
                                     readOnly
+                                />
+                            </td>
+                            <td style={{ border: 'none' }}>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        backgroundColor: 'rgba(173, 216, 230, 0.7)',
+                                        borderRadius: '20px',
+                                        border: '1px solid #4CAF50',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        height: '40px',
+                                        minWidth: '90px',
+                                        textAlign: 'center'
+                                    }}
+                                    type="number"
+                                    step="0.01"
+                                    value={row.receivedWeight || ''}
+                                    onChange={(e) => handleTableChange(index, 'receivedWeight', e.target.value)}
+                                    placeholder="0.00"
+                                />
+                            </td>
+                            <td style={{ border: 'none' }}>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        backgroundColor: 'rgba(255, 182, 193, 0.7)',
+                                        borderRadius: '20px',
+                                        border: '1px solid #2196F3',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        height: '40px',
+                                        minWidth: '90px',
+                                        textAlign: 'center'
+                                    }}
+                                    type="number"
+                                    step="0.01"
+                                    value={row.orderedWeight || ''}
+                                    onChange={(e) => handleTableChange(index, 'orderedWeight', e.target.value)}
+                                    placeholder="0.00"
+                                />
+                            </td>
+                            <td style={{ border: 'none' }}>
+                                <input
+                                    style={{
+                                        width: "100%",
+                                        backgroundColor: 'rgba(221, 160, 221, 0.7)',
+                                        borderRadius: '20px',
+                                        border: '1px solid #9C27B0',
+                                        padding: '12px',
+                                        fontSize: '16px',
+                                        height: '40px',
+                                        minWidth: '90px',
+                                        textAlign: 'center'
+                                    }}
+                                    type="number"
+                                    step="0.01"
+                                    value={row.billedWeight || ''}
+                                    onChange={(e) => handleTableChange(index, 'billedWeight', e.target.value)}
+                                    placeholder="0.00"
                                 />
                             </td>
                             <td style={{ border: 'none' }}>

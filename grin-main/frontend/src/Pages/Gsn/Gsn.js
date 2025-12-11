@@ -63,6 +63,9 @@ export default function Gsn() {
             priceType: '',
             total: 0,
             discount: 0,
+            receivedWeight: '',
+            orderedWeight: '',
+            billedWeight: '',
             weightDifference: 0,
             weightNotes: ''
         }))
@@ -196,6 +199,9 @@ export default function Gsn() {
                 priceType: '',
                 total: 0,
                 discount: 0,
+                receivedWeight: '',
+                orderedWeight: '',
+                billedWeight: '',
                 weightDifference: 0,
                 weightNotes: ''
             }))
@@ -673,6 +679,132 @@ export default function Gsn() {
                                 </div>
 
                                 <div className={styles.formRow}>
+                                    <label className={styles.label}>Address:</label>
+                                    <textarea
+                                        className={styles.input}
+                                        style={{ marginLeft: '5px', minHeight: '60px', resize: 'vertical' }}
+                                        value={address}
+                                        onChange={(e) => setAddress(e.target.value)}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>GST No:</label>
+                                    <input
+                                        className={styles.input}
+                                        type="text"
+                                        style={{ marginLeft: '5px' }}
+                                        value={gstNo}
+                                        onChange={(e) => setGstNo(e.target.value)}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>Mobile No:</label>
+                                    <input
+                                        className={styles.input}
+                                        type="text"
+                                        style={{ marginLeft: '5px' }}
+                                        value={mobileNo}
+                                        onChange={(e) => setMobileNo(e.target.value)}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow} style={{ display: igst ? 'none' : 'flex' }}>
+                                    <label className={styles.label}>CGST:</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        style={{ marginLeft: '5px' }}
+                                        value={cgst}
+                                        onChange={(e) => {
+                                            setCgst(e.target.value);
+                                            if (e.target.value) setIgst(''); // Clear IGST when CGST is entered
+                                        }}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow} style={{ display: igst ? 'none' : 'flex' }}>
+                                    <label className={styles.label}>SGST:</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        style={{ marginLeft: '5px' }}
+                                        value={sgst}
+                                        onChange={(e) => {
+                                            setSgst(e.target.value);
+                                            if (e.target.value) setIgst(''); // Clear IGST when SGST is entered
+                                        }}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow} style={{ display: (cgst || sgst) ? 'none' : 'flex' }}>
+                                    <label className={styles.label}>IGST:</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        style={{ marginLeft: '5px' }}
+                                        value={igst}
+                                        onChange={(e) => {
+                                            setIgst(e.target.value);
+                                            if (e.target.value) {
+                                                setCgst(''); // Clear CGST when IGST is entered
+                                                setSgst(''); // Clear SGST when IGST is entered
+                                            }
+                                        }}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>Discount (%):</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        min="0"
+                                        max="100"
+                                        style={{ marginLeft: '5px' }}
+                                        value={discount}
+                                        onChange={(e) => setDiscount(parseFloat(e.target.value) || 0)}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>Weight Difference (KG):</label>
+                                    <input
+                                        className={styles.input}
+                                        type="number"
+                                        step="0.01"
+                                        style={{ marginLeft: '5px' }}
+                                        value={weightDifferenceValue}
+                                        onChange={(e) => setWeightDifferenceValue(parseFloat(e.target.value) || 0)}
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
+                                    <label className={styles.label}>Weight Difference Notes:</label>
+                                    <textarea
+                                        className={styles.input}
+                                        style={{ marginLeft: '5px', minHeight: '60px', resize: 'vertical' }}
+                                        value={weightDifferenceNotes}
+                                        onChange={(e) => setWeightDifferenceNotes(e.target.value)}
+                                        placeholder="Enter notes about weight variance..."
+                                    />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
+                                </div>
+
+                                <div className={styles.formRow}>
                                     <label className={styles.label}>Supplier Invoice No:</label>
                                     <input
                                         required
@@ -769,61 +901,6 @@ export default function Gsn() {
                                 </div>
                             </div>
 
-                            {/* Weight Difference Notes Section */}
-                            <div className={styles.form} style={{
-                                backgroundColor: 'rgba(255, 243, 205, 0.9)',
-                                border: '2px dashed #ff9800',
-                                marginTop: '20px',
-                                padding: '20px',
-                                borderRadius: '10px'
-                            }}>
-                                <div style={{
-                                    textAlign: 'center',
-                                    marginBottom: '15px',
-                                    fontSize: '18px',
-                                    fontWeight: 'bold',
-                                    color: '#ff6900'
-                                }}>
-                                    📝 Weight Difference Notes (Not part of item list)
-                                </div>
-
-                                <div className={styles.formRow}>
-                                    <label className={styles.label}>Weight Difference (₹):</label>
-                                    <input
-                                        className={styles.input}
-                                        type="number"
-                                        step="0.01"
-                                        value={weightDifferenceValue}
-                                        onChange={(e) => setWeightDifferenceValue(e.target.value)}
-                                        placeholder="Enter weight difference amount"
-                                    />
-                                </div>
-
-                                <div className={styles.formRow} style={{ flexDirection: 'column', alignItems: 'flex-start' }}>
-                                    <label className={styles.label} style={{ marginBottom: '10px' }}>
-                                        Notes/Remarks (Explain weight variance):
-                                    </label>
-                                    <textarea
-                                        className={styles.input}
-                                        value={weightDifferenceNotes}
-                                        onChange={(e) => setWeightDifferenceNotes(e.target.value)}
-                                        rows={4}
-                                        placeholder="Example: Supplier sent 6 tons but actual weight is 5 tons 850 kg. Difference of 150 kg due to weight variance in individual pieces (±30g per piece)."
-                                        style={{ width: '100%', resize: 'vertical' }}
-                                    />
-                                </div>
-
-                                <div style={{
-                                    fontSize: '14px',
-                                    color: '#666',
-                                    marginTop: '10px',
-                                    fontStyle: 'italic',
-                                    textAlign: 'center'
-                                }}>
-                                    💡 This value will be added to the material total for final calculation
-                                </div>
-                            </div>
-
                             <div className={style.form} style={{ backgroundColor: "rgba(218, 216, 224, 0.6)" }}>
                                 <div className={style.formRow}>
                                     <label className={style.label}>Upload Bill (Optional):</label>
@@ -844,75 +921,6 @@ export default function Gsn() {
                             </div>
 
                             <div className={styles.form}>
-                                <div className={styles.formRow} style={{ position: "relative" }}>
-                                    <label className={styles.label}>Supplier Name:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="text"
-                                        value={companyName}
-                                        onChange={(e) => setCompanyName(e.target.value)}
-                                        onFocus={handleCompanyFocus}
-                                        onBlur={handleCompanyBlur}
-                                    />
-                                    <div
-                                        className='companyPopUp'
-                                        ref={companyPopupRef}
-                                        style={{
-                                            display: isCompanyPopupVisible && filteredCompanies.length > 0 ? 'block' : 'none',
-                                            position: 'absolute',
-                                            zIndex: '1000',
-                                            top: '100%',
-                                            left: '0',
-                                            width: 'calc(100% - 2px)',
-                                            border: '1px solid rgba(0, 0, 0, 0.1)',
-                                            backgroundColor: '#ffffff',
-                                            boxShadow: '0px 4px 12px rgba(0, 0, 0, 0.1)',
-                                            borderRadius: '8px',
-                                            padding: '10px',
-                                            maxHeight: '200px',
-                                            overflowY: 'auto'
-                                        }}
-                                    >
-                                        <ul style={{ listStyle: 'none', margin: 0, padding: 0 }}>
-                                            {filteredCompanies.map((compData) => (
-                                                <li key={compData._id}
-                                                    onClick={() => handleSelectCompany(compData)}
-                                                    style={{ cursor: "pointer", padding: "8px 5px", borderBottom: "1px solid #eee" }}
-                                                    onMouseDown={(e) => e.preventDefault()}
-                                                >
-                                                    {compData.companyName}
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </div>
-                                </div>
-                                <div className={styles.formRow}>
-                                    <label className={styles.label}>Address:</label>
-                                    <textarea
-                                        className={styles.input}
-                                        value={address}
-                                        onChange={(e) => setAddress(e.target.value)}
-                                        rows={3}
-                                    />
-                                </div>
-                                <div className={styles.formRow}>
-                                    <label className={styles.label}>GST No:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="text"
-                                        value={gstNo}
-                                        onChange={(e) => setGstNo(e.target.value)}
-                                    />
-                                </div>
-                                <div className={styles.formRow}>
-                                    <label className={styles.label}>Mobile No:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="tel"
-                                        value={mobileNo}
-                                        onChange={(e) => setMobileNo(e.target.value)}
-                                    />
-                                </div>
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>Subtotal (After Item Discounts):</label>
                                     <input
@@ -922,49 +930,9 @@ export default function Gsn() {
                                         readOnly
                                         style={{ fontWeight: 'bold', backgroundColor: 'rgba(218, 216, 224, 0.6)' }}
                                     />
+                                    <input type="text" className={`${styles.dateInput} ${styles.dummy}`} style={{ visibility: "hidden" }} />
                                 </div>
-                                <div className={styles.formRow} style={{ display: igst ? 'none' : 'flex' }}>
-                                    <label className={styles.label}>CGST:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="number"
-                                        step="0.01"
-                                        value={cgst}
-                                        onChange={(e) => {
-                                            setCgst(e.target.value);
-                                            if (e.target.value) setIgst(''); // Clear IGST when CGST is entered
-                                        }}
-                                    />
-                                </div>
-                                <div className={styles.formRow} style={{ display: igst ? 'none' : 'flex' }}>
-                                    <label className={styles.label}>SGST:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="number"
-                                        step="0.01"
-                                        value={sgst}
-                                        onChange={(e) => {
-                                            setSgst(e.target.value);
-                                            if (e.target.value) setIgst(''); // Clear IGST when SGST is entered
-                                        }}
-                                    />
-                                </div>
-                                <div className={styles.formRow} style={{ display: (cgst || sgst) ? 'none' : 'flex' }}>
-                                    <label className={styles.label}>IGST:</label>
-                                    <input
-                                        className={styles.input}
-                                        type="number"
-                                        step="0.01"
-                                        value={igst}
-                                        onChange={(e) => {
-                                            setIgst(e.target.value);
-                                            if (e.target.value) {
-                                                setCgst(''); // Clear CGST when IGST is entered
-                                                setSgst(''); // Clear SGST when IGST is entered
-                                            }
-                                        }}
-                                    />
-                                </div>
+
                                 <div className={styles.formRow}>
                                     <label className={styles.label}>GST Tax:</label>
                                     <input
