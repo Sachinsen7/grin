@@ -833,6 +833,9 @@ export default function ViewForm({ managerType }) {
                                                                             <td>{row.priceType || 'N/A'}</td>
                                                                             <td>{row.discount !== undefined ? `${row.discount}%` : (gsnDoc.discount !== undefined ? `${gsnDoc.discount}%` : '0%')}</td>
                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                            <td>{row.receivedWeight || 'N/A'}</td>
+                                                                            <td>{row.orderedWeight || 'N/A'}</td>
+                                                                            <td>{row.billedWeight || 'N/A'}</td>
                                                                             <td>{row.weightDifference !== undefined ? row.weightDifference : (gsnDoc.weightDifferenceValue !== undefined ? gsnDoc.weightDifferenceValue : 'N/A')}</td>
                                                                             <td>{row.weightNotes || gsnDoc.weightDifferenceNotes || 'N/A'}</td>
                                                                         </tr>
@@ -1023,10 +1026,13 @@ export default function ViewForm({ managerType }) {
                                                                         <th>Item</th>
                                                                         <th>Description</th>
                                                                         <th>Quantity</th>
-                                                                        <th>Price / KG</th>
+                                                                        <th>Price / Piece</th>
                                                                         <th>Type</th>
                                                                         <th>Discount (%)</th>
                                                                         <th>Total</th>
+                                                                        <th>Received Weight</th>
+                                                                        <th>Ordered Weight</th>
+                                                                        <th>Billed Weight</th>
                                                                         <th>Weight Diff (KG)</th>
                                                                         <th>Weight Notes</th>
                                                                     </tr>
@@ -1042,6 +1048,9 @@ export default function ViewForm({ managerType }) {
                                                                             <td>{row.priceType || 'N/A'}</td>
                                                                             <td>{row.discount !== undefined ? `${row.discount}%` : (grnDoc.discount !== undefined ? `${grnDoc.discount}%` : '0%')}</td>
                                                                             <td>{row.total !== undefined ? row.total : ((parseFloat(row.quantityValue) || 0) * (parseFloat(row.priceValue) || 0)).toFixed(2)}</td>
+                                                                            <td>{row.receivedWeight || 'N/A'}</td>
+                                                                            <td>{row.orderedWeight || 'N/A'}</td>
+                                                                            <td>{row.billedWeight || 'N/A'}</td>
                                                                             <td>{row.weightDifference !== undefined ? row.weightDifference : (grnDoc.weightDifferenceValue !== undefined ? grnDoc.weightDifferenceValue : 'N/A')}</td>
                                                                             <td>{row.weightNotes || grnDoc.weightDifferenceNotes || 'N/A'}</td>
                                                                         </tr>
